@@ -62,12 +62,15 @@ export function PnlChart({ strategy }: Props) {
             fontSize: 12,
             color: '#e2e8f0',
           }}
-          formatter={(value: number) => [
-            <span style={{ color: value >= 0 ? '#10b981' : '#ef4444' }}>
-              {value >= 0 ? '+' : ''}${value.toFixed(2)}
-            </span>,
-            'P&L',
-          ]}
+          formatter={(value) => {
+            const v = typeof value === 'number' ? value : 0;
+            return [
+              <span style={{ color: v >= 0 ? '#10b981' : '#ef4444' }}>
+                {v >= 0 ? '+' : ''}${v.toFixed(2)}
+              </span>,
+              'P&L',
+            ];
+          }}
           labelFormatter={(label) => `Stock price: $${label}`}
         />
         <ReferenceLine y={0} stroke="#3b4060" strokeWidth={1.5} />
