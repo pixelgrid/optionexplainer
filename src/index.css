@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0f1117;
+  --bg-card: #1a1d27;
+  --bg-card-hover: #1f2335;
+  --border: #2a2d3e;
+  --text: #94a3b8;
+  --text-h: #e2e8f0;
+  --text-muted: #64748b;
+  --accent: #6366f1;
+  --accent-light: #818cf8;
+  --profit: #10b981;
+  --loss: #ef4444;
+  --neutral: #f59e0b;
+  --bullish: #10b981;
+  --bearish: #ef4444;
+  --volatile: #8b5cf6;
+  --neutral-strat: #3b82f6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
