@@ -11,6 +11,12 @@ import { Earnings } from './pages/Earnings';
 import { Wheel } from './pages/Wheel';
 import { RiskManagement } from './pages/RiskManagement';
 import { Mistakes } from './pages/Mistakes';
+import { VRP } from './pages/VRP';
+import { DTE45 } from './pages/DTE45';
+import { VIXRegime } from './pages/VIXRegime';
+import { Dispersion } from './pages/Dispersion';
+import { GammaScalping } from './pages/GammaScalping';
+import { PutWrite } from './pages/PutWrite';
 
 export default function App() {
   return (
@@ -28,6 +34,12 @@ export default function App() {
         <Route path="/wheel" element={<Wheel />} />
         <Route path="/risk" element={<RiskManagement />} />
         <Route path="/mistakes" element={<Mistakes />} />
+        <Route path="/vrp" element={<VRP />} />
+        <Route path="/dte45" element={<DTE45 />} />
+        <Route path="/vix-regime" element={<VIXRegime />} />
+        <Route path="/dispersion" element={<Dispersion />} />
+        <Route path="/gamma-scalping" element={<GammaScalping />} />
+        <Route path="/put-write" element={<PutWrite />} />
       </Routes>
     </BrowserRouter>
   );

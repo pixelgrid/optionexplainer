@@ -16,6 +16,15 @@ const guidesLinks = [
   { to: '/mistakes', label: 'Common Mistakes' },
 ];
 
+const advancedLinks = [
+  { to: '/vrp', label: 'Volatility Risk Premium' },
+  { to: '/dte45', label: '45/21 DTE System' },
+  { to: '/vix-regime', label: 'VIX Regime Trading' },
+  { to: '/dispersion', label: 'Dispersion Trading' },
+  { to: '/gamma-scalping', label: 'Gamma Scalping' },
+  { to: '/put-write', label: 'Systematic Put-Write' },
+];
+
 function Dropdown({
   label,
   links,
@@ -145,6 +154,7 @@ export function Nav() {
         <NavLink to="/glossary" style={linkStyle}>Glossary</NavLink>
         <Dropdown label="Concepts" links={conceptsLinks} />
         <Dropdown label="Guides" links={guidesLinks} />
+        <Dropdown label="Advanced" links={advancedLinks} />
       </div>
     </nav>
   );
