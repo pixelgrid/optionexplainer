@@ -91,7 +91,7 @@ export function Pricing() {
   }, [S, r, sigma]);
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-wrap">
       <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
         How Options Are Priced
       </h1>
@@ -102,7 +102,7 @@ export function Pricing() {
       {/* 5 Inputs */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="The 5 Inputs" color="#6366f1" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="g-2" style={{ gap: 16 }}>
           <InputCard
             symbol="S" label="Stock Price" min={50} max={150} value={S} onChange={setS}
             format={(v) => `$${v}`}
@@ -193,7 +193,7 @@ export function Pricing() {
           <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
             This is the most common beginner frustration. There are two culprits:
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div className="g-2" style={{ gap: 16, marginBottom: 16 }}>
             <div style={{ padding: '14px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #ef4444' }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#ef4444', marginBottom: 6 }}>IV Crush</div>
               <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>

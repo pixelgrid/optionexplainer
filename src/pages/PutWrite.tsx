@@ -96,8 +96,8 @@ const riskMetrics = [
 
 export function PutWrite() {
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+    <div className="page-wrap">
+      <div className="badge-row">
         <div style={{ padding: '4px 10px', background: '#10b98115', border: '1px solid #10b98130', borderRadius: 6, fontSize: 11, fontWeight: 600, color: '#10b981', letterSpacing: '0.05em' }}>
           CBOE BENCHMARK
         </div>
@@ -113,7 +113,7 @@ export function PutWrite() {
       </p>
 
       {/* Key Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 40 }}>
+      <div className="g-4" style={{ gap: 16, marginBottom: 40 }}>
         {[
           { label: 'PUT Sharpe Ratio', value: '0.65', sub: 'vs 0.49 for S&P (1986–2018)', color: '#10b981' },
           { label: 'Annualized Return', value: '10.8%', sub: 'PUT vs 10.2% S&P', color: '#6366f1' },
@@ -176,7 +176,7 @@ export function PutWrite() {
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Risk-Adjusted Performance Metrics (1986–2018)" color="#f59e0b" />
         <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-wrap">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: '#0f1117' }}>
@@ -206,7 +206,7 @@ export function PutWrite() {
       {/* Implementation */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="How to Implement a Put-Write Program" color="#06b6d4" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="g-2" style={{ gap: 16 }}>
           {[
             {
               title: 'Classic PUT Replication',
@@ -269,7 +269,7 @@ export function PutWrite() {
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Why Does Put-Write Outperform on a Risk-Adjusted Basis?" color="#8b5cf6" />
         <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+          <div className="g-3" style={{ gap: 12 }}>
             {[
               {
                 reason: 'Variance Risk Premium',
@@ -300,7 +300,7 @@ export function PutWrite() {
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Known Failure Modes" color="#ef4444" />
         <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="g-2" style={{ gap: 12 }}>
             {[
               {
                 title: 'Crash & Recovery Lag',

@@ -77,7 +77,7 @@ const combinedData = vrpHarvestData.map((d, i) => ({ ...d, sp500: sp500Data[i].v
 
 export function VRP() {
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-wrap">
       {/* Hero */}
       <div style={{ marginBottom: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
@@ -96,7 +96,7 @@ export function VRP() {
       </div>
 
       {/* Key stats row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, margin: '28px 0' }}>
+      <div className="g-4" style={{ gap: 12, margin: '28px 0' }}>
         {[
           { value: '19.3%', label: 'Avg S&P 500 IV (1990–2018)', color: '#ef4444' },
           { value: '15.1%', label: 'Avg S&P 500 Realized Vol', color: '#10b981' },
@@ -156,7 +156,7 @@ export function VRP() {
           returned −23 basis points per day</strong>. The option seller earned +23 bps/day in pure volatility premium.
         </p>
         <div style={{ padding: '12px 16px', background: '#ef444410', border: '1px solid #ef444440', borderRadius: 8, marginBottom: 16 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+          <div className="g-3" style={{ gap: 16 }}>
             {[
               { label: 'ATM Call (long)', value: '−23 bps/day', color: '#ef4444' },
               { label: 'ATM Put (long)', value: '−30 bps/day', color: '#ef4444' },
@@ -198,7 +198,7 @@ export function VRP() {
           </AreaChart>
         </ResponsiveContainer>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 16 }}>
+      <div className="g-2" style={{ gap: 12, marginTop: 16 }}>
         {[
           { label: 'PUT Index (1986–2018)', items: [['CAGR', '9.54%'], ['Volatility', '9.95%'], ['Sharpe Ratio', '0.65'], ['Beta', '0.56']], color: '#f59e0b' },
           { label: 'S&P 500 (same period)', items: [['CAGR', '9.80%'], ['Volatility', '14.93%'], ['Sharpe Ratio', '0.49'], ['Beta', '1.00']], color: '#6366f1' },
@@ -226,7 +226,7 @@ export function VRP() {
       />
 
       <SectionHeader title="The Variance Risk Premium: Academic Foundation" color="#3b82f6" />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+      <div className="g-2" style={{ gap: 12 }}>
         {[
           {
             authors: 'Bollerslev, Tauchen & Zhou (2009)',
@@ -250,7 +250,7 @@ export function VRP() {
       </div>
 
       <SectionHeader title="How to Harvest the VRP — Practically" color="#10b981" />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+      <div className="g-3" style={{ gap: 12 }}>
         {[
           {
             step: '1',

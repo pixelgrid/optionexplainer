@@ -83,8 +83,8 @@ export function DTE45() {
   const thetaAccelData = useMemo(() => thetaProfile, []);
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+    <div className="page-wrap">
+      <div className="badge-row">
         <div style={{ padding: '4px 10px', background: '#6366f115', border: '1px solid #6366f130', borderRadius: 6, fontSize: 11, fontWeight: 600, color: '#6366f1', letterSpacing: '0.05em' }}>
           RESEARCH-BACKED
         </div>
@@ -100,7 +100,7 @@ export function DTE45() {
       </p>
 
       {/* Key Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 40 }}>
+      <div className="g-4" style={{ gap: 16, marginBottom: 40 }}>
         {[
           { label: 'Win Rate @ 45 DTE Entry', value: '83%', sub: 'short strangles, 16δ', color: '#10b981' },
           { label: '50% Profit Hit Rate', value: '74%', sub: 'of winning trades', color: '#6366f1' },
@@ -122,7 +122,7 @@ export function DTE45() {
           <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
             The theoretical option pricing model predicts theta accelerates as expiration approaches — but the <em>rate</em> of acceleration matters most. At 45 DTE, an ATM option enters the phase where theta-per-dollar-at-risk begins to maximize. Entering here gives you the best combination of:
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+          <div className="g-3" style={{ gap: 12 }}>
             {[
               { icon: '⚡', title: 'Fast decay window', desc: 'You capture the steepest part of the theta curve — from 45 DTE down to 21 DTE roughly 50% of total extrinsic value decays.' },
               { icon: '🎯', title: 'Liquidity & strikes', desc: 'The 30–60 DTE range has the deepest open interest and tightest bid-ask spreads on SPX, QQQ, and most liquid ETFs.' },
@@ -213,7 +213,7 @@ export function DTE45() {
           <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
             tastytrade's 2014–2018 study of short premium trades found that taking profits at 50% of max profit significantly improved risk-adjusted returns compared to holding to expiration or other targets:
           </p>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-wrap">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: '#0f1117' }}>
@@ -250,7 +250,7 @@ export function DTE45() {
       {/* Implementation */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Implementation Blueprint" color="#f59e0b" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="g-2" style={{ gap: 16 }}>
           {[
             {
               step: '1', title: 'Choose Your Underlying',
@@ -312,7 +312,7 @@ export function DTE45() {
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="When It Fails — Known Risk Factors" color="#ef4444" />
         <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="g-2" style={{ gap: 12 }}>
             {[
               { title: 'Gap events', desc: 'A single overnight gap (earnings leak, Fed surprise, geopolitical shock) can blow through a 16-delta strike instantly, causing 3–5× max loss.' },
               { title: 'Trending markets', desc: 'In a sustained directional trend (2022 bear), one side of the strangle is constantly threatened. Repeated rolling increases net credit but also net exposure.' },

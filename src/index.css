@@ -34,3 +34,63 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* ── Responsive grid utilities ─────────────────────────────── */
+.g-2 { display: grid; grid-template-columns: 1fr 1fr; }
+.g-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+.g-4 { display: grid; grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 767px) {
+  .g-3 { grid-template-columns: 1fr; }
+  .g-4 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 599px) {
+  .g-2 { grid-template-columns: 1fr; }
+}
+
+/* ── Page wrapper: tighter padding on small screens ──────── */
+.page-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+@media (max-width: 599px) {
+  .page-wrap { padding: 20px 14px; }
+}
+
+/* ── Badge row: wraps on mobile ──────────────────────────── */
+.badge-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+/* ── Horizontal scroll for data tables ───────────────────── */
+.tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ── Stats grid: always 2-col on the smallest screens ───── */
+@media (max-width: 399px) {
+  .g-4 { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Responsive h1 + body text inside page wrappers ─────── */
+.page-wrap h1 {
+  font-size: clamp(22px, 6vw, 32px);
+}
+@media (max-width: 599px) {
+  .page-wrap > p:first-of-type,
+  .page-wrap > section:first-of-type p {
+    font-size: 14px;
+  }
+}
+
+/* ── Nav: desktop vs mobile visibility ───────────────────── */
+@media (max-width: 767px) {
+  .desktop-nav { display: none !important; }
+  .hamburger   { display: flex !important; }
+}
+@media (min-width: 768px) {
+  .hamburger { display: none !important; }
+}

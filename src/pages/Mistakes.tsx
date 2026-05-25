@@ -82,7 +82,7 @@ const mistakes: Mistake[] = [
 
 export function Mistakes() {
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-wrap">
       <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
         Common Mistakes
       </h1>
@@ -99,7 +99,7 @@ export function Mistakes() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+      <div className="g-2" style={{ gap: 20 }}>
         {mistakes.map((m) => {
           const borderColor = m.severity === 'high' ? '#ef4444' : '#f59e0b';
           const bgColor = m.severity === 'high' ? '#ef444408' : '#f59e0b08';

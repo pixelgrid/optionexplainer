@@ -22,7 +22,7 @@ export function Strategies() {
     : strategies.filter((s) => s.category === active);
 
   return (
-    <div style={{ maxWidth: 1280, margin: '0 auto', padding: '32px 24px' }}>
+    <div style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(20px, 4vw, 32px) clamp(14px, 3vw, 24px)' }}>
       {/* Hero */}
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>

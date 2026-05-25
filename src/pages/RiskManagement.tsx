@@ -73,7 +73,7 @@ export function RiskManagement() {
   }, [portfolioSize, riskPct, strategyType]);
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-wrap">
       <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
         Risk Management
       </h1>
@@ -109,7 +109,7 @@ export function RiskManagement() {
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="Position Sizing Calculator" color="#10b981" />
         <Card>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+          <div className="g-2" style={{ gap: 20, marginBottom: 20 }}>
             <div>
               <label style={{ fontSize: 13, color: '#94a3b8', display: 'block', marginBottom: 8 }}>
                 Portfolio Size
@@ -174,7 +174,7 @@ export function RiskManagement() {
 
           {/* Results */}
           <div style={{ background: '#0f1117', borderRadius: 8, padding: '16px 20px', border: '1px solid #2a2d3e' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 12 }}>
+            <div className="g-3" style={{ gap: 16, marginBottom: 12 }}>
               <div>
                 <div style={{ fontSize: 11, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Max Dollar Risk</div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: riskPct > 2 ? '#ef4444' : '#10b981', fontFamily: 'monospace' }}>
@@ -254,7 +254,7 @@ export function RiskManagement() {
       {/* Section 5: Correlation */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="Correlation &amp; Portfolio Risk" color="#ef4444" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="g-2" style={{ gap: 16 }}>
           <Card style={{ borderLeft: '3px solid #ef4444' }}>
             <div style={{ fontSize: 14, fontWeight: 600, color: '#ef4444', marginBottom: 8 }}>The Illusion of Diversification</div>
             <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.65 }}>

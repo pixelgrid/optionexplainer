@@ -68,8 +68,8 @@ const spikeStrategyData = [
 
 export function VIXRegime() {
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+    <div className="page-wrap">
+      <div className="badge-row">
         <div style={{ padding: '4px 10px', background: '#ef444415', border: '1px solid #ef444430', borderRadius: 6, fontSize: 11, fontWeight: 600, color: '#ef4444', letterSpacing: '0.05em' }}>
           VOLATILITY TIMING
         </div>
@@ -85,7 +85,7 @@ export function VIXRegime() {
       </p>
 
       {/* Key Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 40 }}>
+      <div className="g-4" style={{ gap: 16, marginBottom: 40 }}>
         {[
           { label: 'Prob VIX lower in 10d', value: '78.4%', sub: 'when VIX > 30', color: '#10b981' },
           { label: 'VIX Long-Run Mean', value: '~19.5', sub: '1990–2023 avg', color: '#6366f1' },
@@ -150,7 +150,7 @@ export function VIXRegime() {
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="SPX 30-Day Forward Returns by VIX Regime" color="#10b981" />
         <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-wrap">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: '#0f1117' }}>
@@ -181,7 +181,7 @@ export function VIXRegime() {
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Strategy Performance Comparison" color="#f59e0b" />
         <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-wrap">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: '#0f1117' }}>
@@ -211,7 +211,7 @@ export function VIXRegime() {
       {/* Regime Playbooks */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Regime Playbooks" color="#06b6d4" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+        <div className="g-3" style={{ gap: 16 }}>
           {[
             {
               regime: 'VIX < 20 (Complacency)',
@@ -272,7 +272,7 @@ export function VIXRegime() {
           <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
             The shape of the VIX futures curve (VIX vs VX futures) contains independent information about the risk environment:
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div className="g-2" style={{ gap: 16 }}>
             <div style={{ padding: '14px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #10b981' }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#10b981', marginBottom: 8 }}>Contango (VX &gt; Spot VIX)</div>
               <p style={{ margin: 0, fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>

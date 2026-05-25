@@ -82,8 +82,8 @@ const deltaProfile = Array.from({ length: 61 }, (_, i) => {
 
 export function GammaScalping() {
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+    <div className="page-wrap">
+      <div className="badge-row">
         <div style={{ padding: '4px 10px', background: '#f59e0b15', border: '1px solid #f59e0b30', borderRadius: 6, fontSize: 11, fontWeight: 600, color: '#f59e0b', letterSpacing: '0.05em' }}>
           MARKET NEUTRAL
         </div>
@@ -99,7 +99,7 @@ export function GammaScalping() {
       </p>
 
       {/* Key Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 40 }}>
+      <div className="g-4" style={{ gap: 16, marginBottom: 40 }}>
         {[
           { label: 'Sharpe (Systematic)', value: '~1.0', sub: 'Israelov & Nielsen (AQR)', color: '#f59e0b' },
           { label: 'Break-even RV>IV', value: 'Need RV ≥ IV', sub: 'to cover theta cost', color: '#6366f1' },
@@ -121,7 +121,7 @@ export function GammaScalping() {
           <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
             Every long options position has two competing forces:
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+          <div className="g-2" style={{ gap: 16, marginBottom: 16 }}>
             <div style={{ padding: '14px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #10b981' }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#10b981', marginBottom: 8 }}>Gamma P&L (positive)</div>
               <div style={{ fontFamily: 'monospace', fontSize: 13, color: '#e2e8f0', marginBottom: 8 }}>
@@ -197,7 +197,7 @@ export function GammaScalping() {
           <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
             How often you rehedge is a key decision. More frequent hedging captures gamma more precisely but incurs more transaction costs (bid-ask spread × shares hedged):
           </p>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-wrap">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: '#0f1117' }}>
@@ -254,7 +254,7 @@ export function GammaScalping() {
           <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
             Israelov & Nielsen (2015) decomposed the PUT index return into its component parts, finding that the return to systematic short volatility is <em>not</em> primarily from directional equity beta, but from a distinct volatility risk premium:
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+          <div className="g-3" style={{ gap: 12 }}>
             {[
               { component: 'Equity Beta Component', return: '+4.1%/yr', sharpe: '0.28', color: '#6366f1', desc: 'Passive long exposure to equity returns. This is why short vol loses badly in crashes.' },
               { component: 'Volatility Risk Premium', return: '+6.3%/yr', sharpe: '0.97', color: '#10b981', desc: 'Pure premium collected from IV > RV. The systematic edge — isolated via delta hedging.' },

@@ -105,7 +105,7 @@ export function OptionsChain() {
   const fmt = (v: number, decimals = 2) => v.toFixed(decimals);
 
   return (
-    <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-wrap" style={{ maxWidth: 1100 }}>
       {/* Tooltip */}
       {tooltip.visible && tooltip.text && (
         <div style={{
@@ -136,16 +136,16 @@ export function OptionsChain() {
       </p>
 
       {/* Stock info bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 20, padding: '12px 20px', background: '#1a1d27', borderRadius: 10, border: '1px solid #2a2d3e' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginBottom: 20, padding: '12px 20px', background: '#1a1d27', borderRadius: 10, border: '1px solid #2a2d3e' }}>
         <div>
           <span style={{ fontSize: 18, fontWeight: 700, color: '#e2e8f0' }}>XYZ</span>
           <span style={{ fontSize: 14, color: '#64748b', marginLeft: 8 }}>@ $100.00</span>
         </div>
-        <div style={{ width: 1, height: 24, background: '#2a2d3e' }} />
+        <div style={{ width: 1, height: 24, background: '#2a2d3e', flexShrink: 0 }} />
         <div style={{ fontSize: 13, color: '#64748b' }}>Expiry: <span style={{ color: '#e2e8f0', fontWeight: 500 }}>Jun 20</span></div>
         <div style={{ fontSize: 13, color: '#64748b' }}>DTE: <span style={{ color: '#e2e8f0', fontWeight: 500 }}>21</span></div>
         <div style={{ fontSize: 13, color: '#64748b' }}>IV: <span style={{ color: '#f59e0b', fontWeight: 500 }}>26%</span></div>
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 12, fontSize: 12 }}>
+        <div style={{ display: 'flex', gap: 8, fontSize: 12, flexWrap: 'wrap' }}>
           <span style={{ padding: '3px 8px', background: '#10b98118', borderRadius: 4, color: '#10b981' }}>ITM Call</span>
           <span style={{ padding: '3px 8px', background: '#6366f118', borderRadius: 4, color: '#6366f1' }}>ATM</span>
           <span style={{ padding: '3px 8px', background: '#ef444418', borderRadius: 4, color: '#ef4444' }}>ITM Put</span>
@@ -235,7 +235,7 @@ export function OptionsChain() {
       {/* Key things to look for */}
       <section>
         <SectionHeader title="Key Things to Look For" color="#6366f1" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="g-2" style={{ gap: 16 }}>
           {[
             {
               title: 'Bid-Ask Spread Quality',

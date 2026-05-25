@@ -295,7 +295,7 @@ const tags = [
 
 export function Glossary() {
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-wrap">
       {/* Hero */}
       <div style={{ marginBottom: 40 }}>
         <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>

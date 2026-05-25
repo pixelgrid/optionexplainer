@@ -111,7 +111,7 @@ export function Greeks() {
   }, [T, sigma]);
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-wrap">
       <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
         The Greeks
       </h1>
@@ -132,7 +132,7 @@ export function Greeks() {
       </div>
 
       {/* Stat cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 48 }}>
+      <div className="g-4" style={{ gap: 16, marginBottom: 48 }}>
         <StatCard label="Delta (Call)" value={current.delta_call.toFixed(3)} sub="$change per $1 stock move" color="#10b981" />
         <StatCard label="Gamma" value={current.gamma.toFixed(4)} sub="Delta change per $1 move" color="#f59e0b" />
         <StatCard label="Theta (Call)" value={`$${current.theta_call.toFixed(3)}`} sub="Value lost per day" color="#ef4444" />

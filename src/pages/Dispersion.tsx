@@ -72,8 +72,8 @@ const monthlyPnl = [
 
 export function Dispersion() {
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+    <div className="page-wrap">
+      <div className="badge-row">
         <div style={{ padding: '4px 10px', background: '#06b6d415', border: '1px solid #06b6d430', borderRadius: 6, fontSize: 11, fontWeight: 600, color: '#06b6d4', letterSpacing: '0.05em' }}>
           INSTITUTIONAL GRADE
         </div>
@@ -89,7 +89,7 @@ export function Dispersion() {
       </p>
 
       {/* Key Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 40 }}>
+      <div className="g-4" style={{ gap: 16, marginBottom: 40 }}>
         {[
           { label: 'Correlation Premium', value: '5–9%', sub: 'per month (Driessen 2009)', color: '#06b6d4' },
           { label: 'Sharpe Ratio (pre-2000)', value: '1.2', sub: 'Deng (2008)', color: '#10b981' },
@@ -119,7 +119,7 @@ export function Dispersion() {
               If realized correlation ρ is lower than implied by index IV, selling index vol and buying stock vol will profit.
             </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div className="g-2" style={{ gap: 16 }}>
             <div style={{ padding: '14px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #10b981' }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#10b981', marginBottom: 8 }}>Sell Side</div>
               <p style={{ margin: 0, fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>
@@ -162,7 +162,7 @@ export function Dispersion() {
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Implied vs Realized Correlation: Historical Premium" color="#10b981" />
         <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
-          <div style={{ overflowX: 'auto' }}>
+          <div className="tbl-wrap">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: '#0f1117' }}>
@@ -222,7 +222,7 @@ export function Dispersion() {
           <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
             Institutional dispersion involves 50+ single-stock positions and sophisticated correlation swaps. A simplified version accessible to retail traders:
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div className="g-2" style={{ gap: 16 }}>
             {[
               {
                 step: 'Step 1: Short Index Vol',

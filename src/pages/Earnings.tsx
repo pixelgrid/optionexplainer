@@ -70,7 +70,7 @@ export function Earnings() {
   }, []);
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-wrap">
       <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
         Earnings Playbook
       </h1>
@@ -108,7 +108,7 @@ export function Earnings() {
           The "implied move" is the market's expected 1-standard-deviation price range for an earnings event. Formula: <code style={{ background: '#0f1117', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: '#e2e8f0' }}>±Move ≈ IV × √(DTE/365) × Stock Price</code>. This tells you how much the market is pricing in for the event. If the actual move exceeds the implied move, long straddle buyers profit; if it falls short, they lose.
         </p>
         <Card>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+          <div className="g-2" style={{ gap: 20, marginBottom: 20 }}>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                 <span style={{ fontSize: 13, color: '#94a3b8' }}>IV %</span>
@@ -124,7 +124,7 @@ export function Earnings() {
               <input type="range" min={1} max={30} value={dteInput} onChange={(e) => setDteInput(Number(e.target.value))} style={{ width: '100%', accentColor: '#6366f1' }} />
             </div>
           </div>
-          <div style={{ background: '#0f1117', borderRadius: 8, padding: '16px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+          <div className="g-3" style={{ background: '#0f1117', borderRadius: 8, padding: '16px 20px', gap: 16 }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 11, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Stock Price</div>
               <div style={{ fontSize: 20, fontWeight: 700, color: '#94a3b8', fontFamily: 'monospace' }}>$100</div>
@@ -195,7 +195,7 @@ export function Earnings() {
         <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
           This is the most important thing to understand about earnings trading. Let's walk through the numbers step by step.
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+        <div className="g-2" style={{ gap: 16, marginBottom: 20 }}>
           <Card style={{ borderTop: '3px solid #6366f1' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#6366f1', marginBottom: 12 }}>Before Earnings</div>
             {[

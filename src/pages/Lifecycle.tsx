@@ -43,7 +43,7 @@ function OutcomeCard({ icon, title, color, children }: { icon: string; title: st
 
 export function Lifecycle() {
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-wrap">
       <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
         Trade Lifecycle
       </h1>
@@ -155,7 +155,7 @@ export function Lifecycle() {
         <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
           Understanding the mechanics of assignment removes the fear. It's not an emergency — it's a known outcome you should plan for.
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 16 }}>
+        <div className="g-2" style={{ gap: 14, marginBottom: 16 }}>
           {[
             { label: 'Short Put → Assigned', color: '#ef4444', text: 'You are obligated to buy 100 shares at the strike price. Your broker debits your account the purchase amount ($strike × 100). You now own stock at your strike price — your effective cost basis is the strike minus the premium collected.' },
             { label: 'Short Call → Assigned', color: '#ef4444', text: 'You are obligated to sell 100 shares at the strike price. If you own the shares (covered call), they are sold. If you don\'t own them (naked call — very risky), your broker may force a buy-in at market price.' },
@@ -175,7 +175,7 @@ export function Lifecycle() {
         <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
           Rolling is the act of closing your current position and re-opening a similar one at a different expiry, strike, or both. It's a management tool — not a way to avoid losses.
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div className="g-2" style={{ gap: 14 }}>
           <div style={{ padding: '12px 14px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #10b981' }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#10b981', marginBottom: 6 }}>Roll When</div>
             <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: '#94a3b8', lineHeight: 1.8 }}>

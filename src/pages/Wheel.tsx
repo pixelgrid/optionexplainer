@@ -67,7 +67,7 @@ const ccPnl = Array.from({ length: 61 }, (_, i) => {
 
 export function Wheel() {
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-wrap">
       <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
         The Wheel Strategy
       </h1>
@@ -152,7 +152,7 @@ export function Wheel() {
         <p style={{ margin: '0 0 14px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
           If AAPL falls below $145 at expiry, you get assigned — your broker purchases 100 shares at $145 and debits your account $14,500. But you already collected $200 in premium, so your effective cost basis is <strong style={{ color: '#e2e8f0' }}>$143 per share</strong>.
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div className="g-2" style={{ gap: 14 }}>
           <div style={{ padding: '12px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #10b981', fontSize: 13, color: '#94a3b8' }}>
             <strong style={{ color: '#10b981' }}>Is This Bad?</strong> Not necessarily. If you chose AAPL because you'd be happy owning it at $143, assignment is simply the next step in the strategy. You've already collected $200 and now you own shares at a discount to where the stock was when you sold the put.
           </div>
@@ -197,7 +197,7 @@ export function Wheel() {
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="The Math — Annualized Return" color="#6366f1" />
         <Card>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          <div className="g-2" style={{ gap: 20 }}>
             <div>
               <div style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>Typical CSP: $2 premium on $145 stock</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -239,7 +239,7 @@ export function Wheel() {
       {/* Risks */}
       <section style={{ marginBottom: 24 }}>
         <SectionHeader title="Risks — What Can Go Wrong" color="#ef4444" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="g-2" style={{ gap: 16 }}>
           {[
             {
               title: 'Stock Crashes',

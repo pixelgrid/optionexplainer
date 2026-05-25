@@ -76,7 +76,7 @@ const skewData = [
 
 export function Volatility() {
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '32px 24px' }}>
+    <div className="page-wrap">
       <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
         IV &amp; Volatility
       </h1>
@@ -152,7 +152,7 @@ export function Volatility() {
             </LineChart>
           </ResponsiveContainer>
         </Card>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+        <div className="g-2" style={{ gap: 16 }}>
           <Card style={{ borderLeft: '3px solid #ef4444' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#ef4444', marginBottom: 8 }}>Scenario A: Stock +5%, Options LOSE</div>
             <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>
@@ -194,7 +194,7 @@ export function Volatility() {
       {/* Section 5: When to Buy vs Sell */}
       <section style={{ marginBottom: 24 }}>
         <SectionHeader title="When to Buy vs Sell Options" color="#10b981" />
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+        <div className="g-2" style={{ gap: 20 }}>
           <Card style={{ borderTop: '3px solid #10b981' }}>
             <div style={{ fontSize: 16, fontWeight: 600, color: '#10b981', marginBottom: 12 }}>
               BUY Options When IVR &lt; 25
