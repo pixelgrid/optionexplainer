@@ -17,6 +17,7 @@ const NAV_SECTIONS = [
     label: 'Guides',
     links: [
       { to: '/wheel', label: 'The Wheel' },
+      { to: '/pmcc', label: "Poor Man's Covered Call" },
       { to: '/risk', label: 'Risk Management' },
       { to: '/mistakes', label: 'Common Mistakes' },
     ],

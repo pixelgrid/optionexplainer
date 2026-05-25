@@ -17,6 +17,7 @@ import { VIXRegime } from './pages/VIXRegime';
 import { Dispersion } from './pages/Dispersion';
 import { GammaScalping } from './pages/GammaScalping';
 import { PutWrite } from './pages/PutWrite';
+import { PMCC } from './pages/PMCC';
 
 export default function App() {
   return (
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/dispersion" element={<Dispersion />} />
         <Route path="/gamma-scalping" element={<GammaScalping />} />
         <Route path="/put-write" element={<PutWrite />} />
+        <Route path="/pmcc" element={<PMCC />} />
       </Routes>
     </BrowserRouter>
   );
