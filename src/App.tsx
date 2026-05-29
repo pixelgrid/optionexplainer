@@ -18,6 +18,7 @@ import { Dispersion } from './pages/Dispersion';
 import { GammaScalping } from './pages/GammaScalping';
 import { PutWrite } from './pages/PutWrite';
 import { PMCC } from './pages/PMCC';
+import { FinancialStatements } from './pages/FinancialStatements';
 
 export default function App() {
   return (
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="/gamma-scalping" element={<GammaScalping />} />
         <Route path="/put-write" element={<PutWrite />} />
         <Route path="/pmcc" element={<PMCC />} />
+        <Route path="/financials" element={<FinancialStatements />} />
       </Routes>
     </BrowserRouter>
   );

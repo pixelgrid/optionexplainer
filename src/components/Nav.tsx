@@ -23,6 +23,12 @@ const NAV_SECTIONS = [
     ],
   },
   {
+    label: 'Fundamentals',
+    links: [
+      { to: '/financials', label: 'Financial Statements' },
+    ],
+  },
+  {
     label: 'Advanced',
     links: [
       { to: '/vrp', label: 'Volatility Risk Premium' },
