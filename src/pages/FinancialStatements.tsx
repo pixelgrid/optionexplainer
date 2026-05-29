@@ -49,9 +49,10 @@ function pctChange(curr: number | undefined, prev: number | undefined): number |
 type Severity = 'warn' | 'good' | 'info';
 interface Flag { label: string; detail: string; severity: Severity }
 
-function incomeFlags(stmts: AVReport[]): Flag[] {
-  if (stmts.length < 2) return [];
-  const [curr, prev] = stmts;
+// prevIdx: 1 for annual (prior year), 4 for quarterly (same quarter prior year)
+function incomeFlags(stmts: AVReport[], prevIdx = 1): Flag[] {
+  if (stmts.length <= prevIdx) return [];
+  const curr = stmts[0], prev = stmts[prevIdx];
   const flags: Flag[] = [];
 
   const revChg = pctChange(n(curr, 'totalRevenue'), n(prev, 'totalRevenue'));
@@ -93,9 +94,9 @@ function incomeFlags(stmts: AVReport[]): Flag[] {
   return flags;
 }
 
-function balanceFlags(stmts: AVReport[]): Flag[] {
-  if (stmts.length < 2) return [];
-  const [curr, prev] = stmts;
+function balanceFlags(stmts: AVReport[], prevIdx = 1): Flag[] {
+  if (stmts.length <= prevIdx) return [];
+  const curr = stmts[0], prev = stmts[prevIdx];
   const flags: Flag[] = [];
 
   const cashChg = pctChange(n(curr, 'cashAndCashEquivalentsAtCarryingValue'), n(prev, 'cashAndCashEquivalentsAtCarryingValue'));
@@ -131,9 +132,9 @@ function balanceFlags(stmts: AVReport[]): Flag[] {
   return flags;
 }
 
-function cashflowFlags(cfStmts: AVReport[], incStmts: AVReport[]): Flag[] {
-  if (cfStmts.length < 2) return [];
-  const [curr, prev] = cfStmts;
+function cashflowFlags(cfStmts: AVReport[], incStmts: AVReport[], prevIdx = 1): Flag[] {
+  if (cfStmts.length <= prevIdx) return [];
+  const curr = cfStmts[0], prev = cfStmts[prevIdx];
   const flags: Flag[] = [];
 
   const ocf = n(curr, 'operatingCashflow');
@@ -273,15 +274,27 @@ function LearnRow({ name, formula, short, long, gotcha }: { name: string; formul
 
 type RowDef = { label: string; key: string; divisor?: number; suffix?: string };
 
-function LiveTable({ stmts, rows }: { stmts: AVReport[]; rows: RowDef[] }) {
+// For quarterly data, YoY = compare index 0 to index 4 (same quarter prior year).
+// For annual data, YoY = compare index 0 to index 1 (prior year).
+function LiveTable({ stmts, rows, period }: { stmts: AVReport[]; rows: RowDef[]; period: Period }) {
   if (!stmts.length) return null;
+  const prevIdx = period === 'quarterly' ? 4 : 1;
   const periods = stmts.slice(0, 4);
+  const yoyBase = stmts[prevIdx]; // the period we compare against for YoY
+
   return (
     <div style={{ overflowX: 'auto' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
         <thead>
           <tr>
-            <th style={{ textAlign: 'left', padding: '8px 0', color: '#64748b', fontWeight: 500, borderBottom: '1px solid #2a2d3e', minWidth: 200 }}>Line Item</th>
+            <th style={{ textAlign: 'left', padding: '8px 0', color: '#64748b', fontWeight: 500, borderBottom: '1px solid #2a2d3e', minWidth: 200 }}>
+              Line Item
+              {yoyBase && (
+                <span style={{ fontSize: 10, fontWeight: 400, color: '#3b82f6', marginLeft: 8 }}>
+                  YoY vs {yoyBase.fiscalDateEnding?.slice(0, 7)}
+                </span>
+              )}
+            </th>
             {periods.map((s, i) => (
               <th key={i} style={{ textAlign: 'right', padding: '8px 8px', color: '#64748b', fontWeight: 500, borderBottom: '1px solid #2a2d3e', minWidth: 110 }}>
                 {s.fiscalDateEnding?.slice(0, 7) ?? '—'}
@@ -292,12 +305,13 @@ function LiveTable({ stmts, rows }: { stmts: AVReport[]; rows: RowDef[] }) {
         <tbody>
           {rows.map(({ label, key, divisor, suffix }) => {
             const vals = periods.map(s => n(s, key));
-            const curr = vals[0], prev = vals[1];
-            const chg = pctChange(curr, prev);
+            const curr = vals[0];
+            const yoyPrev = yoyBase ? n(yoyBase, key) : undefined;
+            const chg = pctChange(curr, yoyPrev);
             const chgColor = chg == null ? '' : chg < -0.05 ? '#ef4444' : chg > 0.05 ? '#10b981' : '#64748b';
             const display = (v: number | undefined) => {
               if (v == null) return '—';
-              if (divisor) return ((v / divisor)).toFixed(0) + (suffix ?? '');
+              if (divisor) return (v / divisor).toFixed(0) + (suffix ?? '');
               return fmt(v);
             };
             return (
@@ -309,7 +323,7 @@ function LiveTable({ stmts, rows }: { stmts: AVReport[]; rows: RowDef[] }) {
                   {label}
                   {chg != null && (
                     <span style={{ fontSize: 11, color: chgColor, fontWeight: 600 }}>
-                      {chg > 0 ? '+' : ''}{(chg * 100).toFixed(1)}%
+                      {chg > 0 ? '+' : ''}{(chg * 100).toFixed(1)}% YoY
                     </span>
                   )}
                 </td>
@@ -545,9 +559,12 @@ export function FinancialStatements() {
   const balStmts = data ? (period === 'annual' ? data.balanceAnnual   : data.balanceQuarterly)   : [];
   const cfStmts  = data ? (period === 'annual' ? data.cashflowAnnual  : data.cashflowQuarterly)  : [];
 
-  const iFlags = incomeFlags(incStmts);
-  const bFlags = balanceFlags(balStmts);
-  const cFlags = cashflowFlags(cfStmts, incStmts);
+  // Annual: compare index 0 vs 1 (prior year). Quarterly: compare index 0 vs 4 (same quarter prior year).
+  const prevIdx = period === 'quarterly' ? 4 : 1;
+
+  const iFlags = incomeFlags(incStmts, prevIdx);
+  const bFlags = balanceFlags(balStmts, prevIdx);
+  const cFlags = cashflowFlags(cfStmts, incStmts, prevIdx);
   const ratioRows = computeRatios(incStmts, balStmts, cfStmts);
 
   const TABS = [
@@ -656,7 +673,7 @@ export function FinancialStatements() {
                   {iFlags.map((f, i) => <FlagBadge key={i} flag={f} />)}
                 </div>
               )}
-              <Card><LiveTable stmts={incStmts} rows={INCOME_ROWS} /></Card>
+              <Card><LiveTable stmts={incStmts} rows={INCOME_ROWS} period={period} /></Card>
             </div>
           )}
         </div>
@@ -679,7 +696,7 @@ export function FinancialStatements() {
                   {bFlags.map((f, i) => <FlagBadge key={i} flag={f} />)}
                 </div>
               )}
-              <Card><LiveTable stmts={balStmts} rows={BALANCE_ROWS} /></Card>
+              <Card><LiveTable stmts={balStmts} rows={BALANCE_ROWS} period={period} /></Card>
             </div>
           )}
         </div>
@@ -702,7 +719,7 @@ export function FinancialStatements() {
                   {cFlags.map((f, i) => <FlagBadge key={i} flag={f} />)}
                 </div>
               )}
-              <Card><LiveTable stmts={cfStmts} rows={CASHFLOW_ROWS} /></Card>
+              <Card><LiveTable stmts={cfStmts} rows={CASHFLOW_ROWS} period={period} /></Card>
             </div>
           )}
         </div>
