@@ -259,7 +259,7 @@ export function Nav() {
         {/* Logo */}
         <NavLink to="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
           <span style={{ fontSize: 18, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
-            Option<span style={{ color: '#6366f1' }}>IQ</span>
+            Meridian
           </span>
         </NavLink>
 

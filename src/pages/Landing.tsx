@@ -100,10 +100,10 @@ export function Landing() {
       {/* Hero */}
       <div style={{ textAlign: 'center', marginBottom: 56 }}>
         <h1 style={{ margin: '0 0 12px', color: '#e2e8f0', fontSize: 'clamp(32px, 6vw, 52px)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1 }}>
-          Option<span style={{ color: '#6366f1' }}>IQ</span>
+          Meridian
         </h1>
         <p style={{ margin: '0 auto 28px', color: '#64748b', fontSize: 'clamp(14px, 2vw, 17px)', maxWidth: 560, lineHeight: 1.6 }}>
-          A free toolkit for options traders — strategy education, volatility analysis, and fundamental stock research, all in one place.
+          A free toolkit for traders and investors — options strategies, volatility analysis, stock fundamentals, and more.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button onClick={() => navigate('/strategies')}
