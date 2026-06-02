@@ -23,13 +23,15 @@ import { EarningsSurprises } from './pages/EarningsSurprises';
 import { ValuationSnapshot } from './pages/ValuationSnapshot';
 import { DCFCalculator } from './pages/DCFCalculator';
 import { DividendSafety } from './pages/DividendSafety';
+import { Landing } from './pages/Landing';
 
 export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Nav />
       <Routes>
-        <Route path="/" element={<Strategies />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/strategies" element={<Strategies />} />
         <Route path="/glossary" element={<Glossary />} />
         <Route path="/greeks" element={<Greeks />} />
         <Route path="/pricing" element={<Pricing />} />
