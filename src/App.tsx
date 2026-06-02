@@ -24,6 +24,7 @@ import { ValuationSnapshot } from './pages/ValuationSnapshot';
 import { DCFCalculator } from './pages/DCFCalculator';
 import { DividendSafety } from './pages/DividendSafety';
 import { Landing } from './pages/Landing';
+import { NewsSentiment } from './pages/NewsSentiment';
 
 export default function App() {
   return (
@@ -54,6 +55,7 @@ export default function App() {
         <Route path="/valuation" element={<ValuationSnapshot />} />
         <Route path="/dcf" element={<DCFCalculator />} />
         <Route path="/dividends" element={<DividendSafety />} />
+        <Route path="/news-sentiment" element={<NewsSentiment />} />
       </Routes>
     </BrowserRouter>
   );

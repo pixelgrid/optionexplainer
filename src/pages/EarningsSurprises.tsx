@@ -150,7 +150,7 @@ export function EarningsSurprises() {
 
       {/* API key setup */}
       {showKeyInput ? (
-        <Card style={{ marginBottom: 24, borderColor: '#6366f140' }}>
+        <Card style={{ marginBottom: 24, border: '1px solid #6366f140' }}>
           <div style={{ color: '#818cf8', fontWeight: 600, marginBottom: 8 }}>Alpha Vantage API Key Required</div>
           <p style={{ color: '#94a3b8', fontSize: 13, margin: '0 0 12px' }}>
             Free key at <strong style={{ color: '#e2e8f0' }}>alphavantage.co/support/#api-key</strong> — 25 calls/day, no credit card. Saved locally in your browser.

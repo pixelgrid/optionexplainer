@@ -175,7 +175,7 @@ export function DCFCalculator() {
       </div>
 
       {/* Methodology note */}
-      <Card style={{ marginBottom: 20, background: '#6366f110', borderColor: '#6366f140' }}>
+      <Card style={{ marginBottom: 20, background: '#6366f110', border: '1px solid #6366f140' }}>
         <div style={{ color: '#818cf8', fontWeight: 600, fontSize: 13, marginBottom: 8 }}>Model Methodology</div>
         <div style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.6 }}>
           5-year projection of Free Cash Flow (OCF − CapEx), discounted at the WACC. Terminal value uses Gordon Growth Model at end of Year 5.
@@ -185,7 +185,7 @@ export function DCFCalculator() {
       </Card>
 
       {showKeyInput ? (
-        <Card style={{ marginBottom: 24, borderColor: '#6366f140' }}>
+        <Card style={{ marginBottom: 24, border: '1px solid #6366f140' }}>
           <div style={{ color: '#818cf8', fontWeight: 600, marginBottom: 8 }}>Alpha Vantage API Key Required</div>
           <p style={{ color: '#94a3b8', fontSize: 13, margin: '0 0 12px' }}>
             Free key at <strong style={{ color: '#e2e8f0' }}>alphavantage.co/support/#api-key</strong> — 25 calls/day. Saved in your browser.
@@ -404,7 +404,7 @@ export function DCFCalculator() {
           )}
 
           {baseFCF != null && baseFCF <= 0 && (
-            <Card style={{ background: '#f59e0b10', borderColor: '#f59e0b40' }}>
+            <Card style={{ background: '#f59e0b10', border: '1px solid #f59e0b40' }}>
               <div style={{ color: '#fcd34d', fontSize: 14 }}>
                 DCF model requires positive FCF. {ticker} had negative FCF of {fmtMoney(baseFCF)} in the most recent year. Consider using a forward FCF estimate or a different valuation approach (EV/Revenue, EV/EBITDA) for this company.
               </div>

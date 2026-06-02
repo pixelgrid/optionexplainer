@@ -5,4 +5,10 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: '/optionexplainer/',
+  optimizeDeps: {
+    exclude: ['@xenova/transformers'],
+  },
+  worker: {
+    format: 'es',
+  },
 })

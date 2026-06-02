@@ -52,6 +52,7 @@ const STOCK_TOOLS: Tool[] = [
   { to: '/valuation', name: 'Valuation Snapshot', desc: 'Full ratio dashboard — PE, PB, PS, PEG, EV/EBITDA, margins, analyst target, 52-week range.', tag: 'AV · 2 calls', tagColor: '#3b82f6' },
   { to: '/dcf', name: 'DCF Calculator', desc: 'Interactive 5-year discounted cash flow model with sensitivity table and margin of safety.', tag: 'AV · 2 calls', tagColor: '#f59e0b' },
   { to: '/dividends', name: 'Dividend Safety', desc: 'Payout ratio, FCF coverage, Safe/Watch/At Risk badge, and annual dividend history chart.', tag: 'AV · 3 calls', tagColor: '#10b981' },
+  { to: '/news-sentiment', name: 'News Sentiment & Summary', desc: 'Local AI analysis of financial news and SEC filings — sentiment scoring, abstractive summary, and key bullish/bearish signals.', tag: 'Local AI', tagColor: '#ec4899' },
 ];
 
 function ToolCard({ tool, accent }: { tool: Tool; accent: string }) {

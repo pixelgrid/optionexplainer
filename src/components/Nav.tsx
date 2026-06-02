@@ -62,6 +62,12 @@ const NAV_SECTIONS: NavSection[] = [
           { to: '/dividends', label: 'Dividend Safety' },
         ],
       },
+      {
+        heading: 'AI Tools',
+        links: [
+          { to: '/news-sentiment', label: 'News Sentiment & Summary' },
+        ],
+      },
     ],
   },
 ];

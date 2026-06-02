@@ -170,7 +170,7 @@ export function DividendSafety() {
       </div>
 
       {/* Why it matters */}
-      <Card style={{ marginBottom: 20, background: '#10b98110', borderColor: '#10b98140' }}>
+      <Card style={{ marginBottom: 20, background: '#10b98110', border: '1px solid #10b98140' }}>
         <div style={{ color: '#10b981', fontWeight: 600, fontSize: 13, marginBottom: 8 }}>Why Dividend Safety Matters for Options Traders</div>
         <div style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.6 }}>
           Wheel strategy traders target stocks with <strong style={{ color: '#e2e8f0' }}>safe, growing dividends</strong> — you collect option premium
@@ -180,7 +180,7 @@ export function DividendSafety() {
       </Card>
 
       {showKeyInput ? (
-        <Card style={{ marginBottom: 24, borderColor: '#6366f140' }}>
+        <Card style={{ marginBottom: 24, border: '1px solid #6366f140' }}>
           <div style={{ color: '#818cf8', fontWeight: 600, marginBottom: 8 }}>Alpha Vantage API Key Required</div>
           <p style={{ color: '#94a3b8', fontSize: 13, margin: '0 0 12px' }}>
             Free key at <strong style={{ color: '#e2e8f0' }}>alphavantage.co/support/#api-key</strong> — 25 calls/day. Saved in your browser.
@@ -219,7 +219,7 @@ export function DividendSafety() {
       {data && (
         <>
           {!paysDividends ? (
-            <Card style={{ background: '#f59e0b10', borderColor: '#f59e0b40' }}>
+            <Card style={{ background: '#f59e0b10', border: '1px solid #f59e0b40' }}>
               <div style={{ color: '#fcd34d', fontSize: 15, fontWeight: 600 }}>{ticker} does not pay a dividend</div>
               <div style={{ color: '#94a3b8', fontSize: 13, marginTop: 8 }}>
                 No dividend history found. This stock may still be suitable for the Wheel via premium only, or consider other dividend-paying stocks in the same sector.
