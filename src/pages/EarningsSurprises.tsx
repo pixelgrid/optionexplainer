@@ -229,7 +229,7 @@ export function EarningsSurprises() {
                     <CartesianGrid {...CHART_STYLE.cartesianGrid} />
                     <XAxis dataKey="period" {...CHART_STYLE.xAxis} />
                     <YAxis {...CHART_STYLE.yAxis} tickFormatter={v => v + '%'} />
-                    <Tooltip {...CHART_STYLE.tooltip} formatter={(v: number) => [v.toFixed(2) + '%', 'Surprise']} />
+                    <Tooltip {...CHART_STYLE.tooltip} formatter={(v: unknown) => [(v as number).toFixed(2) + '%', 'Surprise']} />
                     <ReferenceLine y={0} stroke="#2a2d3e" strokeWidth={2} />
                     <Bar dataKey="surprise" radius={[4, 4, 0, 0]}>
                       {chartData.map((entry, i) => (

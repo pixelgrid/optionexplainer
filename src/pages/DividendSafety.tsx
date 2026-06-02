@@ -119,17 +119,18 @@ export function DividendSafety() {
 
   // EPS (most recent annual)
   const latestIncome = data?.income[0];
-  const eps = latestIncome ? (nn((latestIncome as Record<string, string>).reportedEPS) ?? nn((latestIncome as Record<string, string>).eps)) : null;
-  const netIncome = latestIncome ? nn((latestIncome as Record<string, string>).netIncome) : null;
+  const incomeRec = latestIncome as unknown as Record<string, string> | undefined;
+  const netIncome = incomeRec ? nn(incomeRec.netIncome) : null;
 
   // FCF (most recent annual)
   const latestCF = data?.cashflow[0];
-  const ocf = latestCF ? nn((latestCF as Record<string, string>).operatingCashflow) : null;
-  const capex = latestCF ? nn((latestCF as Record<string, string>).capitalExpenditures) : null;
+  const cfRec = latestCF as unknown as Record<string, string> | undefined;
+  const ocf = cfRec ? nn(cfRec.operatingCashflow) : null;
+  const capex = cfRec ? nn(cfRec.capitalExpenditures) : null;
   const fcf = ocf != null && capex != null ? ocf - Math.abs(capex) : null;
 
   // Dividends paid (from cashflow statement)
-  const divsPaidCF = latestCF ? Math.abs(nn((latestCF as Record<string, string>).dividendPayout) ?? 0) : null;
+  const divsPaidCF = cfRec ? Math.abs(nn(cfRec.dividendPayout) ?? 0) : null;
 
   // Payout ratio (using EPS × shares from income; or use dividendPayout / netIncome)
   const payoutRatio = divsPaidCF != null && netIncome != null && netIncome > 0 ? divsPaidCF / netIncome : null;
@@ -314,7 +315,7 @@ export function DividendSafety() {
                         <CartesianGrid {...CHART_STYLE.cartesianGrid} />
                         <XAxis dataKey="year" {...CHART_STYLE.xAxis} />
                         <YAxis {...CHART_STYLE.yAxis} tickFormatter={v => '$' + v.toFixed(2)} />
-                        <Tooltip {...CHART_STYLE.tooltip} formatter={(v: number) => ['$' + v.toFixed(4), 'Annual DPS']} />
+                        <Tooltip {...CHART_STYLE.tooltip} formatter={(v: unknown) => ['$' + (v as number).toFixed(4), 'Annual DPS']} />
                         <Area type="monotone" dataKey="total" stroke="#10b981" strokeWidth={2} fill="url(#divGrad)" dot={{ fill: '#10b981', r: 3 }} />
                       </AreaChart>
                     </ResponsiveContainer>

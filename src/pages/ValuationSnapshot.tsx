@@ -41,12 +41,6 @@ function fmt(v: string | undefined, suffix = '', mult = 1): string {
   return (n * mult).toFixed(2) + suffix;
 }
 
-function fmtPct(v: string | undefined): string {
-  const n = nn(v ?? null);
-  if (n == null) return '—';
-  return (n * 100).toFixed(2) + '%';
-}
-
 function fmtBig(v: string | undefined): string {
   const n = nn(v ?? null);
   if (n == null) return '—';
