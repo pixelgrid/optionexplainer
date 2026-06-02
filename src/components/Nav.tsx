@@ -26,6 +26,10 @@ const NAV_SECTIONS = [
     label: 'Fundamentals',
     links: [
       { to: '/financials', label: 'Financial Statements' },
+      { to: '/earnings-history', label: 'Earnings Surprises' },
+      { to: '/valuation', label: 'Valuation Snapshot' },
+      { to: '/dcf', label: 'DCF Calculator' },
+      { to: '/dividends', label: 'Dividend Safety' },
     ],
   },
   {

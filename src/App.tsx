@@ -19,6 +19,10 @@ import { GammaScalping } from './pages/GammaScalping';
 import { PutWrite } from './pages/PutWrite';
 import { PMCC } from './pages/PMCC';
 import { FinancialStatements } from './pages/FinancialStatements';
+import { EarningsSurprises } from './pages/EarningsSurprises';
+import { ValuationSnapshot } from './pages/ValuationSnapshot';
+import { DCFCalculator } from './pages/DCFCalculator';
+import { DividendSafety } from './pages/DividendSafety';
 
 export default function App() {
   return (
@@ -44,6 +48,10 @@ export default function App() {
         <Route path="/put-write" element={<PutWrite />} />
         <Route path="/pmcc" element={<PMCC />} />
         <Route path="/financials" element={<FinancialStatements />} />
+        <Route path="/earnings-history" element={<EarningsSurprises />} />
+        <Route path="/valuation" element={<ValuationSnapshot />} />
+        <Route path="/dcf" element={<DCFCalculator />} />
+        <Route path="/dividends" element={<DividendSafety />} />
       </Routes>
     </BrowserRouter>
   );

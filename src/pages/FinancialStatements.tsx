@@ -3,7 +3,7 @@ import { useState, useCallback } from 'react';
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type Period = 'annual' | 'quarterly';
-type Tab = 'income' | 'balance' | 'cashflow' | 'ratios';
+type Tab = 'income' | 'balance' | 'cashflow' | 'ratios' | 'quality';
 
 interface AVReport {
   fiscalDateEnding: string;
@@ -519,6 +519,97 @@ function computeRatios(inc: AVReport[], bal: AVReport[], cf: AVReport[]): { labe
   return rows;
 }
 
+// ── Quality Scores: Piotroski F-Score & Altman Z-Score ───────────────────────
+
+interface PiotroskiCheck { label: string; bucket: string; detail: string; pass: boolean | null }
+
+function computePiotroski(inc: AVReport[], bal: AVReport[], cf: AVReport[]): { checks: PiotroskiCheck[]; score: number } {
+  const checks: PiotroskiCheck[] = [];
+  const push = (label: string, bucket: string, detail: string, pass: boolean | null) => checks.push({ label, bucket, detail, pass });
+
+  if (!inc.length || !bal.length || !cf.length) return { checks, score: 0 };
+
+  const b0 = bal[0], b1 = bal[1];
+  const i0 = inc[0], i1 = inc[1];
+  const c0 = cf[0];
+
+  const ta0 = n(b0, 'totalAssets'), ta1 = b1 ? n(b1, 'totalAssets') : undefined;
+  const ni0 = n(i0, 'netIncome'), ni1 = i1 ? n(i1, 'netIncome') : undefined;
+  const ocf0 = n(c0, 'operatingCashflow');
+  const gp0 = n(i0, 'grossProfit'), rev0 = n(i0, 'totalRevenue');
+  const gp1 = i1 ? n(i1, 'grossProfit') : undefined, rev1 = i1 ? n(i1, 'totalRevenue') : undefined;
+  const ca0 = n(b0, 'totalCurrentAssets'), cl0 = n(b0, 'totalCurrentLiabilities');
+  const ca1 = b1 ? n(b1, 'totalCurrentAssets') : undefined, cl1 = b1 ? n(b1, 'totalCurrentLiabilities') : undefined;
+  const ltd0 = n(b0, 'longTermDebt'), ltd1 = b1 ? n(b1, 'longTermDebt') : undefined;
+  const shares0 = n(b0, 'commonStockSharesOutstanding'), shares1 = b1 ? n(b1, 'commonStockSharesOutstanding') : undefined;
+
+  const roa0 = ta0 && ta0 > 0 && ni0 != null ? ni0 / ta0 : null;
+  const roa1 = ta1 && ta1 > 0 && ni1 != null ? ni1 / ta1 : null;
+
+  // Profitability
+  push('Positive ROA', 'Profitability', roa0 != null ? `ROA = ${(roa0 * 100).toFixed(2)}%` : 'Data unavailable', roa0 != null ? roa0 > 0 : null);
+  push('Positive Operating Cash Flow', 'Profitability', ocf0 != null ? `OCF = ${fmt(ocf0)}` : 'Data unavailable', ocf0 != null ? ocf0 > 0 : null);
+  push('Improving ROA (vs prior year)', 'Profitability', roa0 != null && roa1 != null ? `${(roa1 * 100).toFixed(2)}% → ${(roa0 * 100).toFixed(2)}%` : 'Need 2 years', roa0 != null && roa1 != null ? roa0 > roa1 : null);
+  push('Cash-Based Earnings (OCF/TA > ROA)', 'Profitability', 'Operating CF exceeds accrual earnings — signals high earnings quality', ocf0 != null && ta0 && ta0 > 0 && roa0 != null ? (ocf0 / ta0) > roa0 : null);
+
+  // Leverage / Liquidity
+  const lev0 = ta0 && ta0 > 0 && ltd0 != null ? ltd0 / ta0 : null;
+  const lev1 = ta1 && ta1 > 0 && ltd1 != null ? ltd1 / ta1 : null;
+  push('Decreasing Leverage (LTD/Assets)', 'Leverage & Liquidity', lev0 != null && lev1 != null ? `${(lev1 * 100).toFixed(1)}% → ${(lev0 * 100).toFixed(1)}%` : 'Need 2 years', lev0 != null && lev1 != null ? lev0 < lev1 : null);
+
+  const cr0 = ca0 && cl0 && cl0 > 0 ? ca0 / cl0 : null;
+  const cr1 = ca1 && cl1 && cl1 > 0 ? ca1 / cl1 : null;
+  push('Improving Current Ratio', 'Leverage & Liquidity', cr0 != null && cr1 != null ? `${cr1.toFixed(2)}x → ${cr0.toFixed(2)}x` : 'Need 2 years', cr0 != null && cr1 != null ? cr0 > cr1 : null);
+
+  push('No Share Dilution', 'Leverage & Liquidity', shares0 != null && shares1 != null ? `${(shares1 / 1e6).toFixed(1)}M → ${(shares0 / 1e6).toFixed(1)}M shares` : 'Data unavailable', shares0 != null && shares1 != null ? shares0 <= shares1 * 1.02 : null);
+
+  // Operating Efficiency
+  const gm0 = gp0 != null && rev0 && rev0 > 0 ? gp0 / rev0 : null;
+  const gm1 = gp1 != null && rev1 && rev1 > 0 ? gp1 / rev1 : null;
+  push('Improving Gross Margin', 'Operating Efficiency', gm0 != null && gm1 != null ? `${(gm1 * 100).toFixed(1)}% → ${(gm0 * 100).toFixed(1)}%` : 'Need 2 years', gm0 != null && gm1 != null ? gm0 > gm1 : null);
+
+  const at0 = rev0 != null && ta0 && ta0 > 0 ? rev0 / ta0 : null;
+  const at1 = rev1 != null && ta1 && ta1 > 0 ? rev1 / ta1 : null;
+  push('Improving Asset Turnover', 'Operating Efficiency', at0 != null && at1 != null ? `${at1.toFixed(2)}x → ${at0.toFixed(2)}x` : 'Need 2 years', at0 != null && at1 != null ? at0 > at1 : null);
+
+  const score = checks.filter(c => c.pass === true).length;
+  return { checks, score };
+}
+
+function computeAltmanZ(inc: AVReport[], bal: AVReport[]): { z: number | null; components: { label: string; coeff: number; value: number; contribution: number }[] } {
+  if (!inc.length || !bal.length) return { z: null, components: [] };
+  const i = inc[0], b = bal[0];
+
+  const ta = n(b, 'totalAssets');
+  if (!ta || ta === 0) return { z: null, components: [] };
+
+  const ca = n(b, 'totalCurrentAssets'), cl = n(b, 'totalCurrentLiabilities');
+  const re = n(b, 'retainedEarnings');
+  const ebit = n(i, 'operatingIncome');
+  const eq = n(b, 'totalShareholderEquity');
+  const tl = n(b, 'totalLiabilities');
+  const rev = n(i, 'totalRevenue');
+
+  const x1 = ca != null && cl != null ? (ca - cl) / ta : null;
+  const x2 = re != null ? re / ta : null;
+  const x3 = ebit != null ? ebit / ta : null;
+  const x4 = eq != null && tl != null && tl > 0 ? eq / tl : null;
+  const x5 = rev != null ? rev / ta : null;
+
+  if (x1 == null || x2 == null || x3 == null || x4 == null || x5 == null) return { z: null, components: [] };
+
+  const components = [
+    { label: 'X1 — Working Capital / Total Assets', coeff: 0.717, value: x1, contribution: 0.717 * x1 },
+    { label: 'X2 — Retained Earnings / Total Assets', coeff: 0.847, value: x2, contribution: 0.847 * x2 },
+    { label: 'X3 — EBIT / Total Assets', coeff: 3.107, value: x3, contribution: 3.107 * x3 },
+    { label: 'X4 — Book Equity / Total Liabilities', coeff: 0.420, value: x4, contribution: 0.420 * x4 },
+    { label: 'X5 — Revenue / Total Assets', coeff: 0.998, value: x5, contribution: 0.998 * x5 },
+  ];
+
+  const z = components.reduce((s, c) => s + c.contribution, 0);
+  return { z, components };
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 const LS_KEY = 'av_api_key';
@@ -567,11 +658,16 @@ export function FinancialStatements() {
   const cFlags = cashflowFlags(cfStmts, incStmts, prevIdx);
   const ratioRows = computeRatios(incStmts, balStmts, cfStmts);
 
+  // Quality scores always use annual data
+  const piotroski = data ? computePiotroski(data.incomeAnnual, data.balanceAnnual, data.cashflowAnnual) : null;
+  const altman = data ? computeAltmanZ(data.incomeAnnual, data.balanceAnnual) : null;
+
   const TABS = [
     { id: 'income'   as Tab, label: 'Income Statement', color: '#10b981' },
     { id: 'balance'  as Tab, label: 'Balance Sheet',    color: '#3b82f6' },
     { id: 'cashflow' as Tab, label: 'Cash Flow',        color: '#8b5cf6' },
     { id: 'ratios'   as Tab, label: 'Ratios & Analysis',color: '#f59e0b' },
+    { id: 'quality'  as Tab, label: 'Quality Scores',   color: '#ec4899' },
   ];
   const activeColor = TABS.find(t => t.id === tab)?.color ?? '#6366f1';
 
@@ -720,6 +816,148 @@ export function FinancialStatements() {
                 </div>
               )}
               <Card><LiveTable stmts={cfStmts} rows={CASHFLOW_ROWS} period={period} /></Card>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Quality Scores ── */}
+      {tab === 'quality' && (
+        <div style={{ display: 'grid', gap: 24 }}>
+          {/* Intro */}
+          <Card style={{ background: '#ec489910', borderColor: '#ec489940' }}>
+            <div style={{ color: '#f9a8d4', fontWeight: 600, fontSize: 14, marginBottom: 8 }}>About These Scores</div>
+            <div style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.7 }}>
+              <strong style={{ color: '#e2e8f0' }}>Piotroski F-Score</strong> uses 9 binary signals across profitability, leverage, and efficiency. Score ≥7 = fundamentally strong. Score ≤2 = deteriorating. Developed by Prof. Joseph Piotroski (2000).<br />
+              <strong style={{ color: '#e2e8f0' }}>Altman Z-Score</strong> predicts bankruptcy risk using 5 balance-sheet ratios. Scores use the <em>private-company model</em> (book equity in X4 rather than market cap). Z′ &gt;2.9 = Safe, 1.23–2.9 = Grey Zone, &lt;1.23 = Distress. Both scores are computed from the financial statements already loaded — no extra API calls.
+            </div>
+          </Card>
+
+          {!data && (
+            <Card>
+              <div style={{ color: '#64748b', fontSize: 14 }}>Enter a ticker and click Analyze to compute quality scores.</div>
+            </Card>
+          )}
+
+          {data && piotroski && (
+            <div>
+              <SectionHeader title={`${ticker} — Piotroski F-Score`} color="#ec4899" />
+              {/* Score badge */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
+                <div style={{
+                  width: 80, height: 80, borderRadius: '50%',
+                  background: piotroski.score >= 7 ? '#10b98120' : piotroski.score >= 5 ? '#f59e0b20' : '#ef444420',
+                  border: `3px solid ${piotroski.score >= 7 ? '#10b981' : piotroski.score >= 5 ? '#f59e0b' : '#ef4444'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{ color: piotroski.score >= 7 ? '#10b981' : piotroski.score >= 5 ? '#f59e0b' : '#ef4444', fontSize: 28, fontWeight: 800, lineHeight: 1 }}>{piotroski.score}</div>
+                    <div style={{ color: '#475569', fontSize: 11 }}>/ 9</div>
+                  </div>
+                </div>
+                <div>
+                  <div style={{ color: piotroski.score >= 7 ? '#10b981' : piotroski.score >= 5 ? '#f59e0b' : '#ef4444', fontSize: 20, fontWeight: 700 }}>
+                    {piotroski.score >= 7 ? 'Strong' : piotroski.score >= 5 ? 'Moderate' : 'Weak'}
+                  </div>
+                  <div style={{ color: '#64748b', fontSize: 13, marginTop: 4 }}>
+                    {piotroski.score >= 7 && 'Improving fundamentals across profitability, leverage, and efficiency — favorable for selling puts and running the Wheel.'}
+                    {piotroski.score >= 5 && piotroski.score < 7 && 'Mixed signals — some positive trends but not consistently improving across all dimensions.'}
+                    {piotroski.score < 5 && 'Deteriorating fundamentals — high risk for premium sellers. Avoid or use for directional bearish strategies.'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Checks by bucket */}
+              {(['Profitability', 'Leverage & Liquidity', 'Operating Efficiency'] as const).map(bucket => {
+                const bucketChecks = piotroski.checks.filter(c => c.bucket === bucket);
+                const bucketColors: Record<string, string> = { Profitability: '#10b981', 'Leverage & Liquidity': '#3b82f6', 'Operating Efficiency': '#f59e0b' };
+                return (
+                  <div key={bucket} style={{ marginBottom: 16 }}>
+                    <div style={{ color: bucketColors[bucket], fontSize: 12, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>{bucket.toUpperCase()}</div>
+                    <div style={{ display: 'grid', gap: 8 }}>
+                      {bucketChecks.map((c, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, background: c.pass === true ? '#10b98108' : c.pass === false ? '#ef444408' : '#ffffff05', border: `1px solid ${c.pass === true ? '#10b98130' : c.pass === false ? '#ef444430' : '#2a2d3e'}`, borderRadius: 8, padding: '10px 14px' }}>
+                          <div style={{ width: 22, height: 22, borderRadius: '50%', background: c.pass === true ? '#10b981' : c.pass === false ? '#ef4444' : '#2a2d3e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 12, fontWeight: 700, color: '#fff' }}>
+                            {c.pass === true ? '✓' : c.pass === false ? '✗' : '?'}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ color: '#e2e8f0', fontWeight: 600, fontSize: 13 }}>{c.label}</div>
+                            <div style={{ color: '#64748b', fontSize: 12, marginTop: 2 }}>{c.detail}</div>
+                          </div>
+                          <div style={{ color: c.pass === true ? '#10b981' : c.pass === false ? '#ef4444' : '#475569', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+                            {c.pass === true ? '+1' : c.pass === false ? '0' : '—'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {data && altman && (
+            <div>
+              <SectionHeader title={`${ticker} — Altman Z′-Score`} color="#ec4899" />
+              {altman.z == null ? (
+                <Card><div style={{ color: '#64748b', fontSize: 13 }}>Insufficient balance sheet data to compute Z-Score (need: working capital, retained earnings, EBIT, equity, total liabilities, revenue).</div></Card>
+              ) : (
+                <>
+                  {/* Score gauge */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 20, flexWrap: 'wrap' }}>
+                    <div style={{
+                      minWidth: 120, padding: '16px 24px', borderRadius: 12, textAlign: 'center',
+                      background: altman.z > 2.9 ? '#10b98120' : altman.z > 1.23 ? '#f59e0b20' : '#ef444420',
+                      border: `2px solid ${altman.z > 2.9 ? '#10b981' : altman.z > 1.23 ? '#f59e0b' : '#ef4444'}`,
+                    }}>
+                      <div style={{ color: altman.z > 2.9 ? '#10b981' : altman.z > 1.23 ? '#f59e0b' : '#ef4444', fontSize: 36, fontWeight: 800 }}>{altman.z.toFixed(2)}</div>
+                      <div style={{ color: '#64748b', fontSize: 11, marginTop: 2 }}>Z′-Score</div>
+                    </div>
+                    <div>
+                      <div style={{ color: altman.z > 2.9 ? '#10b981' : altman.z > 1.23 ? '#f59e0b' : '#ef4444', fontSize: 20, fontWeight: 700 }}>
+                        {altman.z > 2.9 ? 'Safe Zone' : altman.z > 1.23 ? 'Grey Zone' : 'Distress Zone'}
+                      </div>
+                      <div style={{ color: '#64748b', fontSize: 13, marginTop: 4, maxWidth: 400 }}>
+                        {altman.z > 2.9 && 'Low bankruptcy risk. Balance sheet fundamentals are sound. Suitable for premium-selling strategies.'}
+                        {altman.z > 1.23 && altman.z <= 2.9 && 'Moderate risk. Scores in this zone warrant monitoring. Check debt trends and upcoming refinancings.'}
+                        {altman.z <= 1.23 && 'Elevated bankruptcy risk. Avoid selling uncovered puts or holding stock through major downturns.'}
+                      </div>
+                      <div style={{ display: 'flex', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
+                        {[['> 2.9', 'Safe', '#10b981'], ['1.23–2.9', 'Grey Zone', '#f59e0b'], ['< 1.23', 'Distress', '#ef4444']].map(([range, label, color]) => (
+                          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: color }} />
+                            <span style={{ color: '#64748b', fontSize: 11 }}>{label}: {range}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Components */}
+                  <Card>
+                    <div style={{ color: '#64748b', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 12 }}>SCORE COMPONENTS (Z′ = 0.717X1 + 0.847X2 + 3.107X3 + 0.420X4 + 0.998X5)</div>
+                    <div style={{ display: 'grid', gap: 8 }}>
+                      {altman.components.map((c, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div style={{ color: '#64748b', fontSize: 12, minWidth: 300 }}>{c.label}</div>
+                          <div style={{ color: '#e2e8f0', fontSize: 13, fontFamily: 'monospace', minWidth: 70 }}>{c.value.toFixed(3)}</div>
+                          <div style={{ color: c.contribution > 0 ? '#10b981' : '#ef4444', fontSize: 13, fontFamily: 'monospace', minWidth: 70 }}>
+                            {c.contribution > 0 ? '+' : ''}{(c.contribution).toFixed(3)}
+                          </div>
+                          <div style={{ flex: 1, height: 6, background: '#2a2d3e', borderRadius: 3, overflow: 'hidden' }}>
+                            <div style={{ width: `${Math.min(100, Math.abs(c.contribution) / Math.abs(altman.z ?? 1) * 100)}%`, height: '100%', background: c.contribution > 0 ? '#10b981' : '#ef4444', borderRadius: 3 }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #2a2d3e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: '#64748b', fontSize: 12 }}>Total Z′-Score</span>
+                      <span style={{ color: altman.z > 2.9 ? '#10b981' : altman.z > 1.23 ? '#f59e0b' : '#ef4444', fontSize: 18, fontWeight: 700, fontFamily: 'monospace' }}>{altman.z.toFixed(3)}</span>
+                    </div>
+                    <div style={{ marginTop: 10, color: '#475569', fontSize: 11 }}>Uses the Altman Z′ private-company model with book value of equity in X4. The public-company model (market cap / total liabilities) typically yields higher scores for well-valued stocks.</div>
+                  </Card>
+                </>
+              )}
             </div>
           )}
         </div>
