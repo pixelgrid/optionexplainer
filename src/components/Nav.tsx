@@ -43,6 +43,7 @@ const NAV_SECTIONS: NavSection[] = [
           { to: '/dispersion', label: 'Dispersion Trading' },
           { to: '/gamma-scalping', label: 'Gamma Scalping' },
           { to: '/put-write', label: 'Systematic Put-Write' },
+          { to: '/zero-cost-collar', label: 'Zero-Cost Collar' },
         ],
       },
     ],

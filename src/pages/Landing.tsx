@@ -42,6 +42,7 @@ const OPTIONS_TOOLS: { group: string; color: string; tools: Tool[] }[] = [
       { to: '/dispersion', name: 'Dispersion Trading', desc: 'Selling index vol vs buying single-stock vol to capture correlation risk.' },
       { to: '/gamma-scalping', name: 'Gamma Scalping', desc: 'Delta-hedging a long gamma position to extract realized volatility.' },
       { to: '/put-write', name: 'Systematic Put-Write', desc: 'Institutional-grade put-selling with rules-based strike and size.' },
+      { to: '/zero-cost-collar', name: 'Zero-Cost Collar', desc: 'Fund a put with a far OTM call on parabolic momentum stocks with inverted skew. Interactive payoff diagram.' },
     ],
   },
 ];

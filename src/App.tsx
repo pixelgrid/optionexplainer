@@ -25,6 +25,7 @@ import { DCFCalculator } from './pages/DCFCalculator';
 import { DividendSafety } from './pages/DividendSafety';
 import { Landing } from './pages/Landing';
 import { NewsSentiment } from './pages/NewsSentiment';
+import { ZeroCostCollar } from './pages/ZeroCostCollar';
 
 export default function App() {
   return (
@@ -56,6 +57,7 @@ export default function App() {
         <Route path="/dcf" element={<DCFCalculator />} />
         <Route path="/dividends" element={<DividendSafety />} />
         <Route path="/news-sentiment" element={<NewsSentiment />} />
+        <Route path="/zero-cost-collar" element={<ZeroCostCollar />} />
       </Routes>
     </BrowserRouter>
   );
