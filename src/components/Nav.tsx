@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 
 // ── Navigation data ────────────────────────────────────────────────────────
 
@@ -73,6 +74,29 @@ const NAV_SECTIONS: NavSection[] = [
   },
 ];
 
+// ── Theme toggle button ────────────────────────────────────────────────────
+
+function ThemeToggle() {
+  const { theme, toggle } = useTheme();
+  return (
+    <button
+      onClick={toggle}
+      title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      style={{
+        background: 'none', border: '1px solid var(--border)',
+        color: 'var(--text-muted)', fontSize: 15, width: 34, height: 34,
+        borderRadius: 8, cursor: 'pointer', display: 'flex',
+        alignItems: 'center', justifyContent: 'center',
+        transition: 'all 0.15s', flexShrink: 0,
+      }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+    >
+      {theme === 'dark' ? '☀' : '☾'}
+    </button>
+  );
+}
+
 // ── Desktop mega-dropdown ──────────────────────────────────────────────────
 
 function Dropdown({ section }: { section: NavSection }) {
@@ -102,9 +126,9 @@ function Dropdown({ section }: { section: NavSection }) {
       <button
         onClick={() => setOpen(v => !v)}
         style={{
-          background: open ? '#1f2335' : 'none',
+          background: open ? 'var(--bg-card-hover)' : 'none',
           border: 'none',
-          color: open ? section.accent : '#64748b',
+          color: open ? section.accent : 'var(--text-muted)',
           fontSize: 14,
           fontWeight: open ? 600 : 400,
           padding: '6px 14px',
@@ -127,19 +151,19 @@ function Dropdown({ section }: { section: NavSection }) {
             top: '100%',
             right: 0,
             marginTop: 4,
-            background: '#1a1d27',
-            border: '1px solid #2a2d3e',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
             borderRadius: 12,
             padding: '16px 0 10px',
             zIndex: 50,
-            boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
             display: 'flex',
             gap: 0,
             minWidth: isWide ? 580 : 220,
           }}
         >
           {section.groups.map((group, gi) => (
-            <div key={gi} style={{ flex: 1, padding: '0 16px', borderLeft: gi > 0 ? '1px solid #2a2d3e' : 'none' }}>
+            <div key={gi} style={{ flex: 1, padding: '0 16px', borderLeft: gi > 0 ? '1px solid var(--border)' : 'none' }}>
               <div style={{ color: section.accent, fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', padding: '0 0 8px', textTransform: 'uppercase' }}>
                 {group.heading}
               </div>
@@ -150,11 +174,11 @@ function Dropdown({ section }: { section: NavSection }) {
                   style={{
                     display: 'block', width: '100%', textAlign: 'left',
                     padding: '7px 10px', background: 'none', border: 'none',
-                    color: '#94a3b8', fontSize: 13, cursor: 'pointer',
+                    color: 'var(--text)', fontSize: 13, cursor: 'pointer',
                     borderRadius: 6, transition: 'all 0.1s', whiteSpace: 'nowrap',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = section.accent + '18'; e.currentTarget.style.color = '#e2e8f0'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#94a3b8'; }}
+                  onMouseEnter={e => { e.currentTarget.style.background = section.accent + '18'; e.currentTarget.style.color = 'var(--text-h)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--text)'; }}
                 >
                   {label}
                 </button>
@@ -178,15 +202,15 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, top: 56, background: '#0f1117',
-      zIndex: 40, overflowY: 'auto', borderTop: '1px solid #2a2d3e', paddingBottom: 24,
+      position: 'fixed', inset: 0, top: 56, background: 'var(--bg)',
+      zIndex: 40, overflowY: 'auto', borderTop: '1px solid var(--border)', paddingBottom: 24,
     }}>
-      {/* Home + Glossary */}
-      {[{ to: '/', label: 'Home' }, { to: '/glossary', label: 'Glossary' }].map(({ to, label }) => (
+      {/* Home + Glossary links */}
+      {[{ to: '/', label: 'Home' }, { to: '/glossary', label: 'Options Glossary' }, { to: '/stocks-glossary', label: 'Stock Ratios' }].map(({ to, label }) => (
         <button key={to} onClick={() => go(to)} style={{
           display: 'block', width: '100%', textAlign: 'left',
           padding: '13px 20px', background: 'none', border: 'none',
-          borderBottom: '1px solid #1e2130', color: '#e2e8f0',
+          borderBottom: '1px solid var(--border)', color: 'var(--text-h)',
           fontSize: 15, fontWeight: 500, cursor: 'pointer',
         }}>{label}</button>
       ))}
@@ -198,9 +222,9 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
             style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'center',
               width: '100%', textAlign: 'left', padding: '13px 20px',
-              background: openSection === section.id ? '#1a1d27' : 'none',
-              border: 'none', borderBottom: '1px solid #1e2130',
-              color: openSection === section.id ? section.accent : '#94a3b8',
+              background: openSection === section.id ? 'var(--bg-card)' : 'none',
+              border: 'none', borderBottom: '1px solid var(--border)',
+              color: openSection === section.id ? section.accent : 'var(--text-muted)',
               fontSize: 15, fontWeight: 500, cursor: 'pointer',
             }}
           >
@@ -209,13 +233,13 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
           </button>
 
           {openSection === section.id && section.groups.map(group => (
-            <div key={group.heading} style={{ background: '#0c0e16' }}>
+            <div key={group.heading} style={{ background: 'var(--bg)' }}>
               <button
                 onClick={() => setOpenGroup(v => v === group.heading ? null : group.heading)}
                 style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   width: '100%', textAlign: 'left', padding: '10px 28px',
-                  background: 'none', border: 'none', borderBottom: '1px solid #1a1d27',
+                  background: 'none', border: 'none', borderBottom: '1px solid var(--border)',
                   color: section.accent, fontSize: 11, fontWeight: 700,
                   letterSpacing: '0.07em', textTransform: 'uppercase', cursor: 'pointer',
                 }}
@@ -227,7 +251,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
                 <button key={to} onClick={() => go(to)} style={{
                   display: 'block', width: '100%', textAlign: 'left',
                   padding: '10px 36px', background: 'none', border: 'none',
-                  borderBottom: '1px solid #12141e', color: '#64748b',
+                  borderBottom: '1px solid var(--border)', color: 'var(--text-muted)',
                   fontSize: 14, cursor: 'pointer',
                 }}>{label}</button>
               ))}
@@ -248,11 +272,11 @@ export function Nav() {
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
 
   const linkStyle = ({ isActive }: { isActive: boolean }): React.CSSProperties => ({
-    color: isActive ? '#e2e8f0' : '#64748b',
+    color: isActive ? 'var(--text-h)' : 'var(--text-muted)',
     textDecoration: 'none', fontSize: 14,
     fontWeight: isActive ? 600 : 400,
     padding: '6px 14px', borderRadius: 8,
-    background: isActive ? '#1f2335' : 'transparent',
+    background: isActive ? 'var(--bg-card-hover)' : 'transparent',
     transition: 'all 0.15s',
   });
 
@@ -260,36 +284,43 @@ export function Nav() {
     <>
       <nav style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 20px', height: 56, borderBottom: '1px solid #2a2d3e',
-        position: 'sticky', top: 0, background: '#0f1117', zIndex: 50,
+        padding: '0 20px', height: 56, borderBottom: '1px solid var(--nav-border)',
+        position: 'sticky', top: 0, background: 'var(--nav-bg)', zIndex: 50,
+        transition: 'background 0.2s',
       }}>
         {/* Logo */}
         <NavLink to="/" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+          <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
             Meridian
           </span>
         </NavLink>
 
         {/* Desktop nav */}
         <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <NavLink to="/glossary" style={linkStyle}>Glossary</NavLink>
+          <NavLink to="/glossary" style={linkStyle}>Options Glossary</NavLink>
+          <NavLink to="/stocks-glossary" style={linkStyle}>Stock Ratios</NavLink>
           {NAV_SECTIONS.map(s => <Dropdown key={s.id} section={s} />)}
+          <ThemeToggle />
         </div>
 
-        {/* Hamburger */}
-        <button
-          className="hamburger"
-          onClick={() => setMenuOpen(v => !v)}
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          style={{
-            background: 'none', border: 'none', cursor: 'pointer', padding: 8,
-            display: 'none', flexDirection: 'column', gap: 5, alignItems: 'center', justifyContent: 'center',
-          }}
-        >
-          <span style={{ display: 'block', width: 22, height: 2, background: menuOpen ? '#6366f1' : '#94a3b8', borderRadius: 2, transition: 'all 0.2s', transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none' }} />
-          <span style={{ display: 'block', width: 22, height: 2, background: menuOpen ? '#6366f1' : '#94a3b8', borderRadius: 2, transition: 'all 0.2s', opacity: menuOpen ? 0 : 1 }} />
-          <span style={{ display: 'block', width: 22, height: 2, background: menuOpen ? '#6366f1' : '#94a3b8', borderRadius: 2, transition: 'all 0.2s', transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none' }} />
-        </button>
+        {/* Hamburger + theme toggle (mobile) */}
+        <div style={{ display: 'contents' }}>
+          <div className="hamburger" style={{ display: 'none', alignItems: 'center', gap: 8 }}>
+            <ThemeToggle />
+            <button
+              onClick={() => setMenuOpen(v => !v)}
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer', padding: 8,
+                display: 'flex', flexDirection: 'column', gap: 5, alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <span style={{ display: 'block', width: 22, height: 2, background: menuOpen ? 'var(--accent)' : 'var(--text-muted)', borderRadius: 2, transition: 'all 0.2s', transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none' }} />
+              <span style={{ display: 'block', width: 22, height: 2, background: menuOpen ? 'var(--accent)' : 'var(--text-muted)', borderRadius: 2, transition: 'all 0.2s', opacity: menuOpen ? 0 : 1 }} />
+              <span style={{ display: 'block', width: 22, height: 2, background: menuOpen ? 'var(--accent)' : 'var(--text-muted)', borderRadius: 2, transition: 'all 0.2s', transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none' }} />
+            </button>
+          </div>
+        </div>
       </nav>
 
       {menuOpen && <MobileMenu onClose={() => setMenuOpen(false)} />}

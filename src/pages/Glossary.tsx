@@ -298,10 +298,10 @@ export function Glossary() {
     <div className="page-wrap">
       {/* Hero */}
       <div style={{ marginBottom: 40 }}>
-        <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+        <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
           Options Glossary
         </h1>
-        <p style={{ margin: 0, color: '#64748b', fontSize: 15 }}>
+        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: 15 }}>
           Every term you need to navigate an options chain, understand risk, and talk to your broker.
         </p>
       </div>
@@ -318,7 +318,7 @@ export function Glossary() {
                 background: tag.color,
               }}
             />
-            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>
+            <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>
               {tag.label}
             </h2>
           </div>
@@ -330,14 +330,14 @@ export function Glossary() {
                 <div
                   key={t.term}
                   style={{
-                    background: '#1a1d27',
-                    border: '1px solid #2a2d3e',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border)',
                     borderRadius: 10,
                     padding: '16px 20px',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontSize: 15, fontWeight: 600, color: '#e2e8f0' }}>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-h)' }}>
                       {t.term}
                     </span>
                     {t.abbr && (
@@ -356,7 +356,7 @@ export function Glossary() {
                       </span>
                     )}
                   </div>
-                  <p style={{ margin: '0 0 6px', fontSize: 14, color: '#94a3b8', lineHeight: 1.65 }}>
+                  <p style={{ margin: '0 0 6px', fontSize: 14, color: 'var(--text)', lineHeight: 1.65 }}>
                     {t.definition}
                   </p>
                   {t.example && (
@@ -364,11 +364,11 @@ export function Glossary() {
                       style={{
                         marginTop: 8,
                         padding: '8px 12px',
-                        background: '#0f1117',
+                        background: 'var(--surface-code)',
                         borderRadius: 6,
                         borderLeft: `3px solid ${tag.color}`,
                         fontSize: 13,
-                        color: '#64748b',
+                        color: 'var(--text-muted)',
                         fontStyle: 'italic',
                       }}
                     >

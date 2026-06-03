@@ -1,13 +1,16 @@
 @import "tailwindcss";
 
-:root {
+:root,
+[data-theme="dark"] {
   --bg: #0f1117;
   --bg-card: #1a1d27;
   --bg-card-hover: #1f2335;
+  --bg-card2: #111318;
   --border: #2a2d3e;
   --text: #94a3b8;
   --text-h: #e2e8f0;
   --text-muted: #64748b;
+  --text-dim: #9ca3af;
   --accent: #6366f1;
   --accent-light: #818cf8;
   --profit: #10b981;
@@ -17,6 +20,35 @@
   --bearish: #ef4444;
   --volatile: #8b5cf6;
   --neutral-strat: #3b82f6;
+  --nav-bg: #0f1117;
+  --nav-border: #2a2d3e;
+  --surface-code: #0f1117;
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --bg: #f4f6fb;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f2f8;
+  --bg-card2: #f8f9fc;
+  --border: #dde1ee;
+  --text: #4b5577;
+  --text-h: #1a1f36;
+  --text-muted: #8892b0;
+  --text-dim: #6b7492;
+  --accent: #5254cc;
+  --accent-light: #6366f1;
+  --profit: #0ea570;
+  --loss: #dc2626;
+  --neutral: #d97706;
+  --bullish: #0ea570;
+  --bearish: #dc2626;
+  --volatile: #7c3aed;
+  --neutral-strat: #2563eb;
+  --nav-bg: #ffffff;
+  --nav-border: #dde1ee;
+  --surface-code: #eef0f8;
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; }
@@ -29,6 +61,7 @@ body {
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.2s, color 0.2s;
 }
 
 #root {

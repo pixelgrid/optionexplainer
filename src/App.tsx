@@ -26,6 +26,7 @@ import { DividendSafety } from './pages/DividendSafety';
 import { Landing } from './pages/Landing';
 import { NewsSentiment } from './pages/NewsSentiment';
 import { ZeroCostCollar } from './pages/ZeroCostCollar';
+import { StocksGlossary } from './pages/StocksGlossary';
 
 export default function App() {
   return (
@@ -58,6 +59,7 @@ export default function App() {
         <Route path="/dividends" element={<DividendSafety />} />
         <Route path="/news-sentiment" element={<NewsSentiment />} />
         <Route path="/zero-cost-collar" element={<ZeroCostCollar />} />
+        <Route path="/stocks-glossary" element={<StocksGlossary />} />
       </Routes>
     </BrowserRouter>
   );
