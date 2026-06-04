@@ -104,6 +104,7 @@ function Dropdown({ section }: { section: NavSection }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const ref = useRef<HTMLDivElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -114,6 +115,14 @@ function Dropdown({ section }: { section: NavSection }) {
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
+  const handleEnter = () => {
+    if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
+    setOpen(true);
+  };
+  const handleLeave = () => {
+    closeTimer.current = setTimeout(() => setOpen(false), 150);
+  };
+
   const totalLinks = section.groups.reduce((s, g) => s + g.links.length, 0);
   const isWide = totalLinks > 8;
 
@@ -121,8 +130,8 @@ function Dropdown({ section }: { section: NavSection }) {
     <div
       ref={ref}
       style={{ position: 'relative' }}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
     >
       <button
         onClick={() => setOpen(v => !v)}
@@ -151,18 +160,21 @@ function Dropdown({ section }: { section: NavSection }) {
             position: 'absolute',
             top: '100%',
             right: 0,
-            marginTop: 4,
+            paddingTop: 6,   // replaces marginTop — keeps gap visual but stays inside the hover zone
+            background: 'transparent',
+            zIndex: 50,
+            minWidth: isWide ? 580 : 220,
+          }}
+        >
+          <div style={{
             background: 'var(--bg-card)',
             border: '1px solid var(--border)',
             borderRadius: 12,
             padding: '16px 0 10px',
-            zIndex: 50,
             boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
             display: 'flex',
             gap: 0,
-            minWidth: isWide ? 580 : 220,
-          }}
-        >
+          }}>
           {section.groups.map((group, gi) => (
             <div key={gi} style={{ flex: 1, padding: '0 16px', borderLeft: gi > 0 ? '1px solid var(--border)' : 'none' }}>
               <div style={{ color: section.accent, fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', padding: '0 0 8px', textTransform: 'uppercase' }}>
@@ -186,6 +198,7 @@ function Dropdown({ section }: { section: NavSection }) {
               ))}
             </div>
           ))}
+          </div>
         </div>
       )}
     </div>
