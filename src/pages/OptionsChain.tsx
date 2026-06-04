@@ -4,7 +4,7 @@ function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: st
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
@@ -89,12 +89,12 @@ export function OptionsChain() {
         padding: '8px 10px',
         fontSize: 11,
         fontWeight: 600,
-        color: '#64748b',
+        color: 'var(--text-muted)',
         textTransform: 'uppercase',
         letterSpacing: '0.05em',
         textAlign: align,
         cursor: columnDescriptions[label] ? 'help' : 'default',
-        borderBottom: columnDescriptions[label] ? '1px dashed #2a2d3e' : 'none',
+        borderBottom: columnDescriptions[label] ? '1px dashed var(--border)' : 'none',
         whiteSpace: 'nowrap',
       }}
     >
@@ -112,13 +112,13 @@ export function OptionsChain() {
           position: 'fixed',
           left: tooltip.x + 12,
           top: tooltip.y + 8,
-          background: '#1a1d27',
-          border: '1px solid #2a2d3e',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border)',
           borderRadius: 8,
           padding: '8px 12px',
           maxWidth: 260,
           fontSize: 12,
-          color: '#94a3b8',
+          color: 'var(--text)',
           lineHeight: 1.5,
           zIndex: 100,
           pointerEvents: 'none',
@@ -128,23 +128,23 @@ export function OptionsChain() {
         </div>
       )}
 
-      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
         Reading an Options Chain
       </h1>
-      <p style={{ margin: '0 0 32px', color: '#64748b', fontSize: 15, lineHeight: 1.7 }}>
+      <p style={{ margin: '0 0 32px', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7 }}>
         An options chain displays all available contracts for a given underlying and expiry. Calls are on the left, puts on the right, strikes in the middle. Hover over any column header to see what it means. ITM rows are highlighted to help you quickly identify moneyness.
       </p>
 
       {/* Stock info bar */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginBottom: 20, padding: '12px 20px', background: '#1a1d27', borderRadius: 10, border: '1px solid #2a2d3e' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12, marginBottom: 20, padding: '12px 20px', background: 'var(--bg-card)', borderRadius: 10, border: '1px solid var(--border)' }}>
         <div>
-          <span style={{ fontSize: 18, fontWeight: 700, color: '#e2e8f0' }}>XYZ</span>
-          <span style={{ fontSize: 14, color: '#64748b', marginLeft: 8 }}>@ $100.00</span>
+          <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-h)' }}>XYZ</span>
+          <span style={{ fontSize: 14, color: 'var(--text-muted)', marginLeft: 8 }}>@ $100.00</span>
         </div>
-        <div style={{ width: 1, height: 24, background: '#2a2d3e', flexShrink: 0 }} />
-        <div style={{ fontSize: 13, color: '#64748b' }}>Expiry: <span style={{ color: '#e2e8f0', fontWeight: 500 }}>Jun 20</span></div>
-        <div style={{ fontSize: 13, color: '#64748b' }}>DTE: <span style={{ color: '#e2e8f0', fontWeight: 500 }}>21</span></div>
-        <div style={{ fontSize: 13, color: '#64748b' }}>IV: <span style={{ color: '#f59e0b', fontWeight: 500 }}>26%</span></div>
+        <div style={{ width: 1, height: 24, background: 'var(--border)', flexShrink: 0 }} />
+        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Expiry: <span style={{ color: 'var(--text-h)', fontWeight: 500 }}>Jun 20</span></div>
+        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>DTE: <span style={{ color: 'var(--text-h)', fontWeight: 500 }}>21</span></div>
+        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>IV: <span style={{ color: '#f59e0b', fontWeight: 500 }}>26%</span></div>
         <div style={{ display: 'flex', gap: 8, fontSize: 12, flexWrap: 'wrap' }}>
           <span style={{ padding: '3px 8px', background: '#10b98118', borderRadius: 4, color: '#10b981' }}>ITM Call</span>
           <span style={{ padding: '3px 8px', background: '#6366f118', borderRadius: 4, color: '#6366f1' }}>ATM</span>
@@ -153,23 +153,23 @@ export function OptionsChain() {
       </div>
 
       {/* Chain table */}
-      <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, overflow: 'auto', marginBottom: 40 }}>
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'auto', marginBottom: 40 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
           <thead>
-            <tr style={{ borderBottom: '2px solid #2a2d3e' }}>
-              <th colSpan={7} style={{ padding: '8px 16px', fontSize: 12, fontWeight: 600, color: '#10b981', textAlign: 'center', background: '#10b98108', borderRight: '2px solid #2a2d3e', letterSpacing: '0.08em' }}>
+            <tr style={{ borderBottom: '2px solid var(--border)' }}>
+              <th colSpan={7} style={{ padding: '8px 16px', fontSize: 12, fontWeight: 600, color: '#10b981', textAlign: 'center', background: '#10b98108', borderRight: '2px solid var(--border)', letterSpacing: '0.08em' }}>
                 CALLS
               </th>
-              <th style={{ padding: '8px 16px', fontSize: 12, fontWeight: 700, color: '#94a3b8', textAlign: 'center', background: '#0f1117' }}>
+              <th style={{ padding: '8px 16px', fontSize: 12, fontWeight: 700, color: 'var(--text)', textAlign: 'center', background: 'var(--bg)' }}>
                 STRIKE
               </th>
-              <th colSpan={7} style={{ padding: '8px 16px', fontSize: 12, fontWeight: 600, color: '#ef4444', textAlign: 'center', background: '#ef444408', borderLeft: '2px solid #2a2d3e', letterSpacing: '0.08em' }}>
+              <th colSpan={7} style={{ padding: '8px 16px', fontSize: 12, fontWeight: 600, color: '#ef4444', textAlign: 'center', background: '#ef444408', borderLeft: '2px solid var(--border)', letterSpacing: '0.08em' }}>
                 PUTS
               </th>
             </tr>
-            <tr style={{ borderBottom: '1px solid #2a2d3e' }}>
+            <tr style={{ borderBottom: '1px solid var(--border)' }}>
               {['Vol', 'OI', 'Delta', 'IV%', 'Last', 'Ask', 'Bid'].map((h) => th(h))}
-              <th style={{ padding: '8px 16px', textAlign: 'center', fontSize: 11, color: '#475569', background: '#0f1117' }}></th>
+              <th style={{ padding: '8px 16px', textAlign: 'center', fontSize: 11, color: '#475569', background: 'var(--bg)' }}></th>
               {['Bid', 'Ask', 'Last', 'IV%', 'Delta', 'OI', 'Vol'].map((h) => th(h))}
             </tr>
           </thead>
@@ -192,39 +192,39 @@ export function OptionsChain() {
               return (
                 <tr
                   key={row.strike}
-                  style={{ borderBottom: '1px solid #1e2130', transition: 'background 0.1s' }}
+                  style={{ borderBottom: '1px solid var(--border)', transition: 'background 0.1s' }}
                   onMouseEnter={(e) => (e.currentTarget.style.background = '#ffffff08')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#64748b', fontFamily: 'monospace', background: rowBg }}>{row.call.vol.toLocaleString()}</td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#94a3b8', fontFamily: 'monospace', background: rowBg }}>{row.call.oi.toLocaleString()}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: 'var(--text-muted)', fontFamily: 'monospace', background: rowBg }}>{row.call.vol.toLocaleString()}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: 'var(--text)', fontFamily: 'monospace', background: rowBg }}>{row.call.oi.toLocaleString()}</td>
                   <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#10b981', fontFamily: 'monospace', background: rowBg }}>{fmt(row.call.delta, 2)}</td>
                   <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#f59e0b', fontFamily: 'monospace', background: rowBg }}>{row.call.iv}%</td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#94a3b8', fontFamily: 'monospace', background: rowBg }}>{fmt(row.call.last)}</td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#e2e8f0', fontFamily: 'monospace', background: rowBg }}>{fmt(row.call.ask)}</td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#94a3b8', fontFamily: 'monospace', background: rowBg, borderRight: '2px solid #2a2d3e' }}>{fmt(row.call.bid)}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: 'var(--text)', fontFamily: 'monospace', background: rowBg }}>{fmt(row.call.last)}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: 'var(--text-h)', fontFamily: 'monospace', background: rowBg }}>{fmt(row.call.ask)}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: 'var(--text)', fontFamily: 'monospace', background: rowBg, borderRight: '2px solid var(--border)' }}>{fmt(row.call.bid)}</td>
 
                   <td style={{
                     padding: '9px 16px',
                     textAlign: 'center',
                     fontSize: 14,
                     fontWeight: 700,
-                    color: isAtm ? '#6366f1' : '#e2e8f0',
-                    background: isAtm ? '#6366f120' : '#0f1117',
-                    borderLeft: '2px solid #2a2d3e',
-                    borderRight: '2px solid #2a2d3e',
+                    color: isAtm ? '#6366f1' : 'var(--text-h)',
+                    background: isAtm ? '#6366f120' : 'var(--bg)',
+                    borderLeft: '2px solid var(--border)',
+                    borderRight: '2px solid var(--border)',
                     whiteSpace: 'nowrap',
                   }}>
                     {row.strike}{isAtm ? ' ★' : ''}
                   </td>
 
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#94a3b8', fontFamily: 'monospace', background: putBg, borderLeft: '2px solid #2a2d3e' }}>{fmt(row.put.bid)}</td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#e2e8f0', fontFamily: 'monospace', background: putBg }}>{fmt(row.put.ask)}</td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#94a3b8', fontFamily: 'monospace', background: putBg }}>{fmt(row.put.last)}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: 'var(--text)', fontFamily: 'monospace', background: putBg, borderLeft: '2px solid var(--border)' }}>{fmt(row.put.bid)}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: 'var(--text-h)', fontFamily: 'monospace', background: putBg }}>{fmt(row.put.ask)}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: 'var(--text)', fontFamily: 'monospace', background: putBg }}>{fmt(row.put.last)}</td>
                   <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#f59e0b', fontFamily: 'monospace', background: putBg }}>{row.put.iv}%</td>
                   <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#ef4444', fontFamily: 'monospace', background: putBg }}>{fmt(row.put.delta, 2)}</td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#94a3b8', fontFamily: 'monospace', background: putBg }}>{row.put.oi.toLocaleString()}</td>
-                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: '#64748b', fontFamily: 'monospace', background: putBg }}>{row.put.vol.toLocaleString()}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: 'var(--text)', fontFamily: 'monospace', background: putBg }}>{row.put.oi.toLocaleString()}</td>
+                  <td style={{ padding: '9px 10px', textAlign: 'right', fontSize: 13, color: 'var(--text-muted)', fontFamily: 'monospace', background: putBg }}>{row.put.vol.toLocaleString()}</td>
                 </tr>
               );
             })}
@@ -258,9 +258,9 @@ export function OptionsChain() {
               text: 'The $100 strike has 4,200 call OI and 3,900 put OI — by far the highest. This is the "max pain" strike, the price at which the most open options expire worthless. In the final week before expiry, some traders believe market makers exert gravitational pull toward this level. It\'s not a reliable timing tool but worth watching.',
             },
           ].map(({ title, color, text }) => (
-            <div key={title} style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '16px 20px', borderLeft: `3px solid ${color}` }}>
+            <div key={title} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 20px', borderLeft: `3px solid ${color}` }}>
               <div style={{ fontSize: 14, fontWeight: 600, color, marginBottom: 8 }}>{title}</div>
-              <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.65 }}>{text}</p>
+              <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.65 }}>{text}</p>
             </div>
           ))}
         </div>

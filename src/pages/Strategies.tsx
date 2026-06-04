@@ -25,10 +25,10 @@ export function Strategies() {
     <div style={{ maxWidth: 1280, margin: '0 auto', padding: 'clamp(20px, 4vw, 32px) clamp(14px, 3vw, 24px)' }}>
       {/* Hero */}
       <div style={{ marginBottom: 32 }}>
-        <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+        <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
           Options Strategy Guide
         </h1>
-        <p style={{ margin: 0, color: '#64748b', fontSize: 15 }}>
+        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: 15 }}>
           {strategies.length} strategies with live P&L charts. Click any card to see when it's best used.
         </p>
       </div>
@@ -44,9 +44,9 @@ export function Strategies() {
               style={{
                 padding: '7px 18px',
                 borderRadius: 8,
-                border: `1px solid ${isActive ? f.color : '#2a2d3e'}`,
+                border: `1px solid ${isActive ? f.color : 'var(--border)'}`,
                 background: isActive ? `${f.color}18` : 'transparent',
-                color: isActive ? f.color : '#64748b',
+                color: isActive ? f.color : 'var(--text-muted)',
                 fontSize: 13,
                 fontWeight: isActive ? 600 : 400,
                 cursor: 'pointer',

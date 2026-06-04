@@ -6,24 +6,24 @@ import {
 import { blackScholes } from '../lib/blackScholes';
 
 const CHART_STYLE = {
-  cartesianGrid: { strokeDasharray: '3 3', stroke: '#1e2130' },
-  xAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  yAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  tooltip: { contentStyle: { background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 8, fontSize: 13 } },
+  cartesianGrid: { strokeDasharray: '3 3', stroke: 'var(--border)' },
+  xAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  yAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  tooltip: { contentStyle: { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13 } },
 };
 
 function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20, ...style }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20, ...style }}>
       {children}
     </div>
   );
@@ -71,24 +71,24 @@ export function Earnings() {
 
   return (
     <div className="page-wrap">
-      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
         Earnings Playbook
       </h1>
-      <p style={{ margin: '0 0 40px', color: '#64748b', fontSize: 15, lineHeight: 1.7 }}>
+      <p style={{ margin: '0 0 40px', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7 }}>
         Earnings announcements are the most intense, high-IV events in options trading. The potential for large profits and large losses is equally high. This playbook covers everything you need to trade earnings intelligently — or avoid it entirely.
       </p>
 
       {/* Section 1: IV Behavior Around Earnings */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="IV Behavior Around Earnings" color="#8b5cf6" />
-        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           The pattern is highly predictable: IV begins rising slowly about 2 weeks before earnings, accelerates sharply in the final 3–5 days, peaks on earnings day itself, then collapses immediately after the news resolves. This behavior is known as the "volatility crush" and it's so reliable that entire strategies are built around it.
         </p>
         <Card>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={ivEarningsData}>
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-              <XAxis dataKey="day" {...CHART_STYLE.xAxis} label={{ value: 'Days from Earnings', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} />
+              <XAxis dataKey="day" {...CHART_STYLE.xAxis} label={{ value: 'Days from Earnings', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} />
               <YAxis {...CHART_STYLE.yAxis} unit="%" domain={[15, 80]} />
               <Tooltip {...CHART_STYLE.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`${n}%`, 'IV']; }} />
               <ReferenceLine x={0} stroke="#f59e0b" strokeWidth={2} label={{ value: 'Earnings', fill: '#f59e0b', fontSize: 11, position: 'top' }} />
@@ -104,30 +104,30 @@ export function Earnings() {
       {/* Section 2: Implied Move Calculator */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="The Implied Move" color="#6366f1" />
-        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
-          The "implied move" is the market's expected 1-standard-deviation price range for an earnings event. Formula: <code style={{ background: '#0f1117', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: '#e2e8f0' }}>±Move ≈ IV × √(DTE/365) × Stock Price</code>. This tells you how much the market is pricing in for the event. If the actual move exceeds the implied move, long straddle buyers profit; if it falls short, they lose.
+        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
+          The "implied move" is the market's expected 1-standard-deviation price range for an earnings event. Formula: <code style={{ background: 'var(--bg)', padding: '2px 6px', borderRadius: 4, fontSize: 12, color: 'var(--text-h)' }}>±Move ≈ IV × √(DTE/365) × Stock Price</code>. This tells you how much the market is pricing in for the event. If the actual move exceeds the implied move, long straddle buyers profit; if it falls short, they lose.
         </p>
         <Card>
           <div className="g-2" style={{ gap: 20, marginBottom: 20 }}>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: 13, color: '#94a3b8' }}>IV %</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#e2e8f0', fontFamily: 'monospace' }}>{ivInput}%</span>
+                <span style={{ fontSize: 13, color: 'var(--text)' }}>IV %</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-h)', fontFamily: 'monospace' }}>{ivInput}%</span>
               </div>
               <input type="range" min={10} max={150} value={ivInput} onChange={(e) => setIvInput(Number(e.target.value))} style={{ width: '100%', accentColor: '#6366f1' }} />
             </div>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: 13, color: '#94a3b8' }}>DTE (to event)</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#e2e8f0', fontFamily: 'monospace' }}>{dteInput}d</span>
+                <span style={{ fontSize: 13, color: 'var(--text)' }}>DTE (to event)</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-h)', fontFamily: 'monospace' }}>{dteInput}d</span>
               </div>
               <input type="range" min={1} max={30} value={dteInput} onChange={(e) => setDteInput(Number(e.target.value))} style={{ width: '100%', accentColor: '#6366f1' }} />
             </div>
           </div>
-          <div className="g-3" style={{ background: '#0f1117', borderRadius: 8, padding: '16px 20px', gap: 16 }}>
+          <div className="g-3" style={{ background: 'var(--bg)', borderRadius: 8, padding: '16px 20px', gap: 16 }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 11, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Stock Price</div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: '#94a3b8', fontFamily: 'monospace' }}>$100</div>
+              <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)', fontFamily: 'monospace' }}>$100</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 11, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>±1σ Move</div>
@@ -150,9 +150,9 @@ export function Earnings() {
         <Card style={{ overflow: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ borderBottom: '2px solid #2a2d3e' }}>
+              <tr style={{ borderBottom: '2px solid var(--border)' }}>
                 {['Market View', 'Strategy', 'When to Enter', 'Risk / Reward', 'Notes'].map((h) => (
-                  <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 11, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                  <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -171,17 +171,17 @@ export function Earnings() {
                   view: 'Directional + moderate move', strategy: 'Debit Spread (Bull/Bear)', when: 'Before earnings, IVR < 60', rr: 'Limited / Limited', notes: 'The long leg benefits from direction; short leg reduces IV exposure', color: '#f59e0b',
                 },
                 {
-                  view: 'Don\'t want to guess direction', strategy: 'Sit it out / Close positions', when: '1 day before earnings', rr: 'N/A', notes: 'Often the best play for premium sellers — avoid the binary event entirely', color: '#64748b',
+                  view: 'Don\'t want to guess direction', strategy: 'Sit it out / Close positions', when: '1 day before earnings', rr: 'N/A', notes: 'Often the best play for premium sellers — avoid the binary event entirely', color: 'var(--text-muted)',
                 },
               ].map((row, i) => (
-                <tr key={row.strategy} style={{ borderBottom: '1px solid #1e2130', background: i % 2 === 0 ? 'transparent' : '#ffffff04' }}>
-                  <td style={{ padding: '10px 12px', fontSize: 13, color: '#94a3b8' }}>{row.view}</td>
+                <tr key={row.strategy} style={{ borderBottom: '1px solid var(--border)', background: i % 2 === 0 ? 'transparent' : '#ffffff04' }}>
+                  <td style={{ padding: '10px 12px', fontSize: 13, color: 'var(--text)' }}>{row.view}</td>
                   <td style={{ padding: '10px 12px', fontSize: 13, fontWeight: 600 }}>
                     <span style={{ color: row.color }}>{row.strategy}</span>
                   </td>
-                  <td style={{ padding: '10px 12px', fontSize: 12, color: '#64748b' }}>{row.when}</td>
-                  <td style={{ padding: '10px 12px', fontSize: 12, color: '#64748b', whiteSpace: 'nowrap' }}>{row.rr}</td>
-                  <td style={{ padding: '10px 12px', fontSize: 12, color: '#64748b' }}>{row.notes}</td>
+                  <td style={{ padding: '10px 12px', fontSize: 12, color: 'var(--text-muted)' }}>{row.when}</td>
+                  <td style={{ padding: '10px 12px', fontSize: 12, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{row.rr}</td>
+                  <td style={{ padding: '10px 12px', fontSize: 12, color: 'var(--text-muted)' }}>{row.notes}</td>
                 </tr>
               ))}
             </tbody>
@@ -192,21 +192,21 @@ export function Earnings() {
       {/* Section 4: IV Crush Example */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="IV Crush Example — The Math" color="#ef4444" />
-        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           This is the most important thing to understand about earnings trading. Let's walk through the numbers step by step.
         </p>
         <div className="g-2" style={{ gap: 16, marginBottom: 20 }}>
           <Card style={{ borderTop: '3px solid #6366f1' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#6366f1', marginBottom: 12 }}>Before Earnings</div>
             {[
-              { label: 'Stock Price', value: '$100', color: '#e2e8f0' },
+              { label: 'Stock Price', value: '$100', color: 'var(--text-h)' },
               { label: 'IV', value: '60%', color: '#ef4444' },
               { label: 'ATM Call (1 DTE)', value: `$${blackScholes({ S: 100, K: 100, T: 1/365, r: 0.05, sigma: 0.60 }).call.toFixed(2)}`, color: '#10b981' },
               { label: 'ATM Put (1 DTE)', value: `$${blackScholes({ S: 100, K: 100, T: 1/365, r: 0.05, sigma: 0.60 }).put.toFixed(2)}`, color: '#ef4444' },
               { label: 'Straddle Cost', value: `$${straddlePreEarnings.straddle}`, color: '#8b5cf6' },
             ].map(({ label, value, color }) => (
-              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #1e2130' }}>
-                <span style={{ fontSize: 13, color: '#64748b' }}>{label}</span>
+              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{label}</span>
                 <span style={{ fontSize: 13, fontWeight: 600, color, fontFamily: 'monospace' }}>{value}</span>
               </div>
             ))}
@@ -220,14 +220,14 @@ export function Earnings() {
               { label: 'Put (105 stock, 25% IV)', value: `$${blackScholes({ S: 105, K: 100, T: 1/365, r: 0.05, sigma: 0.25 }).put.toFixed(2)}`, color: '#ef4444' },
               { label: 'Straddle Value', value: `$${straddlePostEarnings5.straddle}`, color: '#8b5cf6' },
             ].map(({ label, value, color }) => (
-              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #1e2130' }}>
-                <span style={{ fontSize: 13, color: '#64748b' }}>{label}</span>
+              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{label}</span>
                 <span style={{ fontSize: 13, fontWeight: 600, color, fontFamily: 'monospace' }}>{value}</span>
               </div>
             ))}
           </Card>
         </div>
-        <div style={{ padding: '16px 20px', background: '#ef444418', border: '1px solid #ef444440', borderRadius: 10, fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <div style={{ padding: '16px 20px', background: '#ef444418', border: '1px solid #ef444440', borderRadius: 10, fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           <strong style={{ color: '#ef4444' }}>Result:</strong> You paid ${straddlePreEarnings.straddle} for the straddle. After a +5% gap up, it's worth ${straddlePostEarnings5.straddle}. You <strong style={{ color: '#ef4444' }}>lost ${(straddlePreEarnings.straddle - straddlePostEarnings5.straddle).toFixed(2)} ({(((straddlePreEarnings.straddle - straddlePostEarnings5.straddle) / straddlePreEarnings.straddle) * 100).toFixed(0)}%)</strong> despite the stock moving in the right direction. The IV collapse from 60% to 25% removed more value than the directional move added. This is why the implied move matters — you needed the stock to move MORE than what the market had already priced in.
         </div>
       </section>
@@ -243,9 +243,9 @@ export function Earnings() {
             { rule: 'Know the implied move before entering', color: '#6366f1', text: 'Calculate the ±1σ implied move. Only trade earnings if you have a strong view that the actual move will significantly exceed (for longs) or fall short of (for short premium) the implied move.' },
             { rule: 'Size smaller for earnings trades', color: '#10b981', text: 'Earnings are binary events with high uncertainty. Use 25–50% of your normal position size. You might be right about the company but wrong about the timing, the IV impact, or the market\'s reaction to "in-line" results.' },
           ].map(({ rule, color, text }) => (
-            <div key={rule} style={{ padding: '12px 16px', background: '#1a1d27', borderRadius: 8, borderLeft: `3px solid ${color}`, border: '1px solid #2a2d3e', borderLeftWidth: 3, borderLeftColor: color }}>
+            <div key={rule} style={{ padding: '12px 16px', background: 'var(--bg-card)', borderRadius: 8, borderLeft: `3px solid ${color}`, border: '1px solid var(--border)', borderLeftWidth: 3, borderLeftColor: color }}>
               <div style={{ fontSize: 13, fontWeight: 600, color, marginBottom: 6 }}>{rule}</div>
-              <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>{text}</p>
+              <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>{text}</p>
             </div>
           ))}
         </div>

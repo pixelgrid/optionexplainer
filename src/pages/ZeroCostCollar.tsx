@@ -7,8 +7,8 @@ import {
 // ── Shared styles ──────────────────────────────────────────────────────────
 
 const card = (style?: React.CSSProperties): React.CSSProperties => ({
-  background: '#1a1d27',
-  border: '1px solid #2a2d3e',
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border)',
   borderRadius: 10,
   padding: '20px 24px',
   ...style,
@@ -16,28 +16,28 @@ const card = (style?: React.CSSProperties): React.CSSProperties => ({
 
 const CHART = {
   tooltip: {
-    contentStyle: { background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 8, fontSize: 12, color: '#e2e8f0' },
+    contentStyle: { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, color: 'var(--text-h)' },
   },
-  grid: { strokeDasharray: '3 3', stroke: '#1e2130' },
-  xAxis: { tick: { fill: '#64748b', fontSize: 11 }, tickLine: false, axisLine: { stroke: '#2a2d3e' } },
-  yAxis: { tick: { fill: '#64748b', fontSize: 11 }, tickLine: false, axisLine: false },
+  grid: { strokeDasharray: '3 3', stroke: 'var(--border)' },
+  xAxis: { tick: { fill: 'var(--text-muted)', fontSize: 11 }, tickLine: false, axisLine: { stroke: 'var(--border)' } },
+  yAxis: { tick: { fill: 'var(--text-muted)', fontSize: 11 }, tickLine: false, axisLine: false },
 };
 
 function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, marginTop: 40 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
 
 function KeyBox({ label, value, sub, color = '#818cf8' }: { label: string; value: string; sub?: string; color?: string }) {
   return (
-    <div style={{ background: '#0f1117', border: '1px solid #2a2d3e', borderRadius: 10, padding: '14px 18px' }}>
+    <div style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px' }}>
       <div style={{ color: '#475569', fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', marginBottom: 5 }}>{label}</div>
       <div style={{ color, fontSize: 22, fontWeight: 700 }}>{value}</div>
-      {sub && <div style={{ color: '#64748b', fontSize: 11, marginTop: 3 }}>{sub}</div>}
+      {sub && <div style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 3 }}>{sub}</div>}
     </div>
   );
 }
@@ -54,7 +54,7 @@ function RiskCard({ title, body, severity }: { title: string; body: string; seve
         <div style={{ width: 8, height: 8, borderRadius: '50%', background: cfg.dot, flexShrink: 0 }} />
         <div style={{ color: cfg.title, fontWeight: 700, fontSize: 13 }}>{title}</div>
       </div>
-      <div style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.6 }}>{body}</div>
+      <div style={{ color: 'var(--text)', fontSize: 13, lineHeight: 1.6 }}>{body}</div>
     </div>
   );
 }
@@ -66,7 +66,7 @@ function Slider({ label, value, min, max, step, onChange, fmt }: {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-        <span style={{ color: '#94a3b8', fontSize: 13 }}>{label}</span>
+        <span style={{ color: 'var(--text)', fontSize: 13 }}>{label}</span>
         <span style={{ color: '#818cf8', fontWeight: 700 }}>{fmt(value)}</span>
       </div>
       <input type="range" min={min} max={max} step={step} value={value}
@@ -160,10 +160,10 @@ export function ZeroCostCollar() {
           <span style={{ background: '#6366f120', color: '#818cf8', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 5, letterSpacing: '0.06em' }}>ADVANCED</span>
           <span style={{ background: '#10b98120', color: '#10b981', fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 5, letterSpacing: '0.06em' }}>HEDGING</span>
         </div>
-        <h1 style={{ margin: '0 0 10px', color: '#e2e8f0', fontSize: 'clamp(24px,5vw,34px)', fontWeight: 800, letterSpacing: '-0.02em' }}>
+        <h1 style={{ margin: '0 0 10px', color: 'var(--text-h)', fontSize: 'clamp(24px,5vw,34px)', fontWeight: 800, letterSpacing: '-0.02em' }}>
           Zero-Cost Collar
         </h1>
-        <p style={{ margin: 0, color: '#64748b', fontSize: 15, lineHeight: 1.7, maxWidth: 680 }}>
+        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7, maxWidth: 680 }}>
           A collar where the premium from the short call <em>exactly funds</em> the long put — net cost $0.
           On parabolic momentum stocks, extreme positive call skew makes this possible at strike distances
           that would be impossible on a normal stock.
@@ -175,23 +175,23 @@ export function ZeroCostCollar() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
           <div>
             <div style={{ color: '#818cf8', fontSize: 12, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>STANDARD COLLAR</div>
-            <div style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.7 }}>
+            <div style={{ color: 'var(--text)', fontSize: 13, lineHeight: 1.7 }}>
               Long stock + long put + short call. The put costs money; the call rebate partially offsets it.
               Typical result: <span style={{ color: '#f59e0b' }}>net debit</span> — you pay for the hedge.
             </div>
           </div>
-          <div style={{ borderLeft: '1px solid #2a2d3e', paddingLeft: 20 }}>
+          <div style={{ borderLeft: '1px solid var(--border)', paddingLeft: 20 }}>
             <div style={{ color: '#10b981', fontSize: 12, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>ZERO-COST COLLAR</div>
-            <div style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.7 }}>
-              Same structure, but call premium <strong style={{ color: '#e2e8f0' }}>exactly funds</strong> the put.
+            <div style={{ color: 'var(--text)', fontSize: 13, lineHeight: 1.7 }}>
+              Same structure, but call premium <strong style={{ color: 'var(--text-h)' }}>exactly funds</strong> the put.
               Net cost = $0. Only possible when call skew is extreme — calls priced significantly
               richer than equidistant puts.
             </div>
           </div>
-          <div style={{ borderLeft: '1px solid #2a2d3e', paddingLeft: 20 }}>
+          <div style={{ borderLeft: '1px solid var(--border)', paddingLeft: 20 }}>
             <div style={{ color: '#6366f1', fontSize: 12, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>THE EDGE</div>
-            <div style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.7 }}>
-              On a momentum stock where skew is inverted, you can sell a call <strong style={{ color: '#e2e8f0' }}>far OTM</strong> (20–50% above spot)
+            <div style={{ color: 'var(--text)', fontSize: 13, lineHeight: 1.7 }}>
+              On a momentum stock where skew is inverted, you can sell a call <strong style={{ color: 'var(--text-h)' }}>far OTM</strong> (20–50% above spot)
               and still collect enough to buy a meaningful put (10–15% below spot). On a normal stock,
               zero-cost would mean selling a call <em>near the money</em>, giving up almost all upside.
             </div>
@@ -201,7 +201,7 @@ export function ZeroCostCollar() {
 
       {/* ── SNDK Leg Table ── */}
       <SectionHeader title="The SNDK Blueprint — Concrete Example" color="#10b981" />
-      <p style={{ color: '#64748b', fontSize: 13, margin: '-8px 0 16px' }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: '-8px 0 16px' }}>
         SNDK ran +4,500% over several years and ~+80% in a single month. At peak momentum,
         call IV exceeded put IV at every strike — an inverted skew that funded this exact structure.
       </p>
@@ -209,18 +209,18 @@ export function ZeroCostCollar() {
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid #2a2d3e' }}>
+              <tr style={{ borderBottom: '1px solid var(--border)' }}>
                 {['Leg', 'Strike / Level', 'Purpose', 'Detail'].map(h => (
-                  <th key={h} style={{ textAlign: 'left', padding: '12px 16px', color: '#64748b', fontWeight: 500 }}>{h}</th>
+                  <th key={h} style={{ textAlign: 'left', padding: '12px 16px', color: 'var(--text-muted)', fontWeight: 500 }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {SNDK_LEGS.map((r, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid #1e2130' }}>
-                  <td style={{ padding: '11px 16px', color: '#e2e8f0', fontWeight: 600 }}>{r.leg}</td>
+                <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+                  <td style={{ padding: '11px 16px', color: 'var(--text-h)', fontWeight: 600 }}>{r.leg}</td>
                   <td style={{ padding: '11px 16px', color: '#818cf8', fontFamily: 'monospace', fontWeight: 700 }}>{r.strike}</td>
-                  <td style={{ padding: '11px 16px', color: '#94a3b8' }}>{r.purpose}</td>
+                  <td style={{ padding: '11px 16px', color: 'var(--text)' }}>{r.purpose}</td>
                   <td style={{ padding: '11px 16px', color: '#475569', fontSize: 12 }}>{r.note}</td>
                 </tr>
               ))}
@@ -233,13 +233,13 @@ export function ZeroCostCollar() {
         <KeyBox label="UPSIDE POTENTIAL" value="+47%" sub="$1,684 → $2,480" color="#10b981" />
         <KeyBox label="RISK / REWARD" value="1 : 3.9" sub="$204 risk vs $796 gain" color="#818cf8" />
         <KeyBox label="NET PREMIUM" value="$0" sub="Call funds the put" color="#f59e0b" />
-        <KeyBox label="EXPIRY" value="Jun 2027" sub="383 days of time" color="#64748b" />
+        <KeyBox label="EXPIRY" value="Jun 2027" sub="383 days of time" color="var(--text-muted)" />
         <KeyBox label="IV AT SETUP" value="~103%" sub="60th+ IV percentile" color="#f59e0b" />
       </div>
 
       {/* ── Interactive Payoff Diagram ── */}
       <SectionHeader title="Interactive Payoff Diagram" color="#6366f1" />
-      <p style={{ color: '#64748b', fontSize: 13, margin: '-8px 0 16px' }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: '-8px 0 16px' }}>
         Adjust the parameters to model any stock. The collar line shows your actual P&amp;L at expiry
         vs holding naked stock. Default values match the SNDK example.
       </p>
@@ -262,7 +262,7 @@ export function ZeroCostCollar() {
             { label: 'Participation Range', value: `$${putStrike.toLocaleString()} – $${callStrike.toLocaleString()}`, color: '#f59e0b', sub: 'full delta exposure' },
           ].map(k => (
             <div key={k.label} style={{ flex: 1, minWidth: 120 }}>
-              <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: '0.05em' }}>{k.label}</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, letterSpacing: '0.05em' }}>{k.label}</div>
               <div style={{ color: k.color, fontSize: 17, fontWeight: 700 }}>{k.value}</div>
               <div style={{ color: '#475569', fontSize: 11 }}>{k.sub}</div>
             </div>
@@ -281,7 +281,7 @@ export function ZeroCostCollar() {
               formatter={(v: unknown, name: unknown) => [fmtDollar(v as number) + ' per share', name === 'collar' ? 'Collar P&L' : 'Naked Stock P&L']}
               labelFormatter={v => `Stock @ $${Number(v).toLocaleString()}`}
             />
-            <Legend wrapperStyle={{ fontSize: 12, color: '#64748b' }}
+            <Legend wrapperStyle={{ fontSize: 12, color: 'var(--text-muted)' }}
               formatter={(v: string) => v === 'collar' ? 'Zero-Cost Collar' : 'Naked Stock'} />
 
             {/* Zone shading */}
@@ -290,13 +290,13 @@ export function ZeroCostCollar() {
             <ReferenceArea x1={callStrike} x2={chartData[chartData.length - 1]?.price} fill="#f59e0b08" />
 
             {/* Reference lines */}
-            <ReferenceLine x={spot} stroke="#64748b" strokeDasharray="4 3"
-              label={{ value: 'Spot', fill: '#64748b', fontSize: 10, position: 'insideTopRight' }} />
+            <ReferenceLine x={spot} stroke="var(--text-muted)" strokeDasharray="4 3"
+              label={{ value: 'Spot', fill: 'var(--text-muted)', fontSize: 10, position: 'insideTopRight' }} />
             <ReferenceLine x={putStrike} stroke="#ef444480" strokeDasharray="4 3"
               label={{ value: 'Put', fill: '#ef4444', fontSize: 10, position: 'insideTopRight' }} />
             <ReferenceLine x={callStrike} stroke="#f59e0b80" strokeDasharray="4 3"
               label={{ value: 'Call', fill: '#f59e0b', fontSize: 10, position: 'insideTopLeft' }} />
-            <ReferenceLine y={0} stroke="#2a2d3e" strokeWidth={1.5} />
+            <ReferenceLine y={0} stroke="var(--border)" strokeWidth={1.5} />
 
             <Line type="monotone" dataKey="naked" stroke="#475569" strokeWidth={1.5}
               strokeDasharray="6 3" dot={false} name="naked" />
@@ -326,10 +326,10 @@ export function ZeroCostCollar() {
       {/* ── Why the Math Works ── */}
       <SectionHeader title="Why the Math Works — The Skew Explanation" color="#8b5cf6" />
       <div style={card({ marginBottom: 20 })}>
-        <p style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.7, margin: '0 0 20px' }}>
-          On a normal stock, the IV surface has a <strong style={{ color: '#e2e8f0' }}>"smirk"</strong> — put IV is higher than call IV
+        <p style={{ color: 'var(--text)', fontSize: 13, lineHeight: 1.7, margin: '0 0 20px' }}>
+          On a normal stock, the IV surface has a <strong style={{ color: 'var(--text-h)' }}>"smirk"</strong> — put IV is higher than call IV
           at equidistant strikes. Everyone wants crash protection, so OTM puts are bid up.
-          On a parabolic momentum stock, this <strong style={{ color: '#e2e8f0' }}>inverts</strong>: call IV exceeds put IV at every
+          On a parabolic momentum stock, this <strong style={{ color: 'var(--text-h)' }}>inverts</strong>: call IV exceeds put IV at every
           strike because momentum chasers are paying up for leveraged upside exposure.
           You're selling that elevated call premium and using it to buy crash insurance.
         </p>
@@ -343,13 +343,13 @@ export function ZeroCostCollar() {
             <ResponsiveContainer width="100%" height={140}>
               <ComposedChart data={SKEW_NORMAL} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid {...CHART.grid} />
-                <XAxis dataKey="delta" {...CHART.xAxis} tick={{ fill: '#64748b', fontSize: 9 }} />
+                <XAxis dataKey="delta" {...CHART.xAxis} tick={{ fill: 'var(--text-muted)', fontSize: 9 }} />
                 <YAxis {...CHART.yAxis} domain={[15, 45]} />
                 <Tooltip {...CHART.tooltip} formatter={(v: unknown) => [`${v as number}%`, 'IV']} />
                 <Line type="monotone" dataKey="iv" stroke="#ef4444" strokeWidth={2} dot={{ r: 3, fill: '#ef4444' }} />
               </ComposedChart>
             </ResponsiveContainer>
-            <div style={{ color: '#64748b', fontSize: 11, marginTop: 6 }}>
+            <div style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 6 }}>
               Put IV &gt; Call IV at every strike. To get zero-cost, you'd sell a near-money call — giving up almost all upside.
             </div>
           </div>
@@ -362,13 +362,13 @@ export function ZeroCostCollar() {
             <ResponsiveContainer width="100%" height={140}>
               <ComposedChart data={SKEW_MOMENTUM} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid {...CHART.grid} />
-                <XAxis dataKey="delta" {...CHART.xAxis} tick={{ fill: '#64748b', fontSize: 9 }} />
+                <XAxis dataKey="delta" {...CHART.xAxis} tick={{ fill: 'var(--text-muted)', fontSize: 9 }} />
                 <YAxis {...CHART.yAxis} domain={[15, 65]} />
                 <Tooltip {...CHART.tooltip} formatter={(v: unknown) => [`${v as number}%`, 'IV']} />
                 <Line type="monotone" dataKey="iv" stroke="#10b981" strokeWidth={2} dot={{ r: 3, fill: '#10b981' }} />
               </ComposedChart>
             </ResponsiveContainer>
-            <div style={{ color: '#64748b', fontSize: 11, marginTop: 6 }}>
+            <div style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 6 }}>
               Call IV &gt; Put IV. A far OTM call (47% away) generates enough premium to fund a meaningful put (12% OTM) at zero cost.
             </div>
           </div>
@@ -378,15 +378,15 @@ export function ZeroCostCollar() {
           <div style={{ color: '#818cf8', fontWeight: 700, fontSize: 13, marginBottom: 6 }}>What You're Actually Doing</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <div style={{ color: '#94a3b8', fontSize: 12, lineHeight: 1.6 }}>
-                <strong style={{ color: '#e2e8f0' }}>Selling:</strong> Momentum convexity — specifically,
+              <div style={{ color: 'var(--text)', fontSize: 12, lineHeight: 1.6 }}>
+                <strong style={{ color: 'var(--text-h)' }}>Selling:</strong> Momentum convexity — specifically,
                 the right for other traders to capture gains above $2,480. These buyers are momentum chasers
                 paying elevated call IV to get leveraged upside.
               </div>
             </div>
             <div>
-              <div style={{ color: '#94a3b8', fontSize: 12, lineHeight: 1.6 }}>
-                <strong style={{ color: '#e2e8f0' }}>Buying:</strong> Crash insurance funded by those
+              <div style={{ color: 'var(--text)', fontSize: 12, lineHeight: 1.6 }}>
+                <strong style={{ color: 'var(--text-h)' }}>Buying:</strong> Crash insurance funded by those
                 same buyers. The market isn't mispriced — it's pricing a genuinely fat-tailed distribution.
                 You're just choosing which slice of that distribution suits your risk tolerance.
               </div>
@@ -397,7 +397,7 @@ export function ZeroCostCollar() {
 
       {/* ── Hidden Costs & Risks ── */}
       <SectionHeader title="What 'Zero Cost' Glosses Over — Hidden Risks" color="#ef4444" />
-      <p style={{ color: '#64748b', fontSize: 13, margin: '-8px 0 16px', lineHeight: 1.6 }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: '-8px 0 16px', lineHeight: 1.6 }}>
         The structure looks clean on paper. These are the four things most explanations skip.
       </p>
       <div style={{ display: 'grid', gap: 12, marginBottom: 24 }}>
@@ -433,8 +433,8 @@ export function ZeroCostCollar() {
             { title: '✗ Momentum chasers entering fresh', body: 'If you\'re new to the stock at $1,684, you\'re entering for the upside story. Capping at $2,480 (47% up) may still sound like a lot, but you\'re taking on all the downside risk of a new position with capped reward.' },
           ].map(i => (
             <div key={i.title}>
-              <div style={{ color: '#e2e8f0', fontSize: 13, fontWeight: 700, marginBottom: 6 }}>{i.title}</div>
-              <div style={{ color: '#94a3b8', fontSize: 12, lineHeight: 1.6 }}>{i.body}</div>
+              <div style={{ color: 'var(--text-h)', fontSize: 13, fontWeight: 700, marginBottom: 6 }}>{i.title}</div>
+              <div style={{ color: 'var(--text)', fontSize: 12, lineHeight: 1.6 }}>{i.body}</div>
             </div>
           ))}
         </div>
@@ -442,7 +442,7 @@ export function ZeroCostCollar() {
 
       {/* ── How to Find Similar Setups ── */}
       <SectionHeader title="How to Find Similar Setups" color="#f59e0b" />
-      <p style={{ color: '#64748b', fontSize: 13, margin: '-8px 0 16px', lineHeight: 1.6 }}>
+      <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: '-8px 0 16px', lineHeight: 1.6 }}>
         You're looking for stocks where positive call skew is extreme — calls significantly more expensive
         than equidistant puts. This 15-minute workflow systematically surfaces candidates.
       </p>
@@ -450,15 +450,15 @@ export function ZeroCostCollar() {
       <div style={{ display: 'grid', gap: 12, marginBottom: 24 }}>
         {/* Screening criteria table */}
         <div style={card({ padding: 0 })}>
-          <div style={{ padding: '14px 20px', borderBottom: '1px solid #2a2d3e', color: '#f59e0b', fontSize: 12, fontWeight: 700, letterSpacing: '0.06em' }}>
+          <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)', color: '#f59e0b', fontSize: 12, fontWeight: 700, letterSpacing: '0.06em' }}>
             SCREENING CRITERIA
           </div>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #2a2d3e' }}>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
                   {['What to look for', 'Why it matters', 'Threshold'].map(h => (
-                    <th key={h} style={{ textAlign: 'left', padding: '10px 16px', color: '#64748b', fontWeight: 500 }}>{h}</th>
+                    <th key={h} style={{ textAlign: 'left', padding: '10px 16px', color: 'var(--text-muted)', fontWeight: 500 }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -470,9 +470,9 @@ export function ZeroCostCollar() {
                   ['Long DTE available', 'Zero-cost collar needs time for skew to persist', '6–18 months expiry'],
                   ['Liquid options market', 'Need tight bid-ask to execute both legs fairly', 'OI > 500 at target strikes'],
                 ].map(([what, why, threshold], i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid #1e2130' }}>
-                    <td style={{ padding: '10px 16px', color: '#e2e8f0' }}>{what}</td>
-                    <td style={{ padding: '10px 16px', color: '#94a3b8' }}>{why}</td>
+                  <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '10px 16px', color: 'var(--text-h)' }}>{what}</td>
+                    <td style={{ padding: '10px 16px', color: 'var(--text)' }}>{why}</td>
                     <td style={{ padding: '10px 16px', color: '#f59e0b', fontFamily: 'monospace', fontSize: 12 }}>{threshold}</td>
                   </tr>
                 ))}
@@ -491,9 +491,9 @@ export function ZeroCostCollar() {
               { tool: 'OptionStrat.com', use: 'Build the collar with real strikes and see if it prices at net zero or near-zero premium.' },
               { tool: 'Unusualwhales.com', use: 'Options flow — heavy OTM call buying on a momentum name signals elevated call IV to investigate.' },
             ].map(t => (
-              <div key={t.tool} style={{ background: '#0f1117', borderRadius: 8, padding: '12px 14px' }}>
-                <div style={{ color: '#e2e8f0', fontWeight: 700, fontSize: 13, marginBottom: 4 }}>{t.tool}</div>
-                <div style={{ color: '#64748b', fontSize: 12, lineHeight: 1.5 }}>{t.use}</div>
+              <div key={t.tool} style={{ background: 'var(--bg)', borderRadius: 8, padding: '12px 14px' }}>
+                <div style={{ color: 'var(--text-h)', fontWeight: 700, fontSize: 13, marginBottom: 4 }}>{t.tool}</div>
+                <div style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: 1.5 }}>{t.use}</div>
               </div>
             ))}
           </div>
@@ -515,8 +515,8 @@ export function ZeroCostCollar() {
                   {w.step}
                 </div>
                 <div>
-                  <div style={{ color: '#e2e8f0', fontSize: 13, fontWeight: 600 }}>{w.action}</div>
-                  <div style={{ color: '#64748b', fontSize: 12, marginTop: 2, lineHeight: 1.5 }}>{w.detail}</div>
+                  <div style={{ color: 'var(--text-h)', fontSize: 13, fontWeight: 600 }}>{w.action}</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 2, lineHeight: 1.5 }}>{w.detail}</div>
                 </div>
               </div>
             ))}
@@ -527,8 +527,8 @@ export function ZeroCostCollar() {
       {/* ── Current Candidates ── */}
       <SectionHeader title="What to Look for Now" color="#818cf8" />
       <div style={card({ marginBottom: 32 })}>
-        <p style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.7, margin: '0 0 14px' }}>
-          The SNDK post explicitly names <strong style={{ color: '#e2e8f0' }}>$MU (Micron)</strong> as an
+        <p style={{ color: 'var(--text)', fontSize: 13, lineHeight: 1.7, margin: '0 0 14px' }}>
+          The SNDK post explicitly names <strong style={{ color: 'var(--text-h)' }}>$MU (Micron)</strong> as an
           "even more extreme" candidate — a high-IV cyclical memory semiconductor that historically shows
           strong positive skew when momentum is running. The general formula:
         </p>
@@ -541,7 +541,7 @@ export function ZeroCostCollar() {
             { label: 'Call skew', value: '25Δ call > 25Δ put', color: '#10b981' },
             { label: 'DTE', value: '6–18 months (LEAPS)', color: '#818cf8' },
           ].map(i => (
-            <div key={i.label} style={{ background: '#0f1117', borderRadius: 8, padding: '10px 14px' }}>
+            <div key={i.label} style={{ background: 'var(--bg)', borderRadius: 8, padding: '10px 14px' }}>
               <div style={{ color: '#475569', fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', marginBottom: 3 }}>{i.label}</div>
               <div style={{ color: i.color, fontSize: 13, fontWeight: 600 }}>{i.value}</div>
             </div>
@@ -562,8 +562,8 @@ export function ZeroCostCollar() {
             <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '10px 0', borderBottom: i < 3 ? '1px solid #6366f120' : 'none' }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#6366f1', flexShrink: 0, marginTop: 6 }} />
               <div>
-                <span style={{ color: '#e2e8f0', fontWeight: 600, fontSize: 13 }}>{title} — </span>
-                <span style={{ color: '#94a3b8', fontSize: 13 }}>{body}</span>
+                <span style={{ color: 'var(--text-h)', fontWeight: 600, fontSize: 13 }}>{title} — </span>
+                <span style={{ color: 'var(--text)', fontSize: 13 }}>{body}</span>
               </div>
             </div>
           ))}

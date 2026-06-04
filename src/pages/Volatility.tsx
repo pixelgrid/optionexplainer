@@ -4,24 +4,24 @@ import {
 } from 'recharts';
 
 const CHART_STYLE = {
-  cartesianGrid: { strokeDasharray: '3 3', stroke: '#1e2130' },
-  xAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  yAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  tooltip: { contentStyle: { background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 8, fontSize: 13 } },
+  cartesianGrid: { strokeDasharray: '3 3', stroke: 'var(--border)' },
+  xAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  yAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  tooltip: { contentStyle: { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13 } },
 };
 
 function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20, ...style }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20, ...style }}>
       {children}
     </div>
   );
@@ -77,27 +77,27 @@ const skewData = [
 export function Volatility() {
   return (
     <div className="page-wrap">
-      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
         IV &amp; Volatility
       </h1>
-      <p style={{ margin: '0 0 40px', color: '#64748b', fontSize: 15, lineHeight: 1.7 }}>
+      <p style={{ margin: '0 0 40px', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7 }}>
         Volatility is the lifeblood of options pricing. Understanding the difference between implied and historical volatility, and knowing how to measure whether options are cheap or expensive, is one of the most important edges an options trader can develop.
       </p>
 
       {/* Section 1: IV vs HV */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="Implied vs Historical Volatility" color="#6366f1" />
-        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
-          <strong style={{ color: '#e2e8f0' }}>Historical Volatility (HV)</strong> — also called realized volatility — is calculated from actual past price movements. It's a fact. <strong style={{ color: '#e2e8f0' }}>Implied Volatility (IV)</strong> is the market's forward-looking estimate of future movement, extracted by back-solving the Black-Scholes equation given the observed option price. When IV &gt; HV, options are considered "expensive" (good time to sell). When IV &lt; HV, options may be "cheap" (consider buying).
+        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
+          <strong style={{ color: 'var(--text-h)' }}>Historical Volatility (HV)</strong> — also called realized volatility — is calculated from actual past price movements. It's a fact. <strong style={{ color: 'var(--text-h)' }}>Implied Volatility (IV)</strong> is the market's forward-looking estimate of future movement, extracted by back-solving the Black-Scholes equation given the observed option price. When IV &gt; HV, options are considered "expensive" (good time to sell). When IV &lt; HV, options may be "cheap" (consider buying).
         </p>
         <Card>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={ivHvData}>
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-              <XAxis dataKey="index" {...CHART_STYLE.xAxis} label={{ value: 'Time (months)', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} tickFormatter={() => ''} />
+              <XAxis dataKey="index" {...CHART_STYLE.xAxis} label={{ value: 'Time (months)', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} tickFormatter={() => ''} />
               <YAxis {...CHART_STYLE.yAxis} unit="%" domain={[10, 45]} />
               <Tooltip {...CHART_STYLE.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`${n}%`]; }} />
-              <Legend wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: 'var(--text)' }} />
               <Line type="monotone" dataKey="hv" name="Historical Vol (HV)" stroke="#10b981" dot={false} strokeWidth={2} strokeDasharray="5 3" />
               <Line type="monotone" dataKey="iv" name="Implied Vol (IV)" stroke="#6366f1" dot={false} strokeWidth={2} />
             </LineChart>
@@ -111,20 +111,20 @@ export function Volatility() {
       {/* Section 2: IVR / IV Percentile */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="IV Rank &amp; IV Percentile" color="#8b5cf6" />
-        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
-          <strong style={{ color: '#e2e8f0' }}>IV Rank (IVR)</strong> tells you where current IV sits relative to its 52-week high and low: IVR = (current IV − 52w low) / (52w high − 52w low) × 100. An IVR of 80 means IV is near the top of its recent range — a strong signal to sell premium. <strong style={{ color: '#e2e8f0' }}>IV Percentile</strong> is slightly different: it measures the percentage of days in the past year where IV was below the current level. Both are useful filters for deciding when to be a buyer vs seller of volatility.
+        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
+          <strong style={{ color: 'var(--text-h)' }}>IV Rank (IVR)</strong> tells you where current IV sits relative to its 52-week high and low: IVR = (current IV − 52w low) / (52w high − 52w low) × 100. An IVR of 80 means IV is near the top of its recent range — a strong signal to sell premium. <strong style={{ color: 'var(--text-h)' }}>IV Percentile</strong> is slightly different: it measures the percentage of days in the past year where IV was below the current level. Both are useful filters for deciding when to be a buyer vs seller of volatility.
         </p>
-        <div style={{ padding: '12px 16px', background: '#6366f118', border: '1px solid #6366f130', borderRadius: 8, marginBottom: 16, fontSize: 14, color: '#94a3b8' }}>
+        <div style={{ padding: '12px 16px', background: '#6366f118', border: '1px solid #6366f130', borderRadius: 8, marginBottom: 16, fontSize: 14, color: 'var(--text)' }}>
           Rule of thumb: <strong style={{ color: '#10b981' }}>IVR &lt; 25</strong> — consider buying options. <strong style={{ color: '#ef4444' }}>IVR &gt; 50</strong> — consider selling premium.
         </div>
         <Card>
-          <div style={{ fontSize: 12, color: '#64748b', marginBottom: 8 }}>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>
             Current IV: <span style={{ color: '#ef4444', fontWeight: 700 }}>{currentIV}%</span> — approximately the 81st percentile of this year's range
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={ivYearData} barSize={3}>
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-              <XAxis dataKey="day" {...CHART_STYLE.xAxis} label={{ value: 'Trading Days (1 year)', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} tickFormatter={() => ''} />
+              <XAxis dataKey="day" {...CHART_STYLE.xAxis} label={{ value: 'Trading Days (1 year)', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} tickFormatter={() => ''} />
               <YAxis {...CHART_STYLE.yAxis} unit="%" domain={[0, 60]} />
               <Tooltip {...CHART_STYLE.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`${n}%`, 'IV']; }} />
               <ReferenceLine y={currentIV} stroke="#ef4444" strokeWidth={2} strokeDasharray="4 3" label={{ value: `Current IV ${currentIV}%`, fill: '#ef4444', fontSize: 11, position: 'right' }} />
@@ -137,7 +137,7 @@ export function Volatility() {
       {/* Section 3: IV Crush */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="IV Crush" color="#ef4444" />
-        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           IV Crush is the sharp drop in implied volatility that occurs immediately after a binary event — most commonly an earnings release — resolves. The market had been pricing in uncertainty; once the news is out, that uncertainty disappears and IV collapses. Option buyers who don't account for this often find their position losing money even when they were "right" about the direction of the stock move.
         </p>
         <Card style={{ marginBottom: 16 }}>
@@ -155,13 +155,13 @@ export function Volatility() {
         <div className="g-2" style={{ gap: 16 }}>
           <Card style={{ borderLeft: '3px solid #ef4444' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#ef4444', marginBottom: 8 }}>Scenario A: Stock +5%, Options LOSE</div>
-            <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
               Stock at $100, ATM straddle costs $8. IV is 65%. Stock gaps up to $105 (+5%). IV collapses to 28%. New call value ≈ $5.20, new straddle ≈ $5.80. You paid $8 and now it's worth $5.80 — a <strong style={{ color: '#ef4444' }}>$2.20 loss</strong> despite the stock moving.
             </p>
           </Card>
           <Card style={{ borderLeft: '3px solid #10b981' }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: '#10b981', marginBottom: 8 }}>Scenario B: Stock +10%, Options PROFIT</div>
-            <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
               Same setup. Stock gaps up to $110 (+10%). IV collapses to 28%. New call value ≈ $10.50, straddle ≈ $11. You paid $8 and it's worth $11 — a <strong style={{ color: '#10b981' }}>$3 gain</strong>. The move was large enough to overcome the IV crush.
             </p>
           </Card>
@@ -171,17 +171,17 @@ export function Volatility() {
       {/* Section 4: Skew */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="Volatility Skew" color="#f59e0b" />
-        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           Skew describes how implied volatility varies across different strike prices for the same expiry. In equity markets, OTM puts consistently trade at higher IV than OTM calls — this is called "negative skew" or "put skew." The reason: institutional investors pay a premium for downside protection (portfolio insurance), inflating OTM put prices. Skew steepens during fear-driven market environments and flattens during calm periods.
         </p>
         <Card>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={skewData}>
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-              <XAxis dataKey="strike" {...CHART_STYLE.xAxis} label={{ value: 'Strike Price ($)', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} />
+              <XAxis dataKey="strike" {...CHART_STYLE.xAxis} label={{ value: 'Strike Price ($)', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} />
               <YAxis {...CHART_STYLE.yAxis} unit="%" domain={[18, 46]} />
               <Tooltip {...CHART_STYLE.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`${n}%`, 'IV']; }} />
-              <ReferenceLine x={100} stroke="#2a2d3e" strokeDasharray="4 4" label={{ value: 'ATM ($100)', fill: '#475569', fontSize: 10 }} />
+              <ReferenceLine x={100} stroke="var(--border)" strokeDasharray="4 4" label={{ value: 'ATM ($100)', fill: '#475569', fontSize: 10 }} />
               <Line type="monotone" dataKey="iv" name="Implied Volatility" stroke="#f59e0b" dot={{ fill: '#f59e0b', r: 4 }} strokeWidth={2.5} />
             </LineChart>
           </ResponsiveContainer>
@@ -199,7 +199,7 @@ export function Volatility() {
             <div style={{ fontSize: 16, fontWeight: 600, color: '#10b981', marginBottom: 12 }}>
               BUY Options When IVR &lt; 25
             </div>
-            <ul style={{ margin: 0, paddingLeft: 18, fontSize: 14, color: '#94a3b8', lineHeight: 2 }}>
+            <ul style={{ margin: 0, paddingLeft: 18, fontSize: 14, color: 'var(--text)', lineHeight: 2 }}>
               <li>IV is near historical lows — options are cheap</li>
               <li>You expect a volatility expansion event</li>
               <li>You have a strong directional conviction</li>
@@ -214,7 +214,7 @@ export function Volatility() {
             <div style={{ fontSize: 16, fontWeight: 600, color: '#ef4444', marginBottom: 12 }}>
               SELL Options When IVR &gt; 50
             </div>
-            <ul style={{ margin: 0, paddingLeft: 18, fontSize: 14, color: '#94a3b8', lineHeight: 2 }}>
+            <ul style={{ margin: 0, paddingLeft: 18, fontSize: 14, color: 'var(--text)', lineHeight: 2 }}>
               <li>IV is elevated — options are expensive</li>
               <li>You expect volatility to mean-revert lower</li>
               <li>You want to collect premium as a high-prob trade</li>

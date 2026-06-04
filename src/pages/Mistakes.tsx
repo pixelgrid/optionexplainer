@@ -83,10 +83,10 @@ const mistakes: Mistake[] = [
 export function Mistakes() {
   return (
     <div className="page-wrap">
-      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
         Common Mistakes
       </h1>
-      <p style={{ margin: '0 0 32px', color: '#64748b', fontSize: 15, lineHeight: 1.7 }}>
+      <p style={{ margin: '0 0 32px', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7 }}>
         The 10 most common ways beginner option traders lose money — and exactly how to avoid each one.
       </p>
 
@@ -109,7 +109,7 @@ export function Mistakes() {
             <div
               key={m.num}
               style={{
-                background: '#1a1d27',
+                background: 'var(--bg-card)',
                 border: `1px solid ${borderColor}40`,
                 borderRadius: 12,
                 overflow: 'hidden',
@@ -126,7 +126,7 @@ export function Mistakes() {
                   {m.num}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0', lineHeight: 1.4 }}>{m.title}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-h)', lineHeight: 1.4 }}>{m.title}</div>
                   <span style={{
                     display: 'inline-block', marginTop: 4, padding: '1px 7px', borderRadius: 4,
                     fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase',
@@ -142,13 +142,13 @@ export function Mistakes() {
                 <div style={{ fontSize: 12, fontWeight: 600, color: borderColor, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>
                   What happens
                 </div>
-                <p style={{ margin: '0 0 14px', fontSize: 13, color: '#94a3b8', lineHeight: 1.65 }}>{m.what}</p>
+                <p style={{ margin: '0 0 14px', fontSize: 13, color: 'var(--text)', lineHeight: 1.65 }}>{m.what}</p>
 
-                <div style={{ padding: '10px 12px', background: '#0f1117', borderRadius: 8, borderLeft: `3px solid #10b981` }}>
+                <div style={{ padding: '10px 12px', background: 'var(--bg)', borderRadius: 8, borderLeft: `3px solid #10b981` }}>
                   <div style={{ fontSize: 11, fontWeight: 600, color: '#10b981', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>
                     How to avoid it
                   </div>
-                  <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>{m.avoid}</p>
+                  <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>{m.avoid}</p>
                 </div>
               </div>
             </div>
@@ -156,10 +156,10 @@ export function Mistakes() {
         })}
       </div>
 
-      <div style={{ marginTop: 40, padding: '20px 24px', background: '#1a1d27', border: '1px solid #6366f140', borderRadius: 12 }}>
+      <div style={{ marginTop: 40, padding: '20px 24px', background: 'var(--bg-card)', border: '1px solid #6366f140', borderRadius: 12 }}>
         <div style={{ fontSize: 15, fontWeight: 600, color: '#6366f1', marginBottom: 8 }}>The Pattern Behind All 10 Mistakes</div>
-        <p style={{ margin: 0, fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
-          Every mistake above has a common thread: <strong style={{ color: '#e2e8f0' }}>hope over process</strong>. Hoping the stock will recover. Hoping IV won't crush. Hoping that lottery ticket will hit. Hoping the position will come back. Successful options trading replaces hope with rules: pre-defined entries based on IVR, fixed profit targets, automatic loss stops, and position sizes that can survive being wrong 30% of the time. Process over prediction.
+        <p style={{ margin: 0, fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
+          Every mistake above has a common thread: <strong style={{ color: 'var(--text-h)' }}>hope over process</strong>. Hoping the stock will recover. Hoping IV won't crush. Hoping that lottery ticket will hit. Hoping the position will come back. Successful options trading replaces hope with rules: pre-defined entries based on IVR, fixed profit targets, automatic loss stops, and position sizes that can survive being wrong 30% of the time. Process over prediction.
         </p>
       </div>
     </div>

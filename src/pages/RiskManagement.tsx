@@ -5,24 +5,24 @@ import {
 } from 'recharts';
 
 const CHART_STYLE = {
-  cartesianGrid: { strokeDasharray: '3 3', stroke: '#1e2130' },
-  xAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  yAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  tooltip: { contentStyle: { background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 8, fontSize: 13 } },
+  cartesianGrid: { strokeDasharray: '3 3', stroke: 'var(--border)' },
+  xAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  yAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  tooltip: { contentStyle: { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13 } },
 };
 
 function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20, ...style }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20, ...style }}>
       {children}
     </div>
   );
@@ -74,27 +74,27 @@ export function RiskManagement() {
 
   return (
     <div className="page-wrap">
-      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
         Risk Management
       </h1>
-      <p style={{ margin: '0 0 40px', color: '#64748b', fontSize: 15, lineHeight: 1.7 }}>
+      <p style={{ margin: '0 0 40px', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7 }}>
         The number one cause of options trading failure is not picking the wrong direction — it's sizing positions too large and letting a single bad trade wipe out months of consistent gains. Risk management is the unsexy part of options trading that separates professionals from gamblers.
       </p>
 
       {/* Section 1: 1-2% Rule */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="The 1-2% Rule" color="#6366f1" />
-        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           Never risk more than 1–2% of your total portfolio on a single trade. This sounds conservative, but consider what happens after a run of 20 consecutive losses (which can happen even with 70%+ win-rate strategies during adverse markets). At 5% risk per trade, you'd be down 64%. At 1% risk, you'd be down only 18% — still functional and recoverable.
         </p>
         <Card>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={drawdownData}>
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-              <XAxis dataKey="trade" {...CHART_STYLE.xAxis} label={{ value: 'Consecutive Losses', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} />
+              <XAxis dataKey="trade" {...CHART_STYLE.xAxis} label={{ value: 'Consecutive Losses', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} />
               <YAxis {...CHART_STYLE.yAxis} unit="%" domain={[0, 105]} />
               <Tooltip {...CHART_STYLE.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`${n.toFixed(1)}%`]; }} />
-              <Legend wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: 'var(--text)' }} />
               <Line type="monotone" dataKey="1% Risk" stroke="#10b981" dot={false} strokeWidth={2.5} />
               <Line type="monotone" dataKey="5% Risk" stroke="#ef4444" dot={false} strokeWidth={2.5} />
             </LineChart>
@@ -111,25 +111,25 @@ export function RiskManagement() {
         <Card>
           <div className="g-2" style={{ gap: 20, marginBottom: 20 }}>
             <div>
-              <label style={{ fontSize: 13, color: '#94a3b8', display: 'block', marginBottom: 8 }}>
+              <label style={{ fontSize: 13, color: 'var(--text)', display: 'block', marginBottom: 8 }}>
                 Portfolio Size
               </label>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ color: '#64748b' }}>$</span>
+                <span style={{ color: 'var(--text-muted)' }}>$</span>
                 <input
                   type="number"
                   value={portfolioSize}
                   onChange={(e) => setPortfolioSize(Number(e.target.value))}
                   style={{
-                    flex: 1, background: '#0f1117', border: '1px solid #2a2d3e', borderRadius: 6,
-                    padding: '8px 12px', color: '#e2e8f0', fontSize: 14, fontFamily: 'monospace',
+                    flex: 1, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 6,
+                    padding: '8px 12px', color: 'var(--text-h)', fontSize: 14, fontFamily: 'monospace',
                   }}
                 />
               </div>
             </div>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                <label style={{ fontSize: 13, color: '#94a3b8' }}>Risk % per Trade</label>
+                <label style={{ fontSize: 13, color: 'var(--text)' }}>Risk % per Trade</label>
                 <span style={{ fontSize: 13, fontWeight: 700, color: '#6366f1', fontFamily: 'monospace' }}>{riskPct}%</span>
               </div>
               <input
@@ -144,7 +144,7 @@ export function RiskManagement() {
           </div>
 
           <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 13, color: '#94a3b8', marginBottom: 8 }}>Strategy Type</div>
+            <div style={{ fontSize: 13, color: 'var(--text)', marginBottom: 8 }}>Strategy Type</div>
             <div style={{ display: 'flex', gap: 8 }}>
               {[
                 { key: 'defined', label: 'Defined Risk Spread' },
@@ -158,9 +158,9 @@ export function RiskManagement() {
                     flex: 1,
                     padding: '8px 12px',
                     borderRadius: 8,
-                    border: `1px solid ${strategyType === key ? '#6366f1' : '#2a2d3e'}`,
+                    border: `1px solid ${strategyType === key ? '#6366f1' : 'var(--border)'}`,
                     background: strategyType === key ? '#6366f118' : 'transparent',
-                    color: strategyType === key ? '#6366f1' : '#64748b',
+                    color: strategyType === key ? '#6366f1' : 'var(--text-muted)',
                     fontSize: 12,
                     cursor: 'pointer',
                     transition: 'all 0.15s',
@@ -173,7 +173,7 @@ export function RiskManagement() {
           </div>
 
           {/* Results */}
-          <div style={{ background: '#0f1117', borderRadius: 8, padding: '16px 20px', border: '1px solid #2a2d3e' }}>
+          <div style={{ background: 'var(--bg)', borderRadius: 8, padding: '16px 20px', border: '1px solid var(--border)' }}>
             <div className="g-3" style={{ gap: 16, marginBottom: 12 }}>
               <div>
                 <div style={{ fontSize: 11, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>Max Dollar Risk</div>
@@ -189,7 +189,7 @@ export function RiskManagement() {
               </div>
               <div>
                 <div style={{ fontSize: 11, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 4 }}>As % of Portfolio</div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#94a3b8', fontFamily: 'monospace' }}>
+                <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)', fontFamily: 'monospace' }}>
                   {riskPct}%
                 </div>
               </div>
@@ -205,9 +205,9 @@ export function RiskManagement() {
         <Card style={{ overflow: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ borderBottom: '2px solid #2a2d3e' }}>
+              <tr style={{ borderBottom: '2px solid var(--border)' }}>
                 {['Strategy', 'Risk Type', 'Suggested Max Risk per Trade', 'Notes'].map((h) => (
-                  <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 11, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                  <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -220,8 +220,8 @@ export function RiskManagement() {
                 { strategy: 'Debit Spread', risk: 'Defined', max: '1–2% of portfolio', note: 'Defined risk, but often lower win rate. Size conservatively.' },
                 { strategy: 'Straddle / Strangle', risk: 'Defined (long)', max: '0.5–1% of portfolio', note: 'IV crush risk is significant. Size very small.' },
               ].map((row, i) => (
-                <tr key={row.strategy} style={{ borderBottom: '1px solid #1e2130', background: i % 2 === 0 ? 'transparent' : '#ffffff04' }}>
-                  <td style={{ padding: '10px 12px', fontSize: 13, color: '#e2e8f0', fontWeight: 500 }}>{row.strategy}</td>
+                <tr key={row.strategy} style={{ borderBottom: '1px solid var(--border)', background: i % 2 === 0 ? 'transparent' : '#ffffff04' }}>
+                  <td style={{ padding: '10px 12px', fontSize: 13, color: 'var(--text-h)', fontWeight: 500 }}>{row.strategy}</td>
                   <td style={{ padding: '10px 12px', fontSize: 12 }}>
                     <span style={{
                       padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600,
@@ -230,7 +230,7 @@ export function RiskManagement() {
                     }}>{row.risk}</span>
                   </td>
                   <td style={{ padding: '10px 12px', fontSize: 13, color: '#6366f1', fontWeight: 600, fontFamily: 'monospace' }}>{row.max}</td>
-                  <td style={{ padding: '10px 12px', fontSize: 12, color: '#64748b' }}>{row.note}</td>
+                  <td style={{ padding: '10px 12px', fontSize: 12, color: 'var(--text-muted)' }}>{row.note}</td>
                 </tr>
               ))}
             </tbody>
@@ -242,10 +242,10 @@ export function RiskManagement() {
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="The 16% Rule — Margin Safety Buffer" color="#f59e0b" />
         <Card style={{ borderLeft: '3px solid #f59e0b' }}>
-          <p style={{ margin: '0 0 12px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+          <p style={{ margin: '0 0 12px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
             When selling undefined risk options, keep at least <strong style={{ color: '#f59e0b' }}>16× your maximum loss</strong> available in cash or liquid assets. This ensures a single large adverse move (a "16σ" event is essentially impossible, but even a "3σ" event won't wipe you out).
           </p>
-          <div style={{ padding: '12px 16px', background: '#0f1117', borderRadius: 8, fontSize: 13, color: '#94a3b8' }}>
+          <div style={{ padding: '12px 16px', background: 'var(--bg)', borderRadius: 8, fontSize: 13, color: 'var(--text)' }}>
             <strong style={{ color: '#f59e0b' }}>Example:</strong> You sell a naked put on XYZ. If the stock drops 15% overnight (a common earnings gap), your max realistic loss might be $2,000. The 16× rule says you should have $32,000 in your account before entering this trade. This prevents margin calls from forced liquidation during volatile markets.
           </div>
         </Card>
@@ -257,13 +257,13 @@ export function RiskManagement() {
         <div className="g-2" style={{ gap: 16 }}>
           <Card style={{ borderLeft: '3px solid #ef4444' }}>
             <div style={{ fontSize: 14, fontWeight: 600, color: '#ef4444', marginBottom: 8 }}>The Illusion of Diversification</div>
-            <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.65 }}>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.65 }}>
               Having 10 short puts on AAPL, MSFT, GOOGL, META, NVDA, AMD, TSLA, AMZN, CRM, and ADBE is NOT diversification. They are all tech stocks with 0.85+ correlation. In a tech selloff, all 10 go against you simultaneously. You effectively have 10× the position in "tech short vol."
             </p>
           </Card>
           <Card style={{ borderLeft: '3px solid #10b981' }}>
             <div style={{ fontSize: 14, fontWeight: 600, color: '#10b981', marginBottom: 8 }}>Real Diversification</div>
-            <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.65 }}>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.65 }}>
               Spread across uncorrelated sectors: tech, healthcare, energy, consumer staples, financials, commodities, bonds. Limit to 1–2 positions per sector. Consider a short VIX position separate from individual stock positions. Correlation breaks down exactly when you need it most — in a crisis.
             </p>
           </Card>
@@ -274,7 +274,7 @@ export function RiskManagement() {
       <section style={{ marginBottom: 24 }}>
         <SectionHeader title="Systematic Profit Taking Rules" color="#10b981" />
         <Card>
-          <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+          <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
             Having pre-defined exit rules removes emotion from your trading. Without rules, you'll hold winners too long (greed) and close losers too early (fear) — both of which degrade your returns.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -295,9 +295,9 @@ export function RiskManagement() {
                 text: 'For debit trades: set a maximum holding period. If you buy a call with 45 DTE and it hasn\'t worked in 20 days, close it — you\'ve now paid for 20 days of theta with nothing to show. Never let a debit position decay to worthless; sell when it still has residual value.',
               },
             ].map(({ rule, color, text }) => (
-              <div key={rule} style={{ padding: '14px 16px', background: '#0f1117', borderRadius: 8, borderLeft: `3px solid ${color}` }}>
+              <div key={rule} style={{ padding: '14px 16px', background: 'var(--bg)', borderRadius: 8, borderLeft: `3px solid ${color}` }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color, marginBottom: 6 }}>{rule}</div>
-                <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.65 }}>{text}</p>
+                <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.65 }}>{text}</p>
               </div>
             ))}
           </div>

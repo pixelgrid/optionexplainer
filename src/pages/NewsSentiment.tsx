@@ -42,14 +42,14 @@ interface AVArticle {
 // ── Shared styles ──────────────────────────────────────────────────────────
 
 const inputStyle: React.CSSProperties = {
-  width: '100%', background: '#0f1117', border: '1px solid #2a2d3e', borderRadius: 8,
-  padding: '10px 14px', color: '#e2e8f0', fontSize: 14, outline: 'none',
+  width: '100%', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8,
+  padding: '10px 14px', color: 'var(--text-h)', fontSize: 14, outline: 'none',
   boxSizing: 'border-box', fontFamily: 'inherit',
 };
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20, ...style }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20, ...style }}>
       {children}
     </div>
   );
@@ -59,7 +59,7 @@ function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: st
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
@@ -81,7 +81,7 @@ function ModelPanel({ models, modelsReady, onLoad, autoStarted }: {
           <div style={{ color: modelsReady ? '#10b981' : '#818cf8', fontWeight: 700, fontSize: 14, marginBottom: 4 }}>
             {modelsReady ? '✓ Models ready — running locally in your browser' : 'AI Models'}
           </div>
-          <div style={{ color: '#64748b', fontSize: 12 }}>
+          <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>
             Downloaded once · cached in browser · no data sent to any server
           </div>
         </div>
@@ -102,14 +102,14 @@ function ModelPanel({ models, modelsReady, onLoad, autoStarted }: {
                   <span style={{ fontSize: 11, fontFamily: 'monospace', color: m.status === 'ready' ? '#10b981' : '#818cf8', fontWeight: 700 }}>
                     {m.status === 'ready' ? '✓' : '↓'}
                   </span>
-                  <span style={{ color: '#e2e8f0', fontSize: 13 }}>{m.label}</span>
+                  <span style={{ color: 'var(--text-h)', fontSize: 13 }}>{m.label}</span>
                   <span style={{ color: '#475569', fontSize: 11 }}>{m.size}</span>
                 </div>
-                <span style={{ color: m.status === 'ready' ? '#10b981' : '#64748b', fontSize: 12, fontWeight: 600 }}>
+                <span style={{ color: m.status === 'ready' ? '#10b981' : 'var(--text-muted)', fontSize: 12, fontWeight: 600 }}>
                   {m.status === 'ready' ? 'Ready' : m.status === 'loading' ? `${m.progress.toFixed(0)}%` : m.status}
                 </span>
               </div>
-              <div style={{ height: 4, background: '#2a2d3e', borderRadius: 2, overflow: 'hidden' }}>
+              <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
                 <div style={{
                   height: '100%', borderRadius: 2,
                   background: m.status === 'ready' ? '#10b981' : 'linear-gradient(90deg, #6366f1, #8b5cf6)',
@@ -145,10 +145,10 @@ function ScoreBar({ label, value, color }: { label: string; value: number; color
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-        <span style={{ color: '#64748b', fontSize: 12 }}>{label}</span>
+        <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{label}</span>
         <span style={{ color, fontSize: 12, fontWeight: 600 }}>{(value * 100).toFixed(1)}%</span>
       </div>
-      <div style={{ height: 6, background: '#2a2d3e', borderRadius: 3, overflow: 'hidden' }}>
+      <div style={{ height: 6, background: 'var(--border)', borderRadius: 3, overflow: 'hidden' }}>
         <div style={{ height: '100%', width: `${value * 100}%`, background: color, borderRadius: 3, transition: 'width 0.5s ease' }} />
       </div>
     </div>
@@ -158,7 +158,7 @@ function ScoreBar({ label, value, color }: { label: string; value: number; color
 // ── AV sentiment label formatting ──────────────────────────────────────────
 
 function avSentimentColor(label: string): string {
-  if (!label) return '#64748b';
+  if (!label) return 'var(--text-muted)';
   const l = label.toLowerCase();
   if (l.includes('bullish')) return '#10b981';
   if (l.includes('bearish')) return '#ef4444';
@@ -329,10 +329,10 @@ export function NewsSentiment() {
 
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ margin: '0 0 8px', color: '#e2e8f0', fontSize: 'clamp(22px,5vw,30px)', fontWeight: 700 }}>
+        <h1 style={{ margin: '0 0 8px', color: 'var(--text-h)', fontSize: 'clamp(22px,5vw,30px)', fontWeight: 700 }}>
           News Sentiment & Summary
         </h1>
-        <p style={{ margin: 0, color: '#64748b', fontSize: 14 }}>
+        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: 14 }}>
           Analyze financial news and SEC filings with local AI. Models run entirely in your browser — no data leaves your device.
         </p>
       </div>
@@ -346,7 +346,7 @@ export function NewsSentiment() {
       )}
 
       {/* Model info */}
-      <Card style={{ marginBottom: 20, background: '#0f1117' }}>
+      <Card style={{ marginBottom: 20, background: 'var(--bg)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
           {[
             { name: 'DistilBERT-SST2', task: 'Sentiment', desc: 'Binary positive/negative with confidence score. Sentence-level and document-level scoring. Neutral inferred when neither is dominant.', size: '67 MB' },
@@ -355,10 +355,10 @@ export function NewsSentiment() {
             <div key={m.name}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 4 }}>
                 <span style={{ background: '#6366f120', color: '#818cf8', fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4 }}>{m.task.toUpperCase()}</span>
-                <span style={{ color: '#e2e8f0', fontSize: 13, fontWeight: 600 }}>{m.name}</span>
+                <span style={{ color: 'var(--text-h)', fontSize: 13, fontWeight: 600 }}>{m.name}</span>
                 <span style={{ color: '#475569', fontSize: 11 }}>{m.size}</span>
               </div>
-              <p style={{ color: '#64748b', fontSize: 12, margin: 0, lineHeight: 1.5 }}>{m.desc}</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 12, margin: 0, lineHeight: 1.5 }}>{m.desc}</p>
             </div>
           ))}
         </div>
@@ -374,9 +374,9 @@ export function NewsSentiment() {
             <button key={mode} onClick={() => { setInputMode(mode); setResult(null); setAnalyzeError(''); }}
               style={{
                 background: inputMode === mode ? '#6366f120' : 'none',
-                border: `1px solid ${inputMode === mode ? '#6366f1' : '#2a2d3e'}`,
+                border: `1px solid ${inputMode === mode ? '#6366f1' : 'var(--border)'}`,
                 borderRadius: 8, padding: '8px 16px', fontSize: 13,
-                color: inputMode === mode ? '#818cf8' : '#64748b',
+                color: inputMode === mode ? '#818cf8' : 'var(--text-muted)',
                 cursor: 'pointer', fontWeight: inputMode === mode ? 600 : 400,
               }}>
               {mode === 'fetch' ? '📰 Fetch News by Ticker' : '📋 Paste Article / Filing'}
@@ -401,7 +401,7 @@ export function NewsSentiment() {
               </button>
               {apiKey && (
                 <button onClick={() => setShowKeyInput(v => !v)}
-                  style={{ background: 'none', color: '#64748b', border: '1px solid #2a2d3e', borderRadius: 8, padding: '10px 12px', fontSize: 12, cursor: 'pointer' }}>
+                  style={{ background: 'none', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', fontSize: 12, cursor: 'pointer' }}>
                   ⚙ Key
                 </button>
               )}
@@ -421,7 +421,7 @@ export function NewsSentiment() {
 
             {articles.length > 0 && (
               <div>
-                <div style={{ color: '#64748b', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 10 }}>
+                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 10 }}>
                   SELECT AN ARTICLE TO ANALYZE
                 </div>
                 <div style={{ display: 'grid', gap: 8 }}>
@@ -429,23 +429,23 @@ export function NewsSentiment() {
                     <button key={i} onClick={() => { setSelectedIdx(i); setResult(null); }}
                       style={{
                         display: 'block', width: '100%', textAlign: 'left', cursor: 'pointer',
-                        background: selectedIdx === i ? '#6366f115' : '#0f1117',
-                        border: `1px solid ${selectedIdx === i ? '#6366f1' : '#2a2d3e'}`,
+                        background: selectedIdx === i ? '#6366f115' : 'var(--bg)',
+                        border: `1px solid ${selectedIdx === i ? '#6366f1' : 'var(--border)'}`,
                         borderRadius: 8, padding: '12px 14px', transition: 'all 0.12s',
                       }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10, marginBottom: 4 }}>
-                        <div style={{ color: '#e2e8f0', fontSize: 13, fontWeight: 600, lineHeight: 1.4, flex: 1 }}>{a.title}</div>
+                        <div style={{ color: 'var(--text-h)', fontSize: 13, fontWeight: 600, lineHeight: 1.4, flex: 1 }}>{a.title}</div>
                         {a.overall_sentiment_label && (
                           <span style={{ color: avSentimentColor(a.overall_sentiment_label), fontSize: 10, fontWeight: 700, flexShrink: 0, background: avSentimentColor(a.overall_sentiment_label) + '20', padding: '2px 6px', borderRadius: 4 }}>
                             {a.overall_sentiment_label.replace(/-/g, ' ')}
                           </span>
                         )}
                       </div>
-                      <div style={{ color: '#64748b', fontSize: 12 }}>
+                      <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>
                         {a.source} · {a.time_published?.slice(0, 8).replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')}
                       </div>
                       {selectedIdx === i && a.summary && (
-                        <div style={{ marginTop: 8, color: '#94a3b8', fontSize: 12, lineHeight: 1.5 }}>{a.summary}</div>
+                        <div style={{ marginTop: 8, color: 'var(--text)', fontSize: 12, lineHeight: 1.5 }}>{a.summary}</div>
                       )}
                     </button>
                   ))}
@@ -458,7 +458,7 @@ export function NewsSentiment() {
         {/* Paste mode */}
         {inputMode === 'paste' && (
           <Card>
-            <div style={{ color: '#64748b', fontSize: 12, marginBottom: 8 }}>
+            <div style={{ color: 'var(--text-muted)', fontSize: 12, marginBottom: 8 }}>
               Paste any financial article, earnings release, or SEC filing section (20+ words required)
             </div>
             <textarea value={pastedText} onChange={e => { setPastedText(e.target.value); setResult(null); }}
@@ -478,9 +478,9 @@ export function NewsSentiment() {
       <div style={{ marginBottom: 24 }}>
         <button onClick={analyze} disabled={!canAnalyze}
           style={{
-            background: canAnalyze ? '#6366f1' : '#1f2335',
+            background: canAnalyze ? '#6366f1' : 'var(--bg-card-hover)',
             color: canAnalyze ? '#fff' : '#475569',
-            border: `1px solid ${canAnalyze ? '#6366f1' : '#2a2d3e'}`,
+            border: `1px solid ${canAnalyze ? '#6366f1' : 'var(--border)'}`,
             borderRadius: 10, padding: '12px 32px', fontSize: 15, fontWeight: 700,
             cursor: canAnalyze ? 'pointer' : 'not-allowed', transition: 'all 0.15s',
             display: 'flex', alignItems: 'center', gap: 10,
@@ -512,7 +512,7 @@ export function NewsSentiment() {
 
             {/* Sentiment card */}
             <Card>
-              <div style={{ color: '#64748b', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 12 }}>SENTIMENT</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 12 }}>SENTIMENT</div>
               <div style={{ marginBottom: 16 }}>
                 <SentimentBadge label={result.sentiment.label} />
               </div>
@@ -522,27 +522,27 @@ export function NewsSentiment() {
               </div>
               <div style={{ marginTop: 12, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
                 <div>
-                  <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700 }}>CHUNKS ANALYZED</div>
-                  <div style={{ color: '#e2e8f0', fontSize: 16, fontWeight: 700 }}>{result.sentiment.chunkCount}</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700 }}>CHUNKS ANALYZED</div>
+                  <div style={{ color: 'var(--text-h)', fontSize: 16, fontWeight: 700 }}>{result.sentiment.chunkCount}</div>
                 </div>
                 <div>
-                  <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700 }}>BULLISH CHUNKS</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700 }}>BULLISH CHUNKS</div>
                   <div style={{ color: '#10b981', fontSize: 16, fontWeight: 700 }}>{result.sentiment.posChunks}</div>
                 </div>
                 <div>
-                  <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700 }}>BEARISH CHUNKS</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700 }}>BEARISH CHUNKS</div>
                   <div style={{ color: '#ef4444', fontSize: 16, fontWeight: 700 }}>{result.sentiment.negChunks}</div>
                 </div>
                 <div>
-                  <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700 }}>WORD COUNT</div>
-                  <div style={{ color: '#e2e8f0', fontSize: 16, fontWeight: 700 }}>{result.wordCount}</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700 }}>WORD COUNT</div>
+                  <div style={{ color: 'var(--text-h)', fontSize: 16, fontWeight: 700 }}>{result.wordCount}</div>
                 </div>
               </div>
 
               {/* AV comparison if available */}
               {inputMode === 'fetch' && selectedIdx != null && articles[selectedIdx]?.overall_sentiment_label && (
-                <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid #2a2d3e' }}>
-                  <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, marginBottom: 6 }}>ALPHA VANTAGE SENTIMENT</div>
+                <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, marginBottom: 6 }}>ALPHA VANTAGE SENTIMENT</div>
                   <span style={{ color: avSentimentColor(articles[selectedIdx].overall_sentiment_label), fontSize: 13, fontWeight: 600 }}>
                     {articles[selectedIdx].overall_sentiment_label.replace(/-/g, ' ')}
                   </span>
@@ -553,8 +553,8 @@ export function NewsSentiment() {
 
             {/* Summary card */}
             <Card>
-              <div style={{ color: '#64748b', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 12 }}>AI SUMMARY</div>
-              <p style={{ color: '#e2e8f0', fontSize: 14, lineHeight: 1.7, margin: 0 }}>{result.summary}</p>
+              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 12 }}>AI SUMMARY</div>
+              <p style={{ color: 'var(--text-h)', fontSize: 14, lineHeight: 1.7, margin: 0 }}>{result.summary}</p>
               <div style={{ marginTop: 12, color: '#475569', fontSize: 11 }}>Generated by DistilBART-CNN · abstractive summarization</div>
             </Card>
           </div>
@@ -562,7 +562,7 @@ export function NewsSentiment() {
           {/* Key signals */}
           {(result.sentiment.bullishSignals.length > 0 || result.sentiment.bearishSignals.length > 0) && (
             <Card>
-              <div style={{ color: '#64748b', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 14 }}>KEY SIGNALS</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 14 }}>KEY SIGNALS</div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
 
                 {result.sentiment.bullishSignals.length > 0 && (
@@ -573,8 +573,8 @@ export function NewsSentiment() {
                         <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', background: '#10b98108', border: '1px solid #10b98125', borderRadius: 8, padding: '10px 12px' }}>
                           <span style={{ color: '#10b981', fontSize: 14, flexShrink: 0, marginTop: 1 }}>▲</span>
                           <div style={{ flex: 1 }}>
-                            <div style={{ color: '#e2e8f0', fontSize: 13, lineHeight: 1.5 }}>{s.text}</div>
-                            <div style={{ color: '#64748b', fontSize: 11, marginTop: 3 }}>{(s.score * 100).toFixed(0)}% confidence</div>
+                            <div style={{ color: 'var(--text-h)', fontSize: 13, lineHeight: 1.5 }}>{s.text}</div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 3 }}>{(s.score * 100).toFixed(0)}% confidence</div>
                           </div>
                         </div>
                       ))}
@@ -590,8 +590,8 @@ export function NewsSentiment() {
                         <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', background: '#ef444408', border: '1px solid #ef444425', borderRadius: 8, padding: '10px 12px' }}>
                           <span style={{ color: '#ef4444', fontSize: 14, flexShrink: 0, marginTop: 1 }}>▼</span>
                           <div style={{ flex: 1 }}>
-                            <div style={{ color: '#e2e8f0', fontSize: 13, lineHeight: 1.5 }}>{s.text}</div>
-                            <div style={{ color: '#64748b', fontSize: 11, marginTop: 3 }}>{(s.score * 100).toFixed(0)}% confidence</div>
+                            <div style={{ color: 'var(--text-h)', fontSize: 13, lineHeight: 1.5 }}>{s.text}</div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 3 }}>{(s.score * 100).toFixed(0)}% confidence</div>
                           </div>
                         </div>
                       ))}

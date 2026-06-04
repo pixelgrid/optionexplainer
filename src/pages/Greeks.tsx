@@ -6,17 +6,17 @@ import {
 import { blackScholes } from '../lib/blackScholes';
 
 const CHART_STYLE = {
-  cartesianGrid: { strokeDasharray: '3 3', stroke: '#1e2130' },
-  xAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  yAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  tooltip: { contentStyle: { background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 8, fontSize: 13 } },
+  cartesianGrid: { strokeDasharray: '3 3', stroke: 'var(--border)' },
+  xAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  yAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  tooltip: { contentStyle: { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13 } },
 };
 
 function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
@@ -24,10 +24,10 @@ function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: st
 function StatCard({ label, value, sub, color }: { label: string; value: string; sub?: string; color: string }) {
   return (
     <div style={{
-      background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '16px 20px',
+      background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 20px',
       borderTop: `3px solid ${color}`,
     }}>
-      <div style={{ fontSize: 12, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</div>
+      <div style={{ fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</div>
       <div style={{ fontSize: 24, fontWeight: 700, color, fontFamily: 'monospace' }}>{value}</div>
       {sub && <div style={{ fontSize: 11, color: '#475569', marginTop: 4 }}>{sub}</div>}
     </div>
@@ -42,8 +42,8 @@ function Slider({ label, min, max, value, onChange, format }: {
   return (
     <div style={{ flex: 1, minWidth: 160 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-        <span style={{ fontSize: 13, color: '#94a3b8' }}>{label}</span>
-        <span style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0', fontFamily: 'monospace' }}>{fmt(value)}</span>
+        <span style={{ fontSize: 13, color: 'var(--text)' }}>{label}</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-h)', fontFamily: 'monospace' }}>{fmt(value)}</span>
       </div>
       <input
         type="range" min={min} max={max} value={value}
@@ -56,7 +56,7 @@ function Slider({ label, min, max, value, onChange, format }: {
 
 function ChartExplanation({ text }: { text: string }) {
   return (
-    <p style={{ margin: '12px 0 0', fontSize: 14, color: '#94a3b8', lineHeight: 1.7, padding: '12px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #2a2d3e' }}>
+    <p style={{ margin: '12px 0 0', fontSize: 14, color: 'var(--text)', lineHeight: 1.7, padding: '12px 16px', background: 'var(--bg)', borderRadius: 8, borderLeft: '3px solid var(--border)' }}>
       {text}
     </p>
   );
@@ -112,16 +112,16 @@ export function Greeks() {
 
   return (
     <div className="page-wrap">
-      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
         The Greeks
       </h1>
-      <p style={{ margin: '0 0 32px', color: '#64748b', fontSize: 15, lineHeight: 1.7 }}>
+      <p style={{ margin: '0 0 32px', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7 }}>
         The Greeks are risk measures that describe how an option's price responds to changes in market conditions. Delta measures price sensitivity to the underlying stock, Gamma measures the rate of change of delta, Theta captures time decay, and Vega measures sensitivity to implied volatility. Understanding these four numbers is essential for managing any options position.
       </p>
 
       {/* Sliders */}
-      <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '20px', marginBottom: 32 }}>
-        <div style={{ fontSize: 13, color: '#64748b', marginBottom: 16, fontWeight: 500 }}>
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '20px', marginBottom: 32 }}>
+        <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16, fontWeight: 500 }}>
           Interactive Controls — Strike fixed at $100
         </div>
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
@@ -142,16 +142,16 @@ export function Greeks() {
       {/* Delta Chart */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="Delta — Price Sensitivity" color="#10b981" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '20px' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '20px' }}>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={deltaData}>
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-              <XAxis dataKey="price" {...CHART_STYLE.xAxis} label={{ value: 'Stock Price ($)', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} />
+              <XAxis dataKey="price" {...CHART_STYLE.xAxis} label={{ value: 'Stock Price ($)', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} />
               <YAxis {...CHART_STYLE.yAxis} domain={[-1, 1]} />
               <Tooltip {...CHART_STYLE.tooltip} />
-              <Legend wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
-              <ReferenceLine x={K} stroke="#2a2d3e" strokeDasharray="4 4" label={{ value: 'Strike', fill: '#475569', fontSize: 10 }} />
-              <ReferenceLine y={0} stroke="#2a2d3e" />
+              <Legend wrapperStyle={{ fontSize: 12, color: 'var(--text)' }} />
+              <ReferenceLine x={K} stroke="var(--border)" strokeDasharray="4 4" label={{ value: 'Strike', fill: '#475569', fontSize: 10 }} />
+              <ReferenceLine y={0} stroke="var(--border)" />
               <Line type="monotone" dataKey="callDelta" name="Call Delta" stroke="#10b981" dot={false} strokeWidth={2} />
               <Line type="monotone" dataKey="putDelta" name="Put Delta" stroke="#ef4444" dot={false} strokeWidth={2} />
             </LineChart>
@@ -163,14 +163,14 @@ export function Greeks() {
       {/* Gamma Chart */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="Gamma — Delta Acceleration" color="#f59e0b" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '20px' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '20px' }}>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={gammaData}>
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-              <XAxis dataKey="price" {...CHART_STYLE.xAxis} label={{ value: 'Stock Price ($)', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} />
+              <XAxis dataKey="price" {...CHART_STYLE.xAxis} label={{ value: 'Stock Price ($)', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} />
               <YAxis {...CHART_STYLE.yAxis} />
               <Tooltip {...CHART_STYLE.tooltip} />
-              <ReferenceLine x={K} stroke="#2a2d3e" strokeDasharray="4 4" label={{ value: 'Strike', fill: '#475569', fontSize: 10 }} />
+              <ReferenceLine x={K} stroke="var(--border)" strokeDasharray="4 4" label={{ value: 'Strike', fill: '#475569', fontSize: 10 }} />
               <Line type="monotone" dataKey="gamma" name="Gamma" stroke="#f59e0b" dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
@@ -181,11 +181,11 @@ export function Greeks() {
       {/* Theta Decay Chart */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="Theta — Time Decay" color="#8b5cf6" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '20px' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '20px' }}>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={thetaData}>
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-              <XAxis dataKey="dte" {...CHART_STYLE.xAxis} reversed label={{ value: 'Days to Expiry', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} />
+              <XAxis dataKey="dte" {...CHART_STYLE.xAxis} reversed label={{ value: 'Days to Expiry', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} />
               <YAxis {...CHART_STYLE.yAxis} />
               <Tooltip {...CHART_STYLE.tooltip} />
               <ReferenceLine x={dte} stroke="#6366f1" strokeDasharray="4 4" label={{ value: 'Current DTE', fill: '#6366f1', fontSize: 10 }} />
@@ -199,14 +199,14 @@ export function Greeks() {
       {/* Vega Chart */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="Vega — Volatility Sensitivity" color="#06b6d4" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '20px' }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '20px' }}>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={vegaData}>
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-              <XAxis dataKey="price" {...CHART_STYLE.xAxis} label={{ value: 'Stock Price ($)', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} />
+              <XAxis dataKey="price" {...CHART_STYLE.xAxis} label={{ value: 'Stock Price ($)', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} />
               <YAxis {...CHART_STYLE.yAxis} />
               <Tooltip {...CHART_STYLE.tooltip} />
-              <ReferenceLine x={K} stroke="#2a2d3e" strokeDasharray="4 4" label={{ value: 'Strike', fill: '#475569', fontSize: 10 }} />
+              <ReferenceLine x={K} stroke="var(--border)" strokeDasharray="4 4" label={{ value: 'Strike', fill: '#475569', fontSize: 10 }} />
               <Line type="monotone" dataKey="vega" name="Vega ($ per 1% IV)" stroke="#06b6d4" dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>

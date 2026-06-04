@@ -53,7 +53,7 @@ function fmtBig(v: string | undefined): string {
 
 // Color thresholds — not sector-adjusted, general guidance
 function peColor(pe: number | null): string {
-  if (pe == null) return '#94a3b8';
+  if (pe == null) return 'var(--text)';
   if (pe < 0) return '#ef4444';
   if (pe < 15) return '#10b981';
   if (pe < 25) return '#f59e0b';
@@ -61,36 +61,36 @@ function peColor(pe: number | null): string {
   return '#ef4444';
 }
 function pbColor(pb: number | null): string {
-  if (pb == null) return '#94a3b8';
+  if (pb == null) return 'var(--text)';
   if (pb < 1) return '#3b82f6';
   if (pb < 3) return '#10b981';
   if (pb < 6) return '#f59e0b';
   return '#ef4444';
 }
 function psColor(ps: number | null): string {
-  if (ps == null) return '#94a3b8';
+  if (ps == null) return 'var(--text)';
   if (ps < 2) return '#10b981';
   if (ps < 6) return '#f59e0b';
   if (ps < 12) return '#fb923c';
   return '#ef4444';
 }
 function evEbitdaColor(v: number | null): string {
-  if (v == null) return '#94a3b8';
-  if (v < 0) return '#94a3b8';
+  if (v == null) return 'var(--text)';
+  if (v < 0) return 'var(--text)';
   if (v < 10) return '#10b981';
   if (v < 20) return '#f59e0b';
   if (v < 35) return '#fb923c';
   return '#ef4444';
 }
 function marginColor(v: number | null): string {
-  if (v == null) return '#94a3b8';
+  if (v == null) return 'var(--text)';
   if (v > 0.20) return '#10b981';
   if (v > 0.10) return '#f59e0b';
   if (v > 0) return '#fb923c';
   return '#ef4444';
 }
 function roeColor(v: number | null): string {
-  if (v == null) return '#94a3b8';
+  if (v == null) return 'var(--text)';
   if (v > 0.20) return '#10b981';
   if (v > 0.10) return '#f59e0b';
   return '#ef4444';
@@ -98,7 +98,7 @@ function roeColor(v: number | null): string {
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20, ...style }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20, ...style }}>
       {children}
     </div>
   );
@@ -108,24 +108,24 @@ function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: st
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
 
 function MetricTile({ label, value, color, sub }: { label: string; value: string; color?: string; sub?: string }) {
   return (
-    <div style={{ background: '#0f1117', border: '1px solid #2a2d3e', borderRadius: 10, padding: '14px 16px' }}>
-      <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 6 }}>{label}</div>
-      <div style={{ color: color ?? '#e2e8f0', fontSize: 20, fontWeight: 700 }}>{value}</div>
+    <div style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
+      <div style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 6 }}>{label}</div>
+      <div style={{ color: color ?? 'var(--text-h)', fontSize: 20, fontWeight: 700 }}>{value}</div>
       {sub && <div style={{ color: '#475569', fontSize: 11, marginTop: 4 }}>{sub}</div>}
     </div>
   );
 }
 
 const inputStyle: React.CSSProperties = {
-  width: '100%', background: '#0f1117', border: '1px solid #2a2d3e', borderRadius: 8,
-  padding: '10px 14px', color: '#e2e8f0', fontSize: 14, outline: 'none', boxSizing: 'border-box',
+  width: '100%', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8,
+  padding: '10px 14px', color: 'var(--text-h)', fontSize: 14, outline: 'none', boxSizing: 'border-box',
 };
 
 export function ValuationSnapshot() {
@@ -196,10 +196,10 @@ export function ValuationSnapshot() {
   return (
     <div className="page-wrap" style={{ maxWidth: 960 }}>
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ margin: '0 0 8px', color: '#e2e8f0', fontSize: 'clamp(22px,5vw,30px)', fontWeight: 700 }}>
+        <h1 style={{ margin: '0 0 8px', color: 'var(--text-h)', fontSize: 'clamp(22px,5vw,30px)', fontWeight: 700 }}>
           Valuation Snapshot
         </h1>
-        <p style={{ margin: 0, color: '#64748b', fontSize: 14 }}>
+        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: 14 }}>
           Full valuation dashboard from a single API call — ratios, margins, analyst target, and 52-week context.
         </p>
       </div>
@@ -207,8 +207,8 @@ export function ValuationSnapshot() {
       {showKeyInput ? (
         <Card style={{ marginBottom: 24, border: '1px solid #6366f140' }}>
           <div style={{ color: '#818cf8', fontWeight: 600, marginBottom: 8 }}>Alpha Vantage API Key Required</div>
-          <p style={{ color: '#94a3b8', fontSize: 13, margin: '0 0 12px' }}>
-            Free key at <strong style={{ color: '#e2e8f0' }}>alphavantage.co/support/#api-key</strong> — 25 calls/day. Saved in your browser.
+          <p style={{ color: 'var(--text)', fontSize: 13, margin: '0 0 12px' }}>
+            Free key at <strong style={{ color: 'var(--text-h)' }}>alphavantage.co/support/#api-key</strong> — 25 calls/day. Saved in your browser.
           </p>
           <div style={{ display: 'flex', gap: 10 }}>
             <input style={{ ...inputStyle, flex: 1 }} placeholder="Paste your Alpha Vantage API key…"
@@ -231,12 +231,12 @@ export function ValuationSnapshot() {
               {loading ? 'Loading…' : 'Analyze'}
             </button>
             <button onClick={() => setShowKeyInput(true)}
-              style={{ background: 'none', color: '#64748b', border: '1px solid #2a2d3e', borderRadius: 8, padding: '10px 12px', fontSize: 12, cursor: 'pointer' }}>
+              style={{ background: 'none', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', fontSize: 12, cursor: 'pointer' }}>
               ⚙ API Key
             </button>
           </div>
           {error && <div style={{ marginTop: 12, color: '#fca5a5', fontSize: 13, background: '#ef444415', border: '1px solid #ef444430', borderRadius: 8, padding: '10px 14px' }}>⚠ {error}</div>}
-          {ticker && !error && <div style={{ marginTop: 10, color: '#64748b', fontSize: 13 }}>Showing <span style={{ color: '#818cf8', fontWeight: 700 }}>{ticker}</span></div>}
+          {ticker && !error && <div style={{ marginTop: 10, color: 'var(--text-muted)', fontSize: 13 }}>Showing <span style={{ color: '#818cf8', fontWeight: 700 }}>{ticker}</span></div>}
         </Card>
       )}
 
@@ -246,11 +246,11 @@ export function ValuationSnapshot() {
           <Card style={{ marginBottom: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
               <div>
-                <h2 style={{ margin: '0 0 4px', color: '#e2e8f0', fontSize: 22, fontWeight: 700 }}>{ov.Name}</h2>
+                <h2 style={{ margin: '0 0 4px', color: 'var(--text-h)', fontSize: 22, fontWeight: 700 }}>{ov.Name}</h2>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                   <span style={{ color: '#818cf8', fontSize: 13, fontWeight: 600 }}>{ticker}</span>
                   <span style={{ color: '#475569' }}>·</span>
-                  <span style={{ color: '#64748b', fontSize: 13 }}>{ov.Exchange}</span>
+                  <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>{ov.Exchange}</span>
                   {ov.Sector && ov.Sector !== 'None' && (
                     <>
                       <span style={{ color: '#475569' }}>·</span>
@@ -258,14 +258,14 @@ export function ValuationSnapshot() {
                     </>
                   )}
                   {ov.Industry && ov.Industry !== 'None' && (
-                    <span style={{ color: '#64748b', fontSize: 12 }}>{ov.Industry}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{ov.Industry}</span>
                   )}
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                {price != null && <div style={{ color: '#e2e8f0', fontSize: 28, fontWeight: 700 }}>${price.toFixed(2)}</div>}
-                <div style={{ color: '#64748b', fontSize: 12 }}>Market Cap: <span style={{ color: '#e2e8f0' }}>{fmtBig(ov.MarketCapitalization)}</span></div>
-                {beta != null && <div style={{ color: '#64748b', fontSize: 12 }}>Beta: <span style={{ color: beta > 1.5 ? '#f59e0b' : '#e2e8f0' }}>{beta.toFixed(2)}</span></div>}
+                {price != null && <div style={{ color: 'var(--text-h)', fontSize: 28, fontWeight: 700 }}>${price.toFixed(2)}</div>}
+                <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Market Cap: <span style={{ color: 'var(--text-h)' }}>{fmtBig(ov.MarketCapitalization)}</span></div>
+                {beta != null && <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Beta: <span style={{ color: beta > 1.5 ? '#f59e0b' : 'var(--text-h)' }}>{beta.toFixed(2)}</span></div>}
               </div>
             </div>
           </Card>
@@ -273,20 +273,20 @@ export function ValuationSnapshot() {
           {/* 52-week range */}
           {high52 && low52 && (
             <Card style={{ marginBottom: 20 }}>
-              <div style={{ color: '#64748b', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 10 }}>52-WEEK RANGE</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 10 }}>52-WEEK RANGE</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span style={{ color: '#ef4444', fontSize: 13, fontWeight: 600, minWidth: 60 }}>${low52.toFixed(2)}</span>
-                <div style={{ flex: 1, position: 'relative', height: 8, background: '#2a2d3e', borderRadius: 4 }}>
+                <div style={{ flex: 1, position: 'relative', height: 8, background: 'var(--border)', borderRadius: 4 }}>
                   {rangePos != null && (
-                    <div style={{ position: 'absolute', left: `${Math.max(0, Math.min(100, rangePos))}%`, top: -4, width: 16, height: 16, background: '#6366f1', borderRadius: '50%', transform: 'translateX(-50%)', border: '2px solid #e2e8f0' }} />
+                    <div style={{ position: 'absolute', left: `${Math.max(0, Math.min(100, rangePos))}%`, top: -4, width: 16, height: 16, background: '#6366f1', borderRadius: '50%', transform: 'translateX(-50%)', border: '2px solid var(--text-h)' }} />
                   )}
                   <div style={{ width: `${Math.max(0, Math.min(100, rangePos ?? 0))}%`, height: '100%', background: 'linear-gradient(90deg, #ef4444, #f59e0b, #10b981)', borderRadius: 4 }} />
                 </div>
                 <span style={{ color: '#10b981', fontSize: 13, fontWeight: 600, minWidth: 60, textAlign: 'right' }}>${high52.toFixed(2)}</span>
               </div>
               {rangePos != null && (
-                <div style={{ color: '#64748b', fontSize: 12, marginTop: 8, textAlign: 'center' }}>
-                  Currently at <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{rangePos.toFixed(0)}%</span> of 52-week range
+                <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 8, textAlign: 'center' }}>
+                  Currently at <span style={{ color: 'var(--text-h)', fontWeight: 600 }}>{rangePos.toFixed(0)}%</span> of 52-week range
                   {aboveMa50 != null && <span style={{ marginLeft: 12, color: aboveMa50 ? '#10b981' : '#ef4444' }}>{aboveMa50 ? '▲' : '▼'} 50MA</span>}
                   {aboveMa200 != null && <span style={{ marginLeft: 8, color: aboveMa200 ? '#10b981' : '#ef4444' }}>{aboveMa200 ? '▲' : '▼'} 200MA</span>}
                 </div>
@@ -296,15 +296,15 @@ export function ValuationSnapshot() {
 
           {/* Analyst target */}
           {target != null && price != null && (
-            <Card style={{ marginBottom: 20, border: `1px solid ${upside != null && upside > 10 ? '#10b98140' : upside != null && upside < -10 ? '#ef444440' : '#2a2d3e'}` }}>
+            <Card style={{ marginBottom: 20, border: `1px solid ${upside != null && upside > 10 ? '#10b98140' : upside != null && upside < -10 ? '#ef444440' : 'var(--border)'}` }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
                 <div>
-                  <div style={{ color: '#64748b', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 4 }}>ANALYST CONSENSUS TARGET</div>
-                  <div style={{ color: '#e2e8f0', fontSize: 22, fontWeight: 700 }}>${target.toFixed(2)}</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 4 }}>ANALYST CONSENSUS TARGET</div>
+                  <div style={{ color: 'var(--text-h)', fontSize: 22, fontWeight: 700 }}>${target.toFixed(2)}</div>
                 </div>
                 {upside != null && (
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: '#64748b', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 4 }}>IMPLIED UPSIDE</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 4 }}>IMPLIED UPSIDE</div>
                     <div style={{ fontSize: 28, fontWeight: 700, color: upside > 0 ? '#10b981' : '#ef4444' }}>
                       {upside > 0 ? '+' : ''}{upside.toFixed(1)}%
                     </div>
@@ -317,7 +317,7 @@ export function ValuationSnapshot() {
           {/* Valuation ratios */}
           <div style={{ marginBottom: 20 }}>
             <SectionHeader title="Valuation Multiples" color="#8b5cf6" />
-            <p style={{ color: '#64748b', fontSize: 12, margin: '0 0 12px' }}>Color-coded using general market thresholds — always compare within sector for context.</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 12, margin: '0 0 12px' }}>Color-coded using general market thresholds — always compare within sector for context.</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 10 }}>
               <MetricTile label="P/E (TTM)" value={pe != null ? pe.toFixed(1) + 'x' : '—'} color={peColor(pe)} sub="Trailing" />
               <MetricTile label="P/E (FORWARD)" value={fpe != null ? fpe.toFixed(1) + 'x' : '—'} color={peColor(fpe)} sub="Next 12 months" />
@@ -336,7 +336,7 @@ export function ValuationSnapshot() {
           <div style={{ marginBottom: 20 }}>
             <SectionHeader title="Profitability & Returns" color="#10b981" />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 10 }}>
-              <MetricTile label="GROSS MARGIN" value={ov.GrossProfitTTM && ov.RevenueTTM && nn(ov.RevenueTTM) ? ((nn(ov.GrossProfitTTM) ?? 0) / nn(ov.RevenueTTM)! * 100).toFixed(1) + '%' : '—'} color="#e2e8f0" />
+              <MetricTile label="GROSS MARGIN" value={ov.GrossProfitTTM && ov.RevenueTTM && nn(ov.RevenueTTM) ? ((nn(ov.GrossProfitTTM) ?? 0) / nn(ov.RevenueTTM)! * 100).toFixed(1) + '%' : '—'} color="var(--text-h)" />
               <MetricTile label="OPERATING MARGIN" value={opMargin != null ? (opMargin * 100).toFixed(1) + '%' : '—'} color={marginColor(opMargin)} />
               <MetricTile label="NET PROFIT MARGIN" value={profitMargin != null ? (profitMargin * 100).toFixed(1) + '%' : '—'} color={marginColor(profitMargin)} />
               <MetricTile label="ROE (TTM)" value={roe != null ? (roe * 100).toFixed(1) + '%' : '—'} color={roeColor(roe)} />
@@ -355,14 +355,14 @@ export function ValuationSnapshot() {
               <MetricTile label="EARNINGS GROWTH (QoQ YoY)" value={earningsGrowth != null ? (earningsGrowth > 0 ? '+' : '') + (earningsGrowth * 100).toFixed(1) + '%' : '—'}
                 color={earningsGrowth != null ? (earningsGrowth > 0.1 ? '#10b981' : earningsGrowth > 0 ? '#f59e0b' : '#ef4444') : undefined} />
               <MetricTile label="DIVIDEND YIELD" value={divYield != null && divYield > 0 ? (divYield * 100).toFixed(2) + '%' : 'None'}
-                color={divYield != null && divYield > 0 ? '#10b981' : '#64748b'} />
+                color={divYield != null && divYield > 0 ? '#10b981' : 'var(--text-muted)'} />
               <MetricTile label="DIVIDEND / SHARE" value={nn(ov.DividendPerShare) != null && nn(ov.DividendPerShare)! > 0 ? '$' + Number(ov.DividendPerShare).toFixed(2) : 'None'} />
               <MetricTile label="SHARES OUTSTANDING" value={nn(ov.SharesOutstanding) != null ? (nn(ov.SharesOutstanding)! / 1e9 >= 1 ? (nn(ov.SharesOutstanding)! / 1e9).toFixed(2) + 'B' : (nn(ov.SharesOutstanding)! / 1e6).toFixed(0) + 'M') : '—'} />
             </div>
           </div>
 
           {/* Footnote */}
-          <Card style={{ background: '#0f1117' }}>
+          <Card style={{ background: 'var(--bg)' }}>
             <div style={{ color: '#475569', fontSize: 12 }}>
               Data via Alpha Vantage OVERVIEW endpoint. Valuation colors use general market thresholds — high-growth tech typically trades at premium multiples that appear "expensive" by these thresholds. Always compare within sector peers.
             </div>

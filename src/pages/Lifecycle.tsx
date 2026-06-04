@@ -4,10 +4,10 @@ function StepCard({
 }: { number: number | string; title: string; color: string; children: React.ReactNode }) {
   return (
     <div style={{
-      background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 12,
+      background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12,
       overflow: 'hidden', marginBottom: 24,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderBottom: '1px solid #2a2d3e', background: `${color}08` }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderBottom: '1px solid var(--border)', background: `${color}08` }}>
         <div style={{
           width: 36, height: 36, borderRadius: '50%', background: color,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -15,7 +15,7 @@ function StepCard({
         }}>
           {number}
         </div>
-        <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: '#e2e8f0' }}>{title}</h3>
+        <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h3>
       </div>
       <div style={{ padding: '16px 20px' }}>{children}</div>
     </div>
@@ -24,19 +24,19 @@ function StepCard({
 
 function InfoBox({ label, text, color }: { label: string; text: string; color: string }) {
   return (
-    <div style={{ padding: '10px 14px', background: '#0f1117', borderRadius: 8, borderLeft: `3px solid ${color}`, marginBottom: 10 }}>
+    <div style={{ padding: '10px 14px', background: 'var(--bg)', borderRadius: 8, borderLeft: `3px solid ${color}`, marginBottom: 10 }}>
       <div style={{ fontSize: 12, fontWeight: 600, color, marginBottom: 4 }}>{label}</div>
-      <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>{text}</p>
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>{text}</p>
     </div>
   );
 }
 
 function OutcomeCard({ icon, title, color, children }: { icon: string; title: string; color: string; children: React.ReactNode }) {
   return (
-    <div style={{ flex: 1, background: '#0f1117', border: `1px solid ${color}40`, borderRadius: 10, padding: '14px 16px' }}>
+    <div style={{ flex: 1, background: 'var(--bg)', border: `1px solid ${color}40`, borderRadius: 10, padding: '14px 16px' }}>
       <div style={{ fontSize: 20, marginBottom: 6 }}>{icon}</div>
       <div style={{ fontSize: 13, fontWeight: 600, color, marginBottom: 8 }}>{title}</div>
-      <div style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>{children}</div>
+      <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>{children}</div>
     </div>
   );
 }
@@ -44,10 +44,10 @@ function OutcomeCard({ icon, title, color, children }: { icon: string; title: st
 export function Lifecycle() {
   return (
     <div className="page-wrap">
-      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
         Trade Lifecycle
       </h1>
-      <p style={{ margin: '0 0 40px', color: '#64748b', fontSize: 15, lineHeight: 1.7 }}>
+      <p style={{ margin: '0 0 40px', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7 }}>
         From the moment you enter an options trade to the moment it resolves, there are distinct phases — each with its own decisions and risks. Most beginners focus only on entry. The professionals focus on position management, exit rules, and what happens at expiration.
       </p>
 
@@ -70,10 +70,10 @@ export function Lifecycle() {
               <div style={{ fontSize: 11, color: step.color, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Phase {i + 1}
               </div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0', marginTop: 2 }}>{step.label}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-h)', marginTop: 2 }}>{step.label}</div>
             </div>
             {i < 3 && (
-              <div style={{ fontSize: 18, color: '#2a2d3e', padding: '0 4px' }}>→</div>
+              <div style={{ fontSize: 18, color: 'var(--border)', padding: '0 4px' }}>→</div>
             )}
           </div>
         ))}
@@ -81,7 +81,7 @@ export function Lifecycle() {
 
       {/* Phase 1: Entry */}
       <StepCard number={1} title="Entry — Getting In Right" color="#6366f1">
-        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           How you enter a trade largely determines whether you can manage it profitably. Three key decisions at entry:
         </p>
         <InfoBox
@@ -103,7 +103,7 @@ export function Lifecycle() {
 
       {/* Phase 2: Management */}
       <StepCard number={2} title="During the Trade — Position Management" color="#10b981">
-        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           The golden rules of position management. Having these rules in advance (before you're emotional about a live trade) is essential.
         </p>
         <InfoBox
@@ -125,7 +125,7 @@ export function Lifecycle() {
 
       {/* Phase 3: Expiration */}
       <StepCard number={3} title="At Expiration — Three Outcomes" color="#f59e0b">
-        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           The most important rule: do not hold short options into expiration day unless you have a very specific reason. The final few hours bring extreme gamma risk and assignment uncertainty.
         </p>
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
@@ -152,7 +152,7 @@ export function Lifecycle() {
 
       {/* Phase 4: Assignment & Exercise */}
       <StepCard number={4} title="Assignment &amp; Exercise — What Actually Happens" color="#ef4444">
-        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           Understanding the mechanics of assignment removes the fear. It's not an emergency — it's a known outcome you should plan for.
         </p>
         <div className="g-2" style={{ gap: 14, marginBottom: 16 }}>
@@ -162,9 +162,9 @@ export function Lifecycle() {
             { label: 'Long Put → Exercise', color: '#10b981', text: 'You choose to sell 100 shares at the strike price. Only rational to exercise when the put is deep ITM and the extrinsic value is near zero (you\'d give up more by selling the option vs exercising).' },
             { label: 'Early Exercise Risk (Calls)', color: '#f59e0b', text: 'American-style calls are rarely exercised early, except just before an ex-dividend date. A deep ITM call holder may exercise the day before ex-div to capture the dividend. Be aware of this on any short deep-ITM call position.' },
           ].map(({ label, color, text }) => (
-            <div key={label} style={{ padding: '12px 14px', background: '#0f1117', borderRadius: 8, borderLeft: `3px solid ${color}` }}>
+            <div key={label} style={{ padding: '12px 14px', background: 'var(--bg)', borderRadius: 8, borderLeft: `3px solid ${color}` }}>
               <div style={{ fontSize: 12, fontWeight: 600, color, marginBottom: 6 }}>{label}</div>
-              <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>{text}</p>
+              <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>{text}</p>
             </div>
           ))}
         </div>
@@ -172,22 +172,22 @@ export function Lifecycle() {
 
       {/* Rolling */}
       <StepCard number="↺" title="Rolling — When to Extend vs Accept the Loss" color="#8b5cf6">
-        <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           Rolling is the act of closing your current position and re-opening a similar one at a different expiry, strike, or both. It's a management tool — not a way to avoid losses.
         </p>
         <div className="g-2" style={{ gap: 14 }}>
-          <div style={{ padding: '12px 14px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #10b981' }}>
+          <div style={{ padding: '12px 14px', background: 'var(--bg)', borderRadius: 8, borderLeft: '3px solid #10b981' }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#10b981', marginBottom: 6 }}>Roll When</div>
-            <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: '#94a3b8', lineHeight: 1.8 }}>
+            <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: 'var(--text)', lineHeight: 1.8 }}>
               <li>You can roll for a credit (collect more premium)</li>
               <li>You still believe the thesis (stock direction)</li>
               <li>The net credit-to-date covers your risk</li>
               <li>30+ DTE remains after rolling (avoids pin risk)</li>
             </ul>
           </div>
-          <div style={{ padding: '12px 14px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #ef4444' }}>
+          <div style={{ padding: '12px 14px', background: 'var(--bg)', borderRadius: 8, borderLeft: '3px solid #ef4444' }}>
             <div style={{ fontSize: 12, fontWeight: 600, color: '#ef4444', marginBottom: 6 }}>Take the Loss When</div>
-            <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: '#94a3b8', lineHeight: 1.8 }}>
+            <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13, color: 'var(--text)', lineHeight: 1.8 }}>
               <li>Rolling costs a debit and you'd be "averaging down"</li>
               <li>The fundamental thesis has changed</li>
               <li>The position is eating disproportionate margin</li>

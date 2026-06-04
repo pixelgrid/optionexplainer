@@ -4,8 +4,8 @@ import {
 } from 'recharts';
 
 const card = (style?: React.CSSProperties): React.CSSProperties => ({
-  background: '#1a1d27',
-  border: '1px solid #2a2d3e',
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border)',
   borderRadius: 10,
   padding: '20px 24px',
   ...style,
@@ -13,28 +13,28 @@ const card = (style?: React.CSSProperties): React.CSSProperties => ({
 
 const CHART = {
   tooltip: {
-    contentStyle: { background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 8, fontSize: 12, color: '#e2e8f0' },
+    contentStyle: { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12, color: 'var(--text-h)' },
   },
-  grid: { strokeDasharray: '3 3', stroke: '#1e2130' },
-  xAxis: { tick: { fill: '#64748b', fontSize: 11 }, tickLine: false, axisLine: { stroke: '#2a2d3e' } },
-  yAxis: { tick: { fill: '#64748b', fontSize: 11 }, tickLine: false, axisLine: false },
+  grid: { strokeDasharray: '3 3', stroke: 'var(--border)' },
+  xAxis: { tick: { fill: 'var(--text-muted)', fontSize: 11 }, tickLine: false, axisLine: { stroke: 'var(--border)' } },
+  yAxis: { tick: { fill: 'var(--text-muted)', fontSize: 11 }, tickLine: false, axisLine: false },
 };
 
 function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16, marginTop: 40 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
 
 function Citation({ authors, year, title, journal, detail }: { authors: string; year: string; title: string; journal: string; detail?: string }) {
   return (
-    <div style={{ padding: '10px 14px', background: '#0f1117', borderRadius: 6, borderLeft: '3px solid #6366f1', marginTop: 12, fontSize: 12 }}>
+    <div style={{ padding: '10px 14px', background: 'var(--bg)', borderRadius: 6, borderLeft: '3px solid #6366f1', marginTop: 12, fontSize: 12 }}>
       <span style={{ color: '#818cf8', fontWeight: 600 }}>{authors} ({year}).</span>
-      <span style={{ color: '#94a3b8', fontStyle: 'italic' }}> "{title}."</span>
-      <span style={{ color: '#64748b' }}> {journal}.</span>
+      <span style={{ color: 'var(--text)', fontStyle: 'italic' }}> "{title}."</span>
+      <span style={{ color: 'var(--text-muted)' }}> {journal}.</span>
       {detail && <span style={{ color: '#10b981' }}> {detail}</span>}
     </div>
   );
@@ -85,10 +85,10 @@ export function VRP() {
             Research-Backed
           </span>
         </div>
-        <h1 style={{ margin: '0 0 12px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+        <h1 style={{ margin: '0 0 12px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
           The Volatility Risk Premium
         </h1>
-        <p style={{ margin: 0, color: '#94a3b8', fontSize: 15, lineHeight: 1.7, maxWidth: 750 }}>
+        <p style={{ margin: 0, color: 'var(--text)', fontSize: 15, lineHeight: 1.7, maxWidth: 750 }}>
           The most systematically documented edge in options trading. Over decades of data, implied volatility
           persistently overstates how much the market actually moves — and selling that overpriced fear is how
           professional options traders earn their living.
@@ -105,7 +105,7 @@ export function VRP() {
         ].map(({ value, label, color }) => (
           <div key={label} style={card({ textAlign: 'center' })}>
             <div style={{ fontSize: 26, fontWeight: 700, color, letterSpacing: '-0.02em', marginBottom: 4 }}>{value}</div>
-            <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.4 }}>{label}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.4 }}>{label}</div>
           </div>
         ))}
       </div>
@@ -115,12 +115,12 @@ export function VRP() {
 
       <SectionHeader title="What Is the VRP?" color="#6366f1" />
       <div style={card()}>
-        <p style={{ margin: '0 0 14px', color: '#94a3b8', fontSize: 14, lineHeight: 1.7 }}>
-          Options are priced using <strong style={{ color: '#e2e8f0' }}>implied volatility (IV)</strong> — the market's forecast of future movement.
-          <strong style={{ color: '#e2e8f0' }}> Realized volatility (RV)</strong> is what actually happened. The gap between the two is the
+        <p style={{ margin: '0 0 14px', color: 'var(--text)', fontSize: 14, lineHeight: 1.7 }}>
+          Options are priced using <strong style={{ color: 'var(--text-h)' }}>implied volatility (IV)</strong> — the market's forecast of future movement.
+          <strong style={{ color: 'var(--text-h)' }}> Realized volatility (RV)</strong> is what actually happened. The gap between the two is the
           <strong style={{ color: '#8b5cf6' }}> Volatility Risk Premium</strong>: sellers of options systematically collect the difference.
         </p>
-        <p style={{ margin: 0, color: '#94a3b8', fontSize: 14, lineHeight: 1.7 }}>
+        <p style={{ margin: 0, color: 'var(--text)', fontSize: 14, lineHeight: 1.7 }}>
           Why does this premium exist? Because options buyers pay extra for <em>insurance</em> — they accept negative expected value
           in exchange for protection against tail events. This is structurally similar to insurance premiums: on average,
           the insurer (option seller) wins.
@@ -129,7 +129,7 @@ export function VRP() {
 
       <SectionHeader title="IV vs. Realized Volatility — The Gap That Pays" color="#8b5cf6" />
       <div style={card({ padding: '16px 8px 8px' })}>
-        <div style={{ fontSize: 12, color: '#64748b', marginLeft: 16, marginBottom: 8 }}>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 16, marginBottom: 8 }}>
           S&P 500 — 1-month IV vs Realized Volatility (annualized %) — Illustrative based on Bondarenko 2019 averages
         </div>
         <ResponsiveContainer width="100%" height={240}>
@@ -138,7 +138,7 @@ export function VRP() {
             <XAxis dataKey="month" {...CHART.xAxis} hide />
             <YAxis {...CHART.yAxis} tickFormatter={(v) => `${v}%`} />
             <Tooltip {...CHART.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`${n.toFixed(1)}%`]; }} />
-            <Legend wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
+            <Legend wrapperStyle={{ fontSize: 12, color: 'var(--text)' }} />
             <Line type="monotone" dataKey="iv" name="Implied Vol" stroke="#ef4444" strokeWidth={2} dot={false} />
             <Line type="monotone" dataKey="rv" name="Realized Vol" stroke="#10b981" strokeWidth={2} dot={false} />
           </LineChart>
@@ -150,7 +150,7 @@ export function VRP() {
 
       <SectionHeader title="Delta-Hedged Gains: Isolating the Pure Volatility Edge" color="#10b981" />
       <div style={card()}>
-        <p style={{ margin: '0 0 14px', color: '#94a3b8', fontSize: 14, lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 14px', color: 'var(--text)', fontSize: 14, lineHeight: 1.7 }}>
           To prove the VRP exists independent of directional bias, Bakshi & Kapadia (2003) delta-hedged ATM call positions continuously —
           removing all stock exposure. The result: even after hedging out direction, the <strong style={{ color: '#ef4444' }}>long option position
           returned −23 basis points per day</strong>. The option seller earned +23 bps/day in pure volatility premium.
@@ -164,11 +164,11 @@ export function VRP() {
             ].map(({ label, value, color }) => (
               <div key={label} style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 18, fontWeight: 700, color, marginBottom: 4 }}>{value}</div>
-                <div style={{ fontSize: 11, color: '#64748b' }}>{label}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{label}</div>
               </div>
             ))}
           </div>
-          <p style={{ margin: '10px 0 0', fontSize: 12, color: '#94a3b8', textAlign: 'center' }}>
+          <p style={{ margin: '10px 0 0', fontSize: 12, color: 'var(--text)', textAlign: 'center' }}>
             Returns from the <em>long</em> delta-hedged option perspective — sellers earn the opposite sign
           </p>
         </div>
@@ -183,7 +183,7 @@ export function VRP() {
 
       <SectionHeader title="The CBOE PUT Index: 32 Years of VRP Harvesting" color="#f59e0b" />
       <div style={card({ padding: '16px 8px 8px' })}>
-        <div style={{ fontSize: 12, color: '#64748b', marginLeft: 16, marginBottom: 8 }}>
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 16, marginBottom: 8 }}>
           PUT Index vs. S&P 500 — Simulated cumulative growth of $10,000 (illustrative, reflects reported Sharpe differential)
         </div>
         <ResponsiveContainer width="100%" height={220}>
@@ -192,7 +192,7 @@ export function VRP() {
             <XAxis dataKey="month" {...CHART.xAxis} hide />
             <YAxis {...CHART.yAxis} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
             <Tooltip {...CHART.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`$${n.toLocaleString()}`]; }} />
-            <Legend wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
+            <Legend wrapperStyle={{ fontSize: 12, color: 'var(--text)' }} />
             <Area type="monotone" dataKey="value" name="PUT Index" stroke="#f59e0b" fill="#f59e0b15" strokeWidth={2} dot={false} />
             <Area type="monotone" dataKey="sp500" name="S&P 500" stroke="#6366f1" fill="#6366f110" strokeWidth={2} dot={false} />
           </AreaChart>
@@ -206,16 +206,16 @@ export function VRP() {
           <div key={label} style={card()}>
             <div style={{ fontSize: 13, fontWeight: 600, color, marginBottom: 12 }}>{label}</div>
             {items.map(([k, v]) => (
-              <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid #1e2130', fontSize: 13 }}>
-                <span style={{ color: '#64748b' }}>{k}</span>
-                <span style={{ color: '#e2e8f0', fontWeight: 500 }}>{v}</span>
+              <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid var(--border)', fontSize: 13 }}>
+                <span style={{ color: 'var(--text-muted)' }}>{k}</span>
+                <span style={{ color: 'var(--text-h)', fontWeight: 500 }}>{v}</span>
               </div>
             ))}
           </div>
         ))}
       </div>
       <p style={{ margin: '10px 0 0', fontSize: 12, color: '#475569' }}>
-        The PUT Index achieved similar returns to the S&P 500 with <strong style={{ color: '#e2e8f0' }}>33% less volatility</strong> and a <strong style={{ color: '#e2e8f0' }}>33% higher Sharpe ratio</strong>. This is the VRP harvested systematically.
+        The PUT Index achieved similar returns to the S&P 500 with <strong style={{ color: 'var(--text-h)' }}>33% less volatility</strong> and a <strong style={{ color: 'var(--text-h)' }}>33% higher Sharpe ratio</strong>. This is the VRP harvested systematically.
       </p>
       <Citation
         authors="Bondarenko, O."
@@ -244,7 +244,7 @@ export function VRP() {
           <div key={authors} style={card()}>
             <div style={{ fontSize: 13, fontWeight: 600, color, marginBottom: 4 }}>{authors}</div>
             <div style={{ fontSize: 11, color: '#475569', marginBottom: 10 }}>{journal}</div>
-            <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>{finding}</p>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>{finding}</p>
           </div>
         ))}
       </div>
@@ -273,18 +273,18 @@ export function VRP() {
         ].map(({ step, title, body, color }) => (
           <div key={step} style={card()}>
             <div style={{ width: 28, height: 28, borderRadius: '50%', background: `${color}20`, border: `1px solid ${color}50`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color, marginBottom: 10 }}>{step}</div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0', marginBottom: 6 }}>{title}</div>
-            <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>{body}</p>
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-h)', marginBottom: 6 }}>{title}</div>
+            <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>{body}</p>
           </div>
         ))}
       </div>
 
-      <div style={{ marginTop: 40, padding: '16px 20px', background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10 }}>
-        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#64748b', marginBottom: 8 }}>
+      <div style={{ marginTop: 40, padding: '16px 20px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10 }}>
+        <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 8 }}>
           Key Caveat
         </div>
-        <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.7 }}>
-          The VRP is real but it is not arbitrage — it is a <strong style={{ color: '#e2e8f0' }}>risk premium</strong>, not free money. You are being paid to bear tail risk.
+        <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.7 }}>
+          The VRP is real but it is not arbitrage — it is a <strong style={{ color: 'var(--text-h)' }}>risk premium</strong>, not free money. You are being paid to bear tail risk.
           The premium can be negative for extended periods (2008, 2020), and short volatility positions can suffer severe drawdowns. The edge exists over <em>hundreds of trades</em>,
           not individual ones. Position sizing and risk management are what separates systematic VRP harvesting from gambling.
         </p>

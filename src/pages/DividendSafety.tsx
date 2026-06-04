@@ -45,7 +45,7 @@ async function fetchDividendData(ticker: string, apiKey: string): Promise<Divide
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20, ...style }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20, ...style }}>
       {children}
     </div>
   );
@@ -55,21 +55,21 @@ function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: st
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
 
 const inputStyle: React.CSSProperties = {
-  width: '100%', background: '#0f1117', border: '1px solid #2a2d3e', borderRadius: 8,
-  padding: '10px 14px', color: '#e2e8f0', fontSize: 14, outline: 'none', boxSizing: 'border-box',
+  width: '100%', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8,
+  padding: '10px 14px', color: 'var(--text-h)', fontSize: 14, outline: 'none', boxSizing: 'border-box',
 };
 
 const CHART_STYLE = {
-  cartesianGrid: { strokeDasharray: '3 3', stroke: '#1e2130' },
-  xAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  yAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  tooltip: { contentStyle: { background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 8, fontSize: 12 } },
+  cartesianGrid: { strokeDasharray: '3 3', stroke: 'var(--border)' },
+  xAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  yAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  tooltip: { contentStyle: { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 } },
 };
 
 function computeSafety(payoutRatio: number | null, fcfCoverage: number | null, yearsOfPayments: number): 'Safe' | 'Watch' | 'At Risk' {
@@ -161,10 +161,10 @@ export function DividendSafety() {
   return (
     <div className="page-wrap" style={{ maxWidth: 960 }}>
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ margin: '0 0 8px', color: '#e2e8f0', fontSize: 'clamp(22px,5vw,30px)', fontWeight: 700 }}>
+        <h1 style={{ margin: '0 0 8px', color: 'var(--text-h)', fontSize: 'clamp(22px,5vw,30px)', fontWeight: 700 }}>
           Dividend Safety Dashboard
         </h1>
-        <p style={{ margin: 0, color: '#64748b', fontSize: 14 }}>
+        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: 14 }}>
           Assess whether a dividend is sustainable — payout ratio, FCF coverage, and payment history. Critical for Wheel strategy stock selection.
         </p>
       </div>
@@ -172,8 +172,8 @@ export function DividendSafety() {
       {/* Why it matters */}
       <Card style={{ marginBottom: 20, background: '#10b98110', border: '1px solid #10b98140' }}>
         <div style={{ color: '#10b981', fontWeight: 600, fontSize: 13, marginBottom: 8 }}>Why Dividend Safety Matters for Options Traders</div>
-        <div style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.6 }}>
-          Wheel strategy traders target stocks with <strong style={{ color: '#e2e8f0' }}>safe, growing dividends</strong> — you collect option premium
+        <div style={{ color: 'var(--text)', fontSize: 13, lineHeight: 1.6 }}>
+          Wheel strategy traders target stocks with <strong style={{ color: 'var(--text-h)' }}>safe, growing dividends</strong> — you collect option premium
           plus the dividend yield. A dividend cut is catastrophic: the stock drops 5–15% instantly, wiping out months of premium.
           FCF coverage &gt;1.5× and payout ratio &lt;65% are the two most reliable safety indicators.
         </div>
@@ -182,8 +182,8 @@ export function DividendSafety() {
       {showKeyInput ? (
         <Card style={{ marginBottom: 24, border: '1px solid #6366f140' }}>
           <div style={{ color: '#818cf8', fontWeight: 600, marginBottom: 8 }}>Alpha Vantage API Key Required</div>
-          <p style={{ color: '#94a3b8', fontSize: 13, margin: '0 0 12px' }}>
-            Free key at <strong style={{ color: '#e2e8f0' }}>alphavantage.co/support/#api-key</strong> — 25 calls/day. Saved in your browser.
+          <p style={{ color: 'var(--text)', fontSize: 13, margin: '0 0 12px' }}>
+            Free key at <strong style={{ color: 'var(--text-h)' }}>alphavantage.co/support/#api-key</strong> — 25 calls/day. Saved in your browser.
           </p>
           <div style={{ display: 'flex', gap: 10 }}>
             <input style={{ ...inputStyle, flex: 1 }} placeholder="Paste your Alpha Vantage API key…"
@@ -206,13 +206,13 @@ export function DividendSafety() {
               {loading ? 'Loading… (~3s)' : 'Analyze'}
             </button>
             <button onClick={() => setShowKeyInput(true)}
-              style={{ background: 'none', color: '#64748b', border: '1px solid #2a2d3e', borderRadius: 8, padding: '10px 12px', fontSize: 12, cursor: 'pointer' }}>
+              style={{ background: 'none', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', fontSize: 12, cursor: 'pointer' }}>
               ⚙ API Key
             </button>
           </div>
-          {loading && <div style={{ marginTop: 10, color: '#64748b', fontSize: 12 }}>Fetching 3 data sources (dividends, cash flow, income)…</div>}
+          {loading && <div style={{ marginTop: 10, color: 'var(--text-muted)', fontSize: 12 }}>Fetching 3 data sources (dividends, cash flow, income)…</div>}
           {error && <div style={{ marginTop: 12, color: '#fca5a5', fontSize: 13, background: '#ef444415', border: '1px solid #ef444430', borderRadius: 8, padding: '10px 14px' }}>⚠ {error}</div>}
-          {ticker && !error && !loading && <div style={{ marginTop: 10, color: '#64748b', fontSize: 13 }}>Showing <span style={{ color: '#818cf8', fontWeight: 700 }}>{ticker}</span></div>}
+          {ticker && !error && !loading && <div style={{ marginTop: 10, color: 'var(--text-muted)', fontSize: 13 }}>Showing <span style={{ color: '#818cf8', fontWeight: 700 }}>{ticker}</span></div>}
         </Card>
       )}
 
@@ -221,7 +221,7 @@ export function DividendSafety() {
           {!paysDividends ? (
             <Card style={{ background: '#f59e0b10', border: '1px solid #f59e0b40' }}>
               <div style={{ color: '#fcd34d', fontSize: 15, fontWeight: 600 }}>{ticker} does not pay a dividend</div>
-              <div style={{ color: '#94a3b8', fontSize: 13, marginTop: 8 }}>
+              <div style={{ color: 'var(--text)', fontSize: 13, marginTop: 8 }}>
                 No dividend history found. This stock may still be suitable for the Wheel via premium only, or consider other dividend-paying stocks in the same sector.
               </div>
             </Card>
@@ -235,7 +235,7 @@ export function DividendSafety() {
                       <div style={{ width: 12, height: 12, borderRadius: '50%', background: safetyColor }} />
                       <span style={{ color: safetyColor, fontSize: 20, fontWeight: 700 }}>{safety}</span>
                     </div>
-                    <div style={{ color: '#64748b', fontSize: 13 }}>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>
                       {safety === 'Safe' && 'Dividend appears well-covered by both earnings and free cash flow.'}
                       {safety === 'Watch' && 'Dividend may be stretched — monitor payout ratio and FCF trends closely.'}
                       {safety === 'At Risk' && 'Dividend is at risk of a cut — payout ratio exceeds earnings or FCF.'}
@@ -252,23 +252,23 @@ export function DividendSafety() {
                     { label: 'ANNUAL DPS (LTM)', value: annualDPS > 0 ? '$' + annualDPS.toFixed(4) : '—', color: '#10b981' },
                     {
                       label: 'PAYOUT RATIO', value: payoutRatio != null ? (payoutRatio * 100).toFixed(1) + '%' : '—',
-                      color: payoutRatio == null ? '#94a3b8' : payoutRatio < 0.60 ? '#10b981' : payoutRatio < 0.80 ? '#f59e0b' : '#ef4444',
+                      color: payoutRatio == null ? 'var(--text)' : payoutRatio < 0.60 ? '#10b981' : payoutRatio < 0.80 ? '#f59e0b' : '#ef4444',
                       sub: '% of net income',
                     },
                     {
                       label: 'FCF COVERAGE', value: fcfCoverage != null ? fcfCoverage.toFixed(2) + 'x' : '—',
-                      color: fcfCoverage == null ? '#94a3b8' : fcfCoverage >= 1.5 ? '#10b981' : fcfCoverage >= 1.0 ? '#f59e0b' : '#ef4444',
+                      color: fcfCoverage == null ? 'var(--text)' : fcfCoverage >= 1.5 ? '#10b981' : fcfCoverage >= 1.0 ? '#f59e0b' : '#ef4444',
                       sub: 'FCF ÷ dividends paid',
                     },
                     { label: 'FREE CASH FLOW', value: fcf != null ? fmtMoney(fcf) : '—', color: fcf != null && fcf > 0 ? '#10b981' : '#ef4444' },
-                    { label: 'DIVIDENDS PAID', value: divsPaidCF != null ? fmtMoney(divsPaidCF) : '—', color: '#e2e8f0' },
-                    { label: 'YoY DIV GROWTH', value: divGrowth != null ? (divGrowth > 0 ? '+' : '') + divGrowth.toFixed(1) + '%' : '—', color: divGrowth != null ? (divGrowth > 0 ? '#10b981' : '#ef4444') : '#94a3b8' },
+                    { label: 'DIVIDENDS PAID', value: divsPaidCF != null ? fmtMoney(divsPaidCF) : '—', color: 'var(--text-h)' },
+                    { label: 'YoY DIV GROWTH', value: divGrowth != null ? (divGrowth > 0 ? '+' : '') + divGrowth.toFixed(1) + '%' : '—', color: divGrowth != null ? (divGrowth > 0 ? '#10b981' : '#ef4444') : 'var(--text)' },
                     { label: 'YEARS OF PAYMENTS', value: yearsOfPayments.toString(), color: yearsOfPayments >= 10 ? '#10b981' : yearsOfPayments >= 5 ? '#f59e0b' : '#ef4444', sub: yearsOfPayments >= 25 ? 'Dividend Aristocrat candidate' : undefined },
-                    { label: 'PAYMENTS TRACKED', value: divs.length.toString(), color: '#e2e8f0' },
+                    { label: 'PAYMENTS TRACKED', value: divs.length.toString(), color: 'var(--text-h)' },
                   ].map(m => (
-                    <div key={m.label} style={{ background: '#0f1117', border: '1px solid #2a2d3e', borderRadius: 10, padding: '14px 16px' }}>
-                      <div style={{ color: '#64748b', fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 6 }}>{m.label}</div>
-                      <div style={{ color: m.color ?? '#e2e8f0', fontSize: 20, fontWeight: 700 }}>{m.value}</div>
+                    <div key={m.label} style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
+                      <div style={{ color: 'var(--text-muted)', fontSize: 10, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 6 }}>{m.label}</div>
+                      <div style={{ color: m.color ?? 'var(--text-h)', fontSize: 20, fontWeight: 700 }}>{m.value}</div>
                       {'sub' in m && m.sub && <div style={{ color: '#475569', fontSize: 11, marginTop: 4 }}>{m.sub}</div>}
                     </div>
                   ))}
@@ -276,23 +276,23 @@ export function DividendSafety() {
               </div>
 
               {/* Benchmarks */}
-              <Card style={{ marginBottom: 24, background: '#0f1117' }}>
+              <Card style={{ marginBottom: 24, background: 'var(--bg)' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
                   <div>
-                    <div style={{ color: '#64748b', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>PAYOUT RATIO BENCHMARKS</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>PAYOUT RATIO BENCHMARKS</div>
                     {[['< 40%', 'Very safe — room to grow', '#10b981'], ['40–60%', 'Safe for most sectors', '#10b981'], ['60–75%', 'Elevated — watch closely', '#f59e0b'], ['75–100%', 'Stretched — vulnerable to earnings miss', '#ef4444'], ['> 100%', 'Paid from capital, unsustainable', '#ef4444']].map(([range, label, color]) => (
                       <div key={range} style={{ display: 'flex', gap: 10, marginBottom: 4, alignItems: 'center' }}>
                         <span style={{ color, fontFamily: 'monospace', fontSize: 12, minWidth: 65 }}>{range}</span>
-                        <span style={{ color: '#64748b', fontSize: 12 }}>{label}</span>
+                        <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{label}</span>
                       </div>
                     ))}
                   </div>
                   <div>
-                    <div style={{ color: '#64748b', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>FCF COVERAGE BENCHMARKS</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>FCF COVERAGE BENCHMARKS</div>
                     {[['> 2.0×', 'Very safe, growing dividend likely', '#10b981'], ['1.5–2.0×', 'Safe', '#10b981'], ['1.0–1.5×', 'Adequate — monitor FCF trend', '#f59e0b'], ['0.5–1.0×', 'Dividend straining FCF', '#ef4444'], ['< 0.5×', 'Dividend likely unsustainable from FCF', '#ef4444']].map(([range, label, color]) => (
                       <div key={range} style={{ display: 'flex', gap: 10, marginBottom: 4, alignItems: 'center' }}>
                         <span style={{ color, fontFamily: 'monospace', fontSize: 12, minWidth: 65 }}>{range}</span>
-                        <span style={{ color: '#64748b', fontSize: 12 }}>{label}</span>
+                        <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>{label}</span>
                       </div>
                     ))}
                   </div>
@@ -330,9 +330,9 @@ export function DividendSafety() {
                   <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                       <thead>
-                        <tr style={{ borderBottom: '1px solid #2a2d3e' }}>
+                        <tr style={{ borderBottom: '1px solid var(--border)' }}>
                           {['Ex-Dividend Date', 'Amount / Share', 'YoY Change'].map(h => (
-                            <th key={h} style={{ textAlign: h === 'Ex-Dividend Date' ? 'left' : 'right', padding: '12px 16px', color: '#64748b', fontWeight: 500 }}>{h}</th>
+                            <th key={h} style={{ textAlign: h === 'Ex-Dividend Date' ? 'left' : 'right', padding: '12px 16px', color: 'var(--text-muted)', fontWeight: 500 }}>{h}</th>
                           ))}
                         </tr>
                       </thead>
@@ -343,16 +343,16 @@ export function DividendSafety() {
                           const prevAmt = prevSame ? nn(prevSame.amount) : null;
                           const chg = amount != null && prevAmt != null && prevAmt > 0 ? ((amount - prevAmt) / prevAmt) * 100 : null;
                           return (
-                            <tr key={i} style={{ borderBottom: '1px solid #1e2130' }}
-                              onMouseEnter={e => (e.currentTarget.style.background = '#1f2335')}
+                            <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}
+                              onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-card-hover)')}
                               onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                              <td style={{ padding: '10px 16px', color: '#e2e8f0' }}>{d.ex_dividend_date}</td>
+                              <td style={{ padding: '10px 16px', color: 'var(--text-h)' }}>{d.ex_dividend_date}</td>
                               <td style={{ padding: '10px 16px', textAlign: 'right', color: '#10b981', fontFamily: 'monospace', fontWeight: 600 }}>
                                 {amount != null ? '$' + amount.toFixed(4) : '—'}
                               </td>
                               <td style={{ padding: '10px 16px', textAlign: 'right' }}>
                                 {chg != null ? (
-                                  <span style={{ color: chg > 0 ? '#10b981' : chg < 0 ? '#ef4444' : '#64748b', fontSize: 12, fontWeight: 600 }}>
+                                  <span style={{ color: chg > 0 ? '#10b981' : chg < 0 ? '#ef4444' : 'var(--text-muted)', fontSize: 12, fontWeight: 600 }}>
                                     {chg > 0 ? '+' : ''}{chg.toFixed(1)}% YoY
                                   </span>
                                 ) : <span style={{ color: '#475569', fontSize: 12 }}>—</span>}

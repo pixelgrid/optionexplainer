@@ -6,17 +6,17 @@ import {
 import { blackScholes } from '../lib/blackScholes';
 
 const CHART_STYLE = {
-  cartesianGrid: { strokeDasharray: '3 3', stroke: '#1e2130' },
-  xAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  yAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  tooltip: { contentStyle: { background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 8, fontSize: 13 } },
+  cartesianGrid: { strokeDasharray: '3 3', stroke: 'var(--border)' },
+  xAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  yAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  tooltip: { contentStyle: { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13 } },
 };
 
 function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
@@ -28,13 +28,13 @@ function InputCard({
   value: number; onChange: (v: number) => void; step?: number; format: (v: number) => string;
 }) {
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '16px 20px' }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 20px' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 4 }}>
         <span style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 700, color: '#6366f1' }}>{symbol}</span>
-        <span style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>{label}</span>
-        <span style={{ marginLeft: 'auto', fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: '#e2e8f0' }}>{format(value)}</span>
+        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-h)' }}>{label}</span>
+        <span style={{ marginLeft: 'auto', fontFamily: 'monospace', fontSize: 16, fontWeight: 700, color: 'var(--text-h)' }}>{format(value)}</span>
       </div>
-      <p style={{ margin: '0 0 10px', fontSize: 12, color: '#64748b', lineHeight: 1.5 }}>{description}</p>
+      <p style={{ margin: '0 0 10px', fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>{description}</p>
       <input
         type="range" min={min} max={max} step={step} value={value}
         onChange={(e) => onChange(Number(e.target.value))}
@@ -47,10 +47,10 @@ function InputCard({
   );
 }
 
-function ResultRow({ label, value, color = '#94a3b8' }: { label: string; value: string; color?: string }) {
+function ResultRow({ label, value, color = 'var(--text)' }: { label: string; value: string; color?: string }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #1e2130' }}>
-      <span style={{ fontSize: 13, color: '#64748b' }}>{label}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+      <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{label}</span>
       <span style={{ fontSize: 14, fontWeight: 600, color, fontFamily: 'monospace' }}>{value}</span>
     </div>
   );
@@ -92,10 +92,10 @@ export function Pricing() {
 
   return (
     <div className="page-wrap">
-      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
         How Options Are Priced
       </h1>
-      <p style={{ margin: '0 0 32px', color: '#64748b', fontSize: 15, lineHeight: 1.7 }}>
+      <p style={{ margin: '0 0 32px', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7 }}>
         Option prices are determined by five inputs fed into the Black-Scholes model (or similar). Understanding how each input drives price is fundamental to trading options effectively. Use the interactive calculator below to explore how changing each variable affects the theoretical option value.
       </p>
 
@@ -130,8 +130,8 @@ export function Pricing() {
           />
 
           {/* Results panel */}
-          <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '16px 20px' }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0', marginBottom: 12 }}>Theoretical Prices &amp; Greeks</div>
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 20px' }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-h)', marginBottom: 12 }}>Theoretical Prices &amp; Greeks</div>
             <ResultRow label="Call Price" value={`$${result.call.toFixed(3)}`} color="#10b981" />
             <ResultRow label="Put Price" value={`$${result.put.toFixed(3)}`} color="#ef4444" />
             <ResultRow label="Call Delta" value={result.delta_call.toFixed(4)} color="#10b981" />
@@ -147,14 +147,14 @@ export function Pricing() {
       {/* Call Price vs Stock Price chart */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="Call Price vs Stock Price" color="#10b981" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20 }}>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={callVsStockData}>
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-              <XAxis dataKey="price" {...CHART_STYLE.xAxis} label={{ value: 'Stock Price ($)', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} />
+              <XAxis dataKey="price" {...CHART_STYLE.xAxis} label={{ value: 'Stock Price ($)', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} />
               <YAxis {...CHART_STYLE.yAxis} />
               <Tooltip {...CHART_STYLE.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`$${n.toFixed(2)}`]; }} />
-              <Legend wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: 'var(--text)' }} />
               <Line type="monotone" dataKey="call" name="Call Price (BS)" stroke="#10b981" dot={false} strokeWidth={2.5} />
               <Line type="monotone" dataKey="intrinsic" name="Intrinsic Value" stroke="#475569" dot={false} strokeWidth={1.5} strokeDasharray="5 3" />
             </LineChart>
@@ -168,14 +168,14 @@ export function Pricing() {
       {/* Theta decay chart */}
       <section style={{ marginBottom: 48 }}>
         <SectionHeader title="Theta Decay — ATM Call &amp; Put Price vs Time" color="#8b5cf6" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20 }}>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={thetaDecayData}>
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-              <XAxis dataKey="dte" {...CHART_STYLE.xAxis} reversed label={{ value: 'Days to Expiry', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} />
+              <XAxis dataKey="dte" {...CHART_STYLE.xAxis} reversed label={{ value: 'Days to Expiry', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} />
               <YAxis {...CHART_STYLE.yAxis} />
               <Tooltip {...CHART_STYLE.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`$${n.toFixed(2)}`]; }} />
-              <Legend wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: 'var(--text)' }} />
               <Line type="monotone" dataKey="call" name="ATM Call Price" stroke="#10b981" dot={false} strokeWidth={2} />
               <Line type="monotone" dataKey="put" name="ATM Put Price" stroke="#ef4444" dot={false} strokeWidth={2} />
             </LineChart>
@@ -189,25 +189,25 @@ export function Pricing() {
       {/* Why does my call lose money section */}
       <section style={{ marginBottom: 24 }}>
         <SectionHeader title={'Why does my call lose money even when the stock goes up?'} color="#f59e0b" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
-          <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20 }}>
+          <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
             This is the most common beginner frustration. There are two culprits:
           </p>
           <div className="g-2" style={{ gap: 16, marginBottom: 16 }}>
-            <div style={{ padding: '14px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #ef4444' }}>
+            <div style={{ padding: '14px 16px', background: 'var(--bg)', borderRadius: 8, borderLeft: '3px solid #ef4444' }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#ef4444', marginBottom: 6 }}>IV Crush</div>
-              <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>
+              <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
                 You bought a call when IV was 55% (e.g., before earnings). The stock went up 3%, but IV collapsed to 28% after the announcement. The drop in IV wiped out more value than the directional gain added. This is especially brutal on earnings plays.
               </p>
             </div>
-            <div style={{ padding: '14px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #8b5cf6' }}>
+            <div style={{ padding: '14px 16px', background: 'var(--bg)', borderRadius: 8, borderLeft: '3px solid #8b5cf6' }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#8b5cf6', marginBottom: 6 }}>Theta Decay</div>
-              <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>
+              <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.6 }}>
                 You held a call for 2 weeks while the stock moved sideways, then up 2%. But 14 days of theta ate $0.60 out of your $2.00 option. When the stock finally moved, you were already deep in the hole. Always factor in how many days of decay you're paying for.
               </p>
             </div>
           </div>
-          <div style={{ padding: '12px 16px', background: '#f59e0b10', border: '1px solid #f59e0b30', borderRadius: 8, fontSize: 14, color: '#94a3b8' }}>
+          <div style={{ padding: '12px 16px', background: '#f59e0b10', border: '1px solid #f59e0b30', borderRadius: 8, fontSize: 14, color: 'var(--text)' }}>
             <strong style={{ color: '#f59e0b' }}>The fix:</strong> Buy options with IVR below 25 so IV can expand rather than crush. Always know your theta cost per day. For directional bets, consider debit spreads — they reduce your vega exposure significantly while keeping directional upside.
           </div>
         </div>

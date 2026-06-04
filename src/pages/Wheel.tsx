@@ -4,24 +4,24 @@ import {
 } from 'recharts';
 
 const CHART_STYLE = {
-  cartesianGrid: { strokeDasharray: '3 3', stroke: '#1e2130' },
-  xAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  yAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  tooltip: { contentStyle: { background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 8, fontSize: 13 } },
+  cartesianGrid: { strokeDasharray: '3 3', stroke: 'var(--border)' },
+  xAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  yAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  tooltip: { contentStyle: { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13 } },
 };
 
 function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 12, padding: 20, ...style }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 20, ...style }}>
       {children}
     </div>
   );
@@ -31,14 +31,14 @@ function StepCard({
   number, title, color, children,
 }: { number: number; title: string; color: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderBottom: '1px solid #2a2d3e', background: `${color}08` }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderBottom: '1px solid var(--border)', background: `${color}08` }}>
         <div style={{
           width: 36, height: 36, borderRadius: '50%', background: color,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 16, fontWeight: 700, color: '#fff', flexShrink: 0,
         }}>{number}</div>
-        <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: '#e2e8f0' }}>{title}</h3>
+        <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h3>
       </div>
       <div style={{ padding: '16px 20px' }}>{children}</div>
     </div>
@@ -68,13 +68,13 @@ const ccPnl = Array.from({ length: 61 }, (_, i) => {
 export function Wheel() {
   return (
     <div className="page-wrap">
-      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
         The Wheel Strategy
       </h1>
       <p style={{ margin: '0 0 8px', color: '#6366f1', fontSize: 16, fontWeight: 500 }}>
         A systematic income strategy combining cash-secured puts and covered calls
       </p>
-      <p style={{ margin: '0 0 40px', color: '#64748b', fontSize: 15, lineHeight: 1.7 }}>
+      <p style={{ margin: '0 0 40px', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7 }}>
         The Wheel (also called the "Triple Income Strategy") is one of the most popular strategies for generating consistent income on stocks you're comfortable owning. It leverages two core option-selling strategies in sequence: first selling cash-secured puts, then selling covered calls if assigned, creating a repeating cycle of premium collection.
       </p>
 
@@ -87,7 +87,7 @@ export function Wheel() {
             <div style={{ textAlign: 'center', padding: '20px 16px', background: '#10b98118', border: '2px solid #10b981', borderRadius: 12, minWidth: 140 }}>
               <div style={{ fontSize: 22, marginBottom: 4 }}>💰</div>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#10b981' }}>Cash-Secured Put</div>
-              <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>Sell OTM put, collect premium</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Sell OTM put, collect premium</div>
             </div>
             {/* Arrow */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 8px' }}>
@@ -98,7 +98,7 @@ export function Wheel() {
             <div style={{ textAlign: 'center', padding: '20px 16px', background: '#6366f118', border: '2px solid #6366f1', borderRadius: 12, minWidth: 140 }}>
               <div style={{ fontSize: 22, marginBottom: 4 }}>📦</div>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#6366f1' }}>Own 100 Shares</div>
-              <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>At strike − premium</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>At strike − premium</div>
             </div>
             {/* Arrow */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 8px' }}>
@@ -109,7 +109,7 @@ export function Wheel() {
             <div style={{ textAlign: 'center', padding: '20px 16px', background: '#f59e0b18', border: '2px solid #f59e0b', borderRadius: 12, minWidth: 140 }}>
               <div style={{ fontSize: 22, marginBottom: 4 }}>📈</div>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#f59e0b' }}>Covered Call</div>
-              <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>Sell ATM/OTM call</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Sell ATM/OTM call</div>
             </div>
             {/* Arrow back */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 8px' }}>
@@ -117,7 +117,7 @@ export function Wheel() {
               <div style={{ fontSize: 10, color: '#10b981', fontWeight: 600, whiteSpace: 'nowrap' }}>Called Away</div>
             </div>
             {/* Back to start */}
-            <div style={{ textAlign: 'center', padding: '16px', background: '#0f1117', borderRadius: 8, border: '1px dashed #2a2d3e', minWidth: 80 }}>
+            <div style={{ textAlign: 'center', padding: '16px', background: 'var(--bg)', borderRadius: 8, border: '1px dashed var(--border)', minWidth: 80 }}>
               <div style={{ fontSize: 18 }}>🔄</div>
               <div style={{ fontSize: 11, color: '#475569', marginTop: 4 }}>Repeat</div>
             </div>
@@ -127,19 +127,19 @@ export function Wheel() {
 
       {/* Step 1: Cash-Secured Put */}
       <StepCard number={1} title="Sell a Cash-Secured Put" color="#10b981">
-        <p style={{ margin: '0 0 14px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 14px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           A cash-secured put means you sell a put option while keeping enough cash in your account to purchase 100 shares if assigned. You immediately collect the premium. Your obligation: buy the shares at the strike price if the stock falls below it at expiry.
         </p>
-        <div style={{ padding: '12px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #10b981', marginBottom: 14, fontSize: 13, color: '#94a3b8' }}>
-          <strong style={{ color: '#10b981' }}>Example:</strong> AAPL trading at $155. Sell the 145-strike put expiring in 30 days for $2.00 premium. You collect <strong style={{ color: '#e2e8f0' }}>$200</strong> immediately. If AAPL stays above $145, the put expires worthless — you keep all $200. Annualized: ($200 / $14,500 reserve × 12) = <strong style={{ color: '#10b981' }}>~16.6% annualized</strong>.
+        <div style={{ padding: '12px 16px', background: 'var(--bg)', borderRadius: 8, borderLeft: '3px solid #10b981', marginBottom: 14, fontSize: 13, color: 'var(--text)' }}>
+          <strong style={{ color: '#10b981' }}>Example:</strong> AAPL trading at $155. Sell the 145-strike put expiring in 30 days for $2.00 premium. You collect <strong style={{ color: 'var(--text-h)' }}>$200</strong> immediately. If AAPL stays above $145, the put expires worthless — you keep all $200. Annualized: ($200 / $14,500 reserve × 12) = <strong style={{ color: '#10b981' }}>~16.6% annualized</strong>.
         </div>
         <ResponsiveContainer width="100%" height={220}>
           <LineChart data={cspPnl}>
             <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-            <XAxis dataKey="price" {...CHART_STYLE.xAxis} label={{ value: 'Stock Price at Expiry ($)', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} />
+            <XAxis dataKey="price" {...CHART_STYLE.xAxis} label={{ value: 'Stock Price at Expiry ($)', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} />
             <YAxis {...CHART_STYLE.yAxis} tickFormatter={(v) => `$${v}`} />
             <Tooltip {...CHART_STYLE.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`$${n}`, 'P&L']; }} />
-            <ReferenceLine y={0} stroke="#2a2d3e" />
+            <ReferenceLine y={0} stroke="var(--border)" />
             <ReferenceLine x={145} stroke="#10b981" strokeDasharray="4 4" label={{ value: 'Strike $145', fill: '#10b981', fontSize: 10 }} />
             <ReferenceLine x={143} stroke="#f59e0b" strokeDasharray="4 4" label={{ value: 'Breakeven $143', fill: '#f59e0b', fontSize: 10 }} />
             <Line type="monotone" dataKey="pnl" name="P&L" stroke="#10b981" dot={false} strokeWidth={2.5} />
@@ -149,14 +149,14 @@ export function Wheel() {
 
       {/* Step 2: Get Assigned */}
       <StepCard number={2} title="Get Assigned — You Now Own Shares" color="#6366f1">
-        <p style={{ margin: '0 0 14px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
-          If AAPL falls below $145 at expiry, you get assigned — your broker purchases 100 shares at $145 and debits your account $14,500. But you already collected $200 in premium, so your effective cost basis is <strong style={{ color: '#e2e8f0' }}>$143 per share</strong>.
+        <p style={{ margin: '0 0 14px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
+          If AAPL falls below $145 at expiry, you get assigned — your broker purchases 100 shares at $145 and debits your account $14,500. But you already collected $200 in premium, so your effective cost basis is <strong style={{ color: 'var(--text-h)' }}>$143 per share</strong>.
         </p>
         <div className="g-2" style={{ gap: 14 }}>
-          <div style={{ padding: '12px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #10b981', fontSize: 13, color: '#94a3b8' }}>
+          <div style={{ padding: '12px 16px', background: 'var(--bg)', borderRadius: 8, borderLeft: '3px solid #10b981', fontSize: 13, color: 'var(--text)' }}>
             <strong style={{ color: '#10b981' }}>Is This Bad?</strong> Not necessarily. If you chose AAPL because you'd be happy owning it at $143, assignment is simply the next step in the strategy. You've already collected $200 and now you own shares at a discount to where the stock was when you sold the put.
           </div>
-          <div style={{ padding: '12px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #ef4444', fontSize: 13, color: '#94a3b8' }}>
+          <div style={{ padding: '12px 16px', background: 'var(--bg)', borderRadius: 8, borderLeft: '3px solid #ef4444', fontSize: 13, color: 'var(--text)' }}>
             <strong style={{ color: '#ef4444' }}>Stock Selection Is Everything</strong> This is why the Wheel only works on stocks you genuinely want to own. If you're assigned on a stock that then falls from $145 to $100, your $200 premium barely cushions a $4,500 paper loss. Only run the Wheel on quality names you'd hold anyway.
           </div>
         </div>
@@ -164,19 +164,19 @@ export function Wheel() {
 
       {/* Step 3: Covered Call */}
       <StepCard number={3} title="Sell a Covered Call" color="#f59e0b">
-        <p style={{ margin: '0 0 14px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 14px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           You now own 100 shares with a $143 cost basis. Sell a covered call at or above your cost basis to collect more premium and reduce your risk. Target the strike where you'd be happy to sell your shares.
         </p>
-        <div style={{ padding: '12px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #f59e0b', marginBottom: 14, fontSize: 13, color: '#94a3b8' }}>
-          <strong style={{ color: '#f59e0b' }}>Example continued:</strong> Sell the 150 call for $2.00. Collect another <strong style={{ color: '#e2e8f0' }}>$200</strong>. Now you've collected $400 total, your effective cost basis is $141. If AAPL stays below $150, the call expires worthless, you keep the $200 and can sell another call next month.
+        <div style={{ padding: '12px 16px', background: 'var(--bg)', borderRadius: 8, borderLeft: '3px solid #f59e0b', marginBottom: 14, fontSize: 13, color: 'var(--text)' }}>
+          <strong style={{ color: '#f59e0b' }}>Example continued:</strong> Sell the 150 call for $2.00. Collect another <strong style={{ color: 'var(--text-h)' }}>$200</strong>. Now you've collected $400 total, your effective cost basis is $141. If AAPL stays below $150, the call expires worthless, you keep the $200 and can sell another call next month.
         </div>
         <ResponsiveContainer width="100%" height={220}>
           <LineChart data={ccPnl}>
             <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-            <XAxis dataKey="price" {...CHART_STYLE.xAxis} label={{ value: 'Stock Price at Expiry ($)', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} />
+            <XAxis dataKey="price" {...CHART_STYLE.xAxis} label={{ value: 'Stock Price at Expiry ($)', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} />
             <YAxis {...CHART_STYLE.yAxis} tickFormatter={(v) => `$${v}`} />
             <Tooltip {...CHART_STYLE.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`$${n}`, 'P&L']; }} />
-            <ReferenceLine y={0} stroke="#2a2d3e" />
+            <ReferenceLine y={0} stroke="var(--border)" />
             <ReferenceLine x={150} stroke="#f59e0b" strokeDasharray="4 4" label={{ value: 'Call Strike $150', fill: '#f59e0b', fontSize: 10 }} />
             <Line type="monotone" dataKey="pnl" name="Combined P&L" stroke="#f59e0b" dot={false} strokeWidth={2.5} />
           </LineChart>
@@ -185,11 +185,11 @@ export function Wheel() {
 
       {/* Step 4: Called Away */}
       <StepCard number={4} title="Get Called Away — Full Cycle Complete" color="#ef4444">
-        <p style={{ margin: '0 0 14px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 14px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
           If AAPL rises above $150 at expiry, your shares are called away at $150. You're back to cash and the cycle begins again.
         </p>
-        <div style={{ padding: '12px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #10b981', fontSize: 13, color: '#94a3b8' }}>
-          <strong style={{ color: '#10b981' }}>Final Tally:</strong> Bought shares at effective $143, sold at $150 = <strong style={{ color: '#e2e8f0' }}>$700 gain</strong> on the stock. Plus $400 in total premium = <strong style={{ color: '#10b981' }}>$1,100 total profit</strong> on $14,500 deployed. In ~60 days: <strong style={{ color: '#10b981' }}>7.6% return (~45% annualized)</strong>. But note: this requires AAPL to be assigned AND recover — a lucky scenario. In a flat/sideways market, you'd collect $200–$400 in premium without the stock move.
+        <div style={{ padding: '12px 16px', background: 'var(--bg)', borderRadius: 8, borderLeft: '3px solid #10b981', fontSize: 13, color: 'var(--text)' }}>
+          <strong style={{ color: '#10b981' }}>Final Tally:</strong> Bought shares at effective $143, sold at $150 = <strong style={{ color: 'var(--text-h)' }}>$700 gain</strong> on the stock. Plus $400 in total premium = <strong style={{ color: '#10b981' }}>$1,100 total profit</strong> on $14,500 deployed. In ~60 days: <strong style={{ color: '#10b981' }}>7.6% return (~45% annualized)</strong>. But note: this requires AAPL to be assigned AND recover — a lucky scenario. In a flat/sideways market, you'd collect $200–$400 in premium without the stock move.
         </div>
       </StepCard>
 
@@ -199,24 +199,24 @@ export function Wheel() {
         <Card>
           <div className="g-2" style={{ gap: 20 }}>
             <div>
-              <div style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>Typical CSP: $2 premium on $145 stock</div>
+              <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>Typical CSP: $2 premium on $145 stock</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
                   { label: 'Premium collected', value: '$200', color: '#10b981' },
-                  { label: 'Capital required', value: '$14,500', color: '#94a3b8' },
+                  { label: 'Capital required', value: '$14,500', color: 'var(--text)' },
                   { label: 'Return per cycle', value: '1.38%', color: '#6366f1' },
-                  { label: 'Cycles per year (30d)', value: '12', color: '#94a3b8' },
+                  { label: 'Cycles per year (30d)', value: '12', color: 'var(--text)' },
                   { label: 'Annualized (no assignment)', value: '~16.5%', color: '#10b981' },
                 ].map(({ label, value, color }) => (
-                  <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #1e2130' }}>
-                    <span style={{ fontSize: 13, color: '#64748b' }}>{label}</span>
+                  <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{label}</span>
                     <span style={{ fontSize: 13, fontWeight: 600, color, fontFamily: 'monospace' }}>{value}</span>
                   </div>
                 ))}
               </div>
             </div>
             <div>
-              <div style={{ fontSize: 13, color: '#64748b', marginBottom: 12 }}>With Assignment + Covered Call</div>
+              <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 12 }}>With Assignment + Covered Call</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
                   { label: 'CSP premium', value: '$200', color: '#10b981' },
@@ -225,8 +225,8 @@ export function Wheel() {
                   { label: 'Total profit', value: '$1,100', color: '#10b981' },
                   { label: 'Return on capital', value: '7.6%', color: '#6366f1' },
                 ].map(({ label, value, color }) => (
-                  <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #1e2130' }}>
-                    <span style={{ fontSize: 13, color: '#64748b' }}>{label}</span>
+                  <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{label}</span>
                     <span style={{ fontSize: 13, fontWeight: 600, color, fontFamily: 'monospace' }}>{value}</span>
                   </div>
                 ))}
@@ -258,13 +258,13 @@ export function Wheel() {
             },
             {
               title: 'Tax Considerations',
-              color: '#64748b',
+              color: 'var(--text-muted)',
               text: 'Premium from selling puts/calls is typically taxed as short-term capital gains (ordinary income). Frequent assignment and sale of shares can create multiple taxable events per year. Consult a tax advisor, especially for large positions. Tax drag can significantly reduce the apparent returns.',
             },
           ].map(({ title, color, text }) => (
-            <div key={title} style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '16px 20px', borderLeft: `3px solid ${color}` }}>
+            <div key={title} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 20px', borderLeft: `3px solid ${color}` }}>
               <div style={{ fontSize: 14, fontWeight: 600, color, marginBottom: 8 }}>{title}</div>
-              <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.65 }}>{text}</p>
+              <p style={{ margin: 0, fontSize: 13, color: 'var(--text)', lineHeight: 1.65 }}>{text}</p>
             </div>
           ))}
         </div>

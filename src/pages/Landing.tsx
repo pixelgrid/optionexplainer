@@ -62,8 +62,8 @@ function ToolCard({ tool, accent }: { tool: Tool; accent: string }) {
     <button
       onClick={() => navigate(tool.to)}
       style={{
-        background: '#1a1d27',
-        border: `1px solid #2a2d3e`,
+        background: 'var(--bg-card)',
+        border: `1px solid var(--border)`,
         borderRadius: 12,
         padding: '16px 18px',
         textAlign: 'left',
@@ -73,22 +73,22 @@ function ToolCard({ tool, accent }: { tool: Tool; accent: string }) {
       }}
       onMouseEnter={e => {
         (e.currentTarget as HTMLButtonElement).style.borderColor = accent;
-        (e.currentTarget as HTMLButtonElement).style.background = '#1f2335';
+        (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-card-hover)';
       }}
       onMouseLeave={e => {
-        (e.currentTarget as HTMLButtonElement).style.borderColor = '#2a2d3e';
-        (e.currentTarget as HTMLButtonElement).style.background = '#1a1d27';
+        (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
+        (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-card)';
       }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
-        <div style={{ color: '#e2e8f0', fontWeight: 600, fontSize: 14 }}>{tool.name}</div>
+        <div style={{ color: 'var(--text-h)', fontWeight: 600, fontSize: 14 }}>{tool.name}</div>
         {tool.tag && (
           <span style={{ background: (tool.tagColor ?? accent) + '20', color: tool.tagColor ?? accent, fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, whiteSpace: 'nowrap', flexShrink: 0, letterSpacing: '0.03em' }}>
             {tool.tag}
           </span>
         )}
       </div>
-      <div style={{ color: '#64748b', fontSize: 12, lineHeight: 1.5 }}>{tool.desc}</div>
+      <div style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: 1.5 }}>{tool.desc}</div>
     </button>
   );
 }
@@ -101,10 +101,10 @@ export function Landing() {
 
       {/* Hero */}
       <div style={{ textAlign: 'center', marginBottom: 56 }}>
-        <h1 style={{ margin: '0 0 12px', color: '#e2e8f0', fontSize: 'clamp(32px, 6vw, 52px)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+        <h1 style={{ margin: '0 0 12px', color: 'var(--text-h)', fontSize: 'clamp(32px, 6vw, 52px)', fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1.1 }}>
           Meridian
         </h1>
-        <p style={{ margin: '0 auto 28px', color: '#64748b', fontSize: 'clamp(14px, 2vw, 17px)', maxWidth: 560, lineHeight: 1.6 }}>
+        <p style={{ margin: '0 auto 28px', color: 'var(--text-muted)', fontSize: 'clamp(14px, 2vw, 17px)', maxWidth: 560, lineHeight: 1.6 }}>
           A free toolkit for traders and investors — options strategies, volatility analysis, stock fundamentals, and more.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -113,7 +113,7 @@ export function Landing() {
             Options Tools →
           </button>
           <button onClick={() => navigate('/financials')}
-            style={{ background: 'none', color: '#94a3b8', border: '1px solid #2a2d3e', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
+            style={{ background: 'none', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
             Stock Research →
           </button>
         </div>
@@ -124,8 +124,8 @@ export function Landing() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
           <div style={{ width: 5, height: 32, borderRadius: 3, background: 'linear-gradient(180deg, #6366f1, #8b5cf6)' }} />
           <div>
-            <h2 style={{ margin: 0, color: '#e2e8f0', fontSize: 26, fontWeight: 700 }}>Options</h2>
-            <div style={{ color: '#64748b', fontSize: 13, marginTop: 2 }}>{OPTIONS_TOOLS.reduce((s, g) => s + g.tools.length, 0)} tools across strategies, concepts, and advanced techniques</div>
+            <h2 style={{ margin: 0, color: 'var(--text-h)', fontSize: 26, fontWeight: 700 }}>Options</h2>
+            <div style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 2 }}>{OPTIONS_TOOLS.reduce((s, g) => s + g.tools.length, 0)} tools across strategies, concepts, and advanced techniques</div>
           </div>
         </div>
 
@@ -147,15 +147,15 @@ export function Landing() {
       </div>
 
       {/* Divider */}
-      <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, #2a2d3e, transparent)', marginBottom: 56 }} />
+      <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, var(--border), transparent)', marginBottom: 56 }} />
 
       {/* ── STOCK SECTION ── */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
           <div style={{ width: 5, height: 32, borderRadius: 3, background: 'linear-gradient(180deg, #10b981, #3b82f6)' }} />
           <div>
-            <h2 style={{ margin: 0, color: '#e2e8f0', fontSize: 26, fontWeight: 700 }}>Stock Research</h2>
-            <div style={{ color: '#64748b', fontSize: 13, marginTop: 2 }}>Fundamental analysis tools powered by Alpha Vantage — requires a free API key</div>
+            <h2 style={{ margin: 0, color: 'var(--text-h)', fontSize: 26, fontWeight: 700 }}>Stock Research</h2>
+            <div style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 2 }}>Fundamental analysis tools powered by Alpha Vantage — requires a free API key</div>
           </div>
         </div>
 
@@ -167,10 +167,10 @@ export function Landing() {
 
         <div style={{ marginTop: 16, background: '#10b98110', border: '1px solid #10b98130', borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
           <span style={{ color: '#10b981', fontSize: 16, flexShrink: 0 }}>ⓘ</span>
-          <div style={{ color: '#64748b', fontSize: 13 }}>
-            Stock tools use the <strong style={{ color: '#e2e8f0' }}>Alpha Vantage free tier</strong> (25 calls/day, no credit card).
+          <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>
+            Stock tools use the <strong style={{ color: 'var(--text-h)' }}>Alpha Vantage free tier</strong> (25 calls/day, no credit card).
             Your API key is saved locally in the browser and shared across all stock tools.
-            Get a free key at <strong style={{ color: '#e2e8f0' }}>alphavantage.co/support/#api-key</strong>
+            Get a free key at <strong style={{ color: 'var(--text-h)' }}>alphavantage.co/support/#api-key</strong>
           </div>
         </div>
       </div>

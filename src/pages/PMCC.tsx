@@ -7,24 +7,24 @@ import { blackScholes } from '../lib/blackScholes';
 
 /* ── shared styles ───────────────────────────────────────── */
 const CHART_STYLE = {
-  grid: { strokeDasharray: '3 3', stroke: '#1e2130' },
-  xAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  yAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  tooltip: { contentStyle: { background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 8, fontSize: 12 } },
+  grid: { strokeDasharray: '3 3', stroke: 'var(--border)' },
+  xAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  yAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  tooltip: { contentStyle: { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 12 } },
 };
 
 function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 12, padding: 20, ...style }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 20, ...style }}>
       {children}
     </div>
   );
@@ -32,12 +32,12 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
 
 function StepCard({ number, title, color, children }: { number: number; title: string; color: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderBottom: '1px solid #2a2d3e', background: `${color}0d` }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', marginBottom: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', borderBottom: '1px solid var(--border)', background: `${color}0d` }}>
         <div style={{ width: 36, height: 36, borderRadius: '50%', background: color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
           {number}
         </div>
-        <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: '#e2e8f0' }}>{title}</h3>
+        <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h3>
       </div>
       <div style={{ padding: '18px 20px' }}>{children}</div>
     </div>
@@ -51,8 +51,8 @@ function Slider({ label, min, max, step = 1, value, onChange, format }: {
   return (
     <div style={{ flex: '1 1 180px', minWidth: 0 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6 }}>
-        <span style={{ color: '#94a3b8' }}>{label}</span>
-        <span style={{ color: '#e2e8f0', fontWeight: 600, fontFamily: 'monospace' }}>{format(value)}</span>
+        <span style={{ color: 'var(--text)' }}>{label}</span>
+        <span style={{ color: 'var(--text-h)', fontWeight: 600, fontFamily: 'monospace' }}>{format(value)}</span>
       </div>
       <input type="range" min={min} max={max} step={step} value={value}
         onChange={(e) => onChange(Number(e.target.value))}
@@ -66,9 +66,9 @@ function Slider({ label, min, max, step = 1, value, onChange, format }: {
 
 function MetricBox({ label, value, sub, color }: { label: string; value: string; sub?: string; color: string }) {
   return (
-    <div style={{ background: '#0f1117', borderRadius: 8, padding: '12px 14px', flex: '1 1 120px', minWidth: 0 }}>
+    <div style={{ background: 'var(--bg)', borderRadius: 8, padding: '12px 14px', flex: '1 1 120px', minWidth: 0 }}>
       <div style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 700, color, marginBottom: 2 }}>{value}</div>
-      <div style={{ fontSize: 11, color: '#e2e8f0', fontWeight: 600, marginBottom: 2 }}>{label}</div>
+      <div style={{ fontSize: 11, color: 'var(--text-h)', fontWeight: 600, marginBottom: 2 }}>{label}</div>
       {sub && <div style={{ fontSize: 10, color: '#475569' }}>{sub}</div>}
     </div>
   );
@@ -360,16 +360,16 @@ function DecisionTree() {
   const reset = () => setPath(['root']);
 
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 12, overflow: 'hidden' }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
       {/* breadcrumb */}
-      <div style={{ padding: '10px 20px', background: '#0f1117', borderBottom: '1px solid #2a2d3e', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+      <div style={{ padding: '10px 20px', background: 'var(--bg)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
         {path.map((id, i) => (
           <span key={id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {i > 0 && <span style={{ color: '#2a2d3e', fontSize: 12 }}>›</span>}
+            {i > 0 && <span style={{ color: 'var(--border)', fontSize: 12 }}>›</span>}
             <span style={{
               fontSize: 11,
               fontWeight: i === path.length - 1 ? 600 : 400,
-              color: i === path.length - 1 ? '#e2e8f0' : '#475569',
+              color: i === path.length - 1 ? 'var(--text-h)' : '#475569',
               cursor: i < path.length - 1 ? 'pointer' : 'default',
             }}
               onClick={() => i < path.length - 1 && setPath(path.slice(0, i + 1))}
@@ -389,11 +389,11 @@ function DecisionTree() {
                 Decision Point
               </span>
             </div>
-            <h3 style={{ margin: '0 0 10px', fontSize: 18, fontWeight: 600, color: '#e2e8f0' }}>
+            <h3 style={{ margin: '0 0 10px', fontSize: 18, fontWeight: 600, color: 'var(--text-h)' }}>
               {node.question}
             </h3>
             {node.context && (
-              <p style={{ margin: '0 0 20px', fontSize: 13, color: '#64748b', lineHeight: 1.7 }}>
+              <p style={{ margin: '0 0 20px', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.7 }}>
                 {node.context}
               </p>
             )}
@@ -403,7 +403,7 @@ function DecisionTree() {
                   key={opt.next}
                   onClick={() => goTo(opt.next)}
                   style={{
-                    background: '#0f1117',
+                    background: 'var(--bg)',
                     border: `1px solid ${opt.color}30`,
                     borderLeft: `4px solid ${opt.color}`,
                     borderRadius: 8,
@@ -413,12 +413,12 @@ function DecisionTree() {
                     transition: 'all 0.15s',
                   }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = `${opt.color}10`; e.currentTarget.style.borderColor = `${opt.color}60`; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = '#0f1117'; e.currentTarget.style.border = `1px solid ${opt.color}30`; e.currentTarget.style.borderLeft = `4px solid ${opt.color}`; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--bg)'; e.currentTarget.style.border = `1px solid ${opt.color}30`; e.currentTarget.style.borderLeft = `4px solid ${opt.color}`; }}
                 >
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0', marginBottom: 4 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-h)', marginBottom: 4 }}>
                     {opt.label}
                   </div>
-                  <div style={{ fontSize: 12, color: '#64748b' }}>{opt.desc}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{opt.desc}</div>
                 </button>
               ))}
             </div>
@@ -433,19 +433,19 @@ function DecisionTree() {
                 Recommended Action
               </span>
             </div>
-            <h3 style={{ margin: '0 0 16px', fontSize: 18, fontWeight: 600, color: '#e2e8f0' }}>
+            <h3 style={{ margin: '0 0 16px', fontSize: 18, fontWeight: 600, color: 'var(--text-h)' }}>
               {node.title}
             </h3>
-            <div style={{ background: '#0f1117', borderRadius: 10, padding: '16px 18px', marginBottom: 16, borderLeft: `4px solid ${node.actionColor ?? '#10b981'}` }}>
+            <div style={{ background: 'var(--bg)', borderRadius: 10, padding: '16px 18px', marginBottom: 16, borderLeft: `4px solid ${node.actionColor ?? '#10b981'}` }}>
               {(node.action ?? '').split('\n').map((line, i) => (
                 line.trim() === '' ? <br key={i} /> :
                 line.startsWith('Step') || /^\d+\./.test(line) || line.startsWith('•') || line.startsWith('Example') ?
-                  <p key={i} style={{ margin: '6px 0', fontSize: 13, color: '#94a3b8', lineHeight: 1.7 }}>{line}</p> :
-                  <p key={i} style={{ margin: '0 0 8px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>{line}</p>
+                  <p key={i} style={{ margin: '6px 0', fontSize: 13, color: 'var(--text)', lineHeight: 1.7 }}>{line}</p> :
+                  <p key={i} style={{ margin: '0 0 8px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>{line}</p>
               ))}
             </div>
             {node.tip && (
-              <div style={{ padding: '10px 14px', background: '#6366f110', border: '1px solid #6366f130', borderRadius: 8, fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>
+              <div style={{ padding: '10px 14px', background: '#6366f110', border: '1px solid #6366f130', borderRadius: 8, fontSize: 12, color: 'var(--text)', lineHeight: 1.6 }}>
                 <strong style={{ color: '#6366f1' }}>💡 Pro tip: </strong>{node.tip}
               </div>
             )}
@@ -454,13 +454,13 @@ function DecisionTree() {
       </div>
 
       {/* Nav buttons */}
-      <div style={{ padding: '12px 24px', borderTop: '1px solid #1e2130', display: 'flex', gap: 10 }}>
+      <div style={{ padding: '12px 24px', borderTop: '1px solid var(--border)', display: 'flex', gap: 10 }}>
         {path.length > 1 && (
-          <button onClick={goBack} style={{ background: '#1f2335', border: '1px solid #2a2d3e', color: '#94a3b8', fontSize: 12, padding: '7px 16px', borderRadius: 6, cursor: 'pointer' }}>
+          <button onClick={goBack} style={{ background: 'var(--bg-card-hover)', border: '1px solid var(--border)', color: 'var(--text)', fontSize: 12, padding: '7px 16px', borderRadius: 6, cursor: 'pointer' }}>
             ← Back
           </button>
         )}
-        <button onClick={reset} style={{ background: 'none', border: '1px solid #2a2d3e', color: '#475569', fontSize: 12, padding: '7px 16px', borderRadius: 6, cursor: 'pointer' }}>
+        <button onClick={reset} style={{ background: 'none', border: '1px solid var(--border)', color: '#475569', fontSize: 12, padding: '7px 16px', borderRadius: 6, cursor: 'pointer' }}>
           Start Over
         </button>
       </div>
@@ -533,7 +533,7 @@ function SetupCalculator() {
 
   return (
     <Card>
-      <div style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0', marginBottom: 20 }}>
+      <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-h)', marginBottom: 20 }}>
         Interactive PMCC Builder
       </div>
 
@@ -567,7 +567,7 @@ function SetupCalculator() {
           </div>
 
           {/* P&L chart */}
-          <div style={{ marginBottom: 8, fontSize: 12, color: '#64748b' }}>
+          <div style={{ marginBottom: 8, fontSize: 12, color: 'var(--text-muted)' }}>
             P&L at short call expiry (LEAPS still has {leapsDte - shortDte}d remaining)
           </div>
           <ResponsiveContainer width="100%" height={240}>
@@ -575,13 +575,13 @@ function SetupCalculator() {
               <CartesianGrid {...CHART_STYLE.grid} />
               <XAxis dataKey="price" {...CHART_STYLE.xAxis}
                 tickFormatter={(v) => `$${v}`}
-                label={{ value: 'Stock Price at Short Expiry', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 10 }}
+                label={{ value: 'Stock Price at Short Expiry', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 10 }}
                 height={40} />
               <YAxis {...CHART_STYLE.yAxis} tickFormatter={(v) => `$${v}`} />
               <Tooltip {...CHART_STYLE.tooltip}
                 formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`$${n.toFixed(2)}`]; }}
                 labelFormatter={(l) => `Stock @ $${l}`} />
-              <Legend wrapperStyle={{ fontSize: 11, color: '#94a3b8' }} />
+              <Legend wrapperStyle={{ fontSize: 11, color: 'var(--text)' }} />
               <ReferenceLine y={0} stroke="#475569" />
               <ReferenceLine x={stock} stroke="#6366f140" strokeDasharray="3 3" label={{ value: 'Current', fill: '#6366f1', fontSize: 9 }} />
               <ReferenceLine x={shortStrike} stroke="#f59e0b40" strokeDasharray="3 3" label={{ value: 'Short', fill: '#f59e0b', fontSize: 9 }} />
@@ -593,11 +593,11 @@ function SetupCalculator() {
           </ResponsiveContainer>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
             {[
-              { label: `Risk/Reward: ${riskReward}:1`, color: '#94a3b8' },
+              { label: `Risk/Reward: ${riskReward}:1`, color: 'var(--text)' },
               { label: `Max loss: $${(netDebit * 100).toFixed(0)} (net debit)`, color: '#ef4444' },
               { label: `Max profit: $${maxProfit.toFixed(0)} if above $${shortStrike} at LEAPS expiry`, color: '#10b981' },
             ].map(({ label, color }) => (
-              <span key={label} style={{ fontSize: 11, color, background: '#0f1117', padding: '3px 8px', borderRadius: 4 }}>{label}</span>
+              <span key={label} style={{ fontSize: 11, color, background: 'var(--bg)', padding: '3px 8px', borderRadius: 4 }}>{label}</span>
             ))}
           </div>
         </>
@@ -618,10 +618,10 @@ export function PMCC() {
         <div style={{ padding: '4px 10px', background: '#f59e0b15', border: '1px solid #f59e0b30', borderRadius: 6, fontSize: 11, fontWeight: 600, color: '#f59e0b', letterSpacing: '0.05em' }}>LOW CAPITAL REQUIRED</div>
       </div>
 
-      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
         Dynamic Poor Man's Covered Call
       </h1>
-      <p style={{ margin: '0 0 32px', color: '#64748b', fontSize: 15, lineHeight: 1.7 }}>
+      <p style={{ margin: '0 0 32px', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7 }}>
         A Poor Man's Covered Call (PMCC) replaces the 100-share stock requirement of a traditional covered call with a deep-in-the-money LEAPS call, reducing capital requirements by 60–80%. The "dynamic" part is the ongoing management: rolling the short call up as the stock rises, adjusting after tests, and compounding gains across multiple cycles on the same LEAPS.
       </p>
 
@@ -632,25 +632,25 @@ export function PMCC() {
           <div className="g-2" style={{ gap: 20, marginBottom: 20 }}>
             <div style={{ padding: '16px 18px', background: '#6366f110', border: '1px solid #6366f130', borderRadius: 10 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#6366f1', letterSpacing: '0.05em', marginBottom: 10 }}>LEG 1 — BUY (Long)</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: '#e2e8f0', marginBottom: 6 }}>Deep ITM LEAPS Call</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-h)', marginBottom: 6 }}>Deep ITM LEAPS Call</div>
               <ul style={{ margin: 0, paddingLeft: 16 }}>
                 {['Strike: 70–80 delta (roughly 20–30% below stock price)', 'Expiry: 9–24 months out', 'Acts as a "synthetic stock" substitute', 'This is your cost — the debit you pay'].map(p => (
-                  <li key={p} style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.8 }}>{p}</li>
+                  <li key={p} style={{ fontSize: 12, color: 'var(--text)', lineHeight: 1.8 }}>{p}</li>
                 ))}
               </ul>
             </div>
             <div style={{ padding: '16px 18px', background: '#10b98110', border: '1px solid #10b98130', borderRadius: 10 }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#10b981', letterSpacing: '0.05em', marginBottom: 10 }}>LEG 2 — SELL (Short, each cycle)</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: '#e2e8f0', marginBottom: 6 }}>OTM Short-Dated Call</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-h)', marginBottom: 6 }}>OTM Short-Dated Call</div>
               <ul style={{ margin: 0, paddingLeft: 16 }}>
                 {['Strike: 25–35 delta (~5–10% above stock price)', 'Expiry: 30–45 DTE', 'Generates income that reduces your LEAPS cost basis', 'Renewed each cycle — this is the engine'].map(p => (
-                  <li key={p} style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.8 }}>{p}</li>
+                  <li key={p} style={{ fontSize: 12, color: 'var(--text)', lineHeight: 1.8 }}>{p}</li>
                 ))}
               </ul>
             </div>
           </div>
-          <div style={{ padding: '12px 16px', background: '#0f1117', borderRadius: 8, fontSize: 13, color: '#94a3b8', lineHeight: 1.7 }}>
-            <strong style={{ color: '#e2e8f0' }}>The key rule: </strong>
+          <div style={{ padding: '12px 16px', background: 'var(--bg)', borderRadius: 8, fontSize: 13, color: 'var(--text)', lineHeight: 1.7 }}>
+            <strong style={{ color: 'var(--text-h)' }}>The key rule: </strong>
             the short call strike must always be <em>above</em> the LEAPS strike, and the LEAPS must expire <em>after</em> the short call. This ensures the long call can cover any assignment on the short.
           </div>
         </Card>
@@ -661,7 +661,7 @@ export function PMCC() {
         <SectionHeader title="Step-by-Step Setup Guide" color="#10b981" />
 
         <StepCard number={1} title="Pick a Bullish Underlying" color="#10b981">
-          <p style={{ margin: '0 0 12px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+          <p style={{ margin: '0 0 12px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
             The PMCC requires a bullish-to-neutral view. Choose a stock or ETF where you expect modest upside over the LEAPS duration. ETFs (QQQ, SPY, IWM) are ideal for beginners — liquid, no earnings risk on the LEAPS.
           </p>
           <div className="g-2" style={{ gap: 12 }}>
@@ -669,10 +669,10 @@ export function PMCC() {
               { emoji: '✅', title: 'Good candidates', items: ['Liquid ETFs (QQQ, SPY, IWM, GLD)', 'Large-cap stocks with continuous options (AAPL, MSFT, NVDA)', 'IVR 25–50 at entry — not too cheap, not blowing up', 'Uptrend or strong support level visible'] },
               { emoji: '❌', title: 'Avoid', items: ['Stocks with earnings inside LEAPS window (IV crush risk)', 'Low-liquidity names with wide spreads (costs kill the math)', 'Stocks in a clear downtrend', 'IVR > 60 — LEAPS too expensive to make sense'] },
             ].map(({ emoji, title, items }) => (
-              <div key={title} style={{ background: '#0f1117', borderRadius: 8, padding: '12px 14px' }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0', marginBottom: 8 }}>{emoji} {title}</div>
+              <div key={title} style={{ background: 'var(--bg)', borderRadius: 8, padding: '12px 14px' }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-h)', marginBottom: 8 }}>{emoji} {title}</div>
                 <ul style={{ margin: 0, paddingLeft: 16 }}>
-                  {items.map(i => <li key={i} style={{ fontSize: 12, color: '#64748b', lineHeight: 1.8 }}>{i}</li>)}
+                  {items.map(i => <li key={i} style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.8 }}>{i}</li>)}
                 </ul>
               </div>
             ))}
@@ -680,7 +680,7 @@ export function PMCC() {
         </StepCard>
 
         <StepCard number={2} title="Buy the LEAPS Call" color="#6366f1">
-          <p style={{ margin: '0 0 12px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+          <p style={{ margin: '0 0 12px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
             Buy 1 LEAPS call with high delta and long time to expiry. This is your "synthetic stock" — it should move nearly dollar-for-dollar with the stock.
           </p>
           <div className="g-3" style={{ gap: 12 }}>
@@ -689,9 +689,9 @@ export function PMCC() {
               { label: 'Target DTE', value: '270 – 540 days', desc: 'LEAPS expiry 9–18 months out minimum' },
               { label: 'Strike depth', value: '15–25% ITM', desc: 'Deep enough that time value is minimal vs intrinsic' },
             ].map(({ label, value, desc }) => (
-              <div key={label} style={{ background: '#0f1117', borderRadius: 8, padding: '12px 14px', textAlign: 'center' }}>
+              <div key={label} style={{ background: 'var(--bg)', borderRadius: 8, padding: '12px 14px', textAlign: 'center' }}>
                 <div style={{ fontFamily: 'monospace', fontSize: 18, fontWeight: 700, color: '#6366f1', marginBottom: 4 }}>{value}</div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: '#e2e8f0', marginBottom: 4 }}>{label}</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-h)', marginBottom: 4 }}>{label}</div>
                 <div style={{ fontSize: 11, color: '#475569' }}>{desc}</div>
               </div>
             ))}
@@ -699,7 +699,7 @@ export function PMCC() {
         </StepCard>
 
         <StepCard number={3} title="Sell the Short Call" color="#f59e0b">
-          <p style={{ margin: '0 0 12px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+          <p style={{ margin: '0 0 12px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
             Immediately sell a short-dated OTM call against your LEAPS. This credit reduces your cost basis. You repeat this step every 30–45 days for the life of the LEAPS.
           </p>
           <div className="g-2" style={{ gap: 12 }}>
@@ -709,17 +709,17 @@ export function PMCC() {
               { label: 'Min credit', value: '2%+ of stock price/mo', desc: 'E.g., stock at $150 → collect ≥ $3.00 ($300/contract).' },
               { label: 'IVR check', value: '> 25 preferred', desc: 'Skip this cycle if IVR < 15 — premium too thin.' },
             ].map(({ label, value, desc }) => (
-              <div key={label} style={{ background: '#0f1117', borderRadius: 8, padding: '12px 14px' }}>
+              <div key={label} style={{ background: 'var(--bg)', borderRadius: 8, padding: '12px 14px' }}>
                 <div style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: '#f59e0b', marginBottom: 4 }}>{value}</div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: '#e2e8f0', marginBottom: 3 }}>{label}</div>
-                <div style={{ fontSize: 11, color: '#64748b' }}>{desc}</div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-h)', marginBottom: 3 }}>{label}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{desc}</div>
               </div>
             ))}
           </div>
         </StepCard>
 
         <StepCard number={4} title="Manage Each Cycle (The Dynamic Part)" color="#8b5cf6">
-          <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+          <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
             This is what makes the PMCC "dynamic" — you don't passively wait. Each 30–45 day cycle requires a decision. Use the Interactive Decision Tool below to navigate your specific situation.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -730,11 +730,11 @@ export function PMCC() {
               { trigger: 'Short call is ITM near expiry', action: 'Roll to next cycle at same or +1 strike for credit. Never pay to roll.', color: '#f59e0b' },
               { trigger: 'Stock drops 10–20%', action: 'Stop selling short calls. Hold LEAPS for recovery. Re-enter when stock stabilizes.', color: '#ef4444' },
             ].map(({ trigger, action, color }) => (
-              <div key={trigger} style={{ display: 'flex', gap: 12, padding: '12px 14px', background: '#0f1117', borderRadius: 8 }}>
+              <div key={trigger} style={{ display: 'flex', gap: 12, padding: '12px 14px', background: 'var(--bg)', borderRadius: 8 }}>
                 <div style={{ width: 3, borderRadius: 2, background: color, flexShrink: 0 }} />
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: '#e2e8f0', marginBottom: 3 }}>{trigger}</div>
-                  <div style={{ fontSize: 12, color: '#64748b' }}>→ {action}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-h)', marginBottom: 3 }}>{trigger}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>→ {action}</div>
                 </div>
               </div>
             ))}
@@ -742,7 +742,7 @@ export function PMCC() {
         </StepCard>
 
         <StepCard number={5} title="Exit the Position" color="#ef4444">
-          <p style={{ margin: '0 0 12px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+          <p style={{ margin: '0 0 12px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
             Always exit both legs simultaneously. Close the short call and sell the LEAPS at the same time (as a spread order if possible). Never let the LEAPS expire — it has extrinsic value until the last day.
           </p>
           <div className="g-3" style={{ gap: 10 }}>
@@ -751,9 +751,9 @@ export function PMCC() {
               { title: 'Time-based exit', desc: 'LEAPS has 60–90 days left → roll the entire spread: sell current LEAPS, buy new LEAPS further out.', color: '#6366f1' },
               { title: 'Stop loss exit', desc: 'LEAPS loses 50% of purchase price → exit everything. Short call credit offsets some of the loss.', color: '#ef4444' },
             ].map(({ title, desc, color }) => (
-              <div key={title} style={{ padding: '12px 14px', background: '#0f1117', borderRadius: 8, borderTop: `2px solid ${color}` }}>
+              <div key={title} style={{ padding: '12px 14px', background: 'var(--bg)', borderRadius: 8, borderTop: `2px solid ${color}` }}>
                 <div style={{ fontSize: 12, fontWeight: 600, color, marginBottom: 6 }}>{title}</div>
-                <p style={{ margin: 0, fontSize: 12, color: '#64748b', lineHeight: 1.6 }}>{desc}</p>
+                <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>{desc}</p>
               </div>
             ))}
           </div>
@@ -769,7 +769,7 @@ export function PMCC() {
       {/* Decision tree */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Interactive Decision Tool" color="#8b5cf6" />
-        <p style={{ margin: '0 0 16px', color: '#64748b', fontSize: 14, lineHeight: 1.7 }}>
+        <p style={{ margin: '0 0 16px', color: 'var(--text-muted)', fontSize: 14, lineHeight: 1.7 }}>
           Use this to navigate any situation your PMCC runs into. Answer the questions to get the recommended next action for your specific scenario.
         </p>
         <DecisionTree />
@@ -788,11 +788,11 @@ export function PMCC() {
               { n: '5', rule: 'Don\'t sell calls against a dropping LEAPS.', why: 'Selling OTM calls when the stock is falling caps your upside exactly when you need it most for recovery. Hold until the stock stabilizes.' },
               { n: '6', rule: 'Stop loss: exit when LEAPS loses 50% of purchase price.', why: 'A damaged LEAPS with low delta provides poor leverage and slow recovery. Fresh capital in a new position has better expected value.' },
             ].map(({ n, rule, why }) => (
-              <div key={n} style={{ display: 'flex', gap: 14, padding: '12px 14px', background: '#0f1117', borderRadius: 8 }}>
+              <div key={n} style={{ display: 'flex', gap: 14, padding: '12px 14px', background: 'var(--bg)', borderRadius: 8 }}>
                 <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#ef444420', border: '1px solid #ef444440', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#ef4444', flexShrink: 0 }}>{n}</div>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0', marginBottom: 3 }}>{rule}</div>
-                  <div style={{ fontSize: 12, color: '#64748b', lineHeight: 1.6 }}>{why}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-h)', marginBottom: 3 }}>{rule}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>{why}</div>
                 </div>
               </div>
             ))}

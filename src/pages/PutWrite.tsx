@@ -4,25 +4,25 @@ import {
 } from 'recharts';
 
 const CHART_STYLE = {
-  cartesianGrid: { strokeDasharray: '3 3', stroke: '#1e2130' },
-  xAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  yAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  tooltip: { contentStyle: { background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 8, fontSize: 13 } },
+  cartesianGrid: { strokeDasharray: '3 3', stroke: 'var(--border)' },
+  xAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  yAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  tooltip: { contentStyle: { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13 } },
 };
 
 function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
 
 function Citation({ authors, year, title, source }: { authors: string; year: string; title: string; source: string }) {
   return (
-    <div style={{ padding: '10px 14px', background: '#0f1117', border: '1px solid #2a2d3e', borderRadius: 8, marginBottom: 8 }}>
-      <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>
+    <div style={{ padding: '10px 14px', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8, marginBottom: 8 }}>
+      <div style={{ fontSize: 12, color: 'var(--text)', lineHeight: 1.6 }}>
         <span style={{ color: '#6366f1', fontWeight: 600 }}>{authors} ({year})</span>
         {' — '}
         <span style={{ fontStyle: 'italic' }}>{title}</span>
@@ -105,11 +105,11 @@ export function PutWrite() {
           SYSTEMATIC PREMIUM
         </div>
       </div>
-      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
         Systematic Put-Write
       </h1>
-      <p style={{ margin: '0 0 32px', color: '#64748b', fontSize: 15, lineHeight: 1.7 }}>
-        The CBOE PUT Index — a systematic strategy that sells one-month ATM S&P 500 puts, fully collateralized by T-bills — has delivered <strong style={{ color: '#94a3b8' }}>superior risk-adjusted returns</strong> compared to passive equity investing since its 1986 inception. Bondarenko (2019) documented a Sharpe ratio of 0.65 vs 0.49 for the S&P 500 over 1986–2018, with roughly 40% less volatility. This is the clearest real-world proof that the volatility risk premium is large, persistent, and harvestable at scale.
+      <p style={{ margin: '0 0 32px', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7 }}>
+        The CBOE PUT Index — a systematic strategy that sells one-month ATM S&P 500 puts, fully collateralized by T-bills — has delivered <strong style={{ color: 'var(--text)' }}>superior risk-adjusted returns</strong> compared to passive equity investing since its 1986 inception. Bondarenko (2019) documented a Sharpe ratio of 0.65 vs 0.49 for the S&P 500 over 1986–2018, with roughly 40% less volatility. This is the clearest real-world proof that the volatility risk premium is large, persistent, and harvestable at scale.
       </p>
 
       {/* Key Stats */}
@@ -120,9 +120,9 @@ export function PutWrite() {
           { label: 'Volatility', value: '9.4%', sub: 'vs 15.1% for S&P', color: '#f59e0b' },
           { label: 'Max Drawdown', value: '-32.7%', sub: 'vs -50.9% for S&P', color: '#ef4444' },
         ].map(({ label, value, sub, color }) => (
-          <div key={label} style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '16px 20px' }}>
+          <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 20px' }}>
             <div style={{ fontSize: 24, fontWeight: 700, color, fontFamily: 'monospace', marginBottom: 4 }}>{value}</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#e2e8f0', marginBottom: 2 }}>{label}</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-h)', marginBottom: 2 }}>{label}</div>
             <div style={{ fontSize: 11, color: '#475569' }}>{sub}</div>
           </div>
         ))}
@@ -131,14 +131,14 @@ export function PutWrite() {
       {/* Cumulative Growth Chart */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="PUT Index vs S&P 500: Cumulative Growth ($100)" color="#10b981" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20 }}>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={growthData}>
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
               <XAxis dataKey="year" {...CHART_STYLE.xAxis} />
               <YAxis {...CHART_STYLE.yAxis} />
               <Tooltip {...CHART_STYLE.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`$${n.toFixed(0)}`]; }} />
-              <Legend wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: 'var(--text)' }} />
               <Line type="monotone" dataKey="put" name="PUT Index" stroke="#10b981" dot={false} strokeWidth={2.5} />
               <Line type="monotone" dataKey="spx" name="S&P 500 (Total Return)" stroke="#6366f1" dot={false} strokeWidth={2} strokeDasharray="5 3" />
             </LineChart>
@@ -153,14 +153,14 @@ export function PutWrite() {
       {/* Annual Returns */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Annual Returns: PUT vs S&P 500" color="#6366f1" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20 }}>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={annualReturns} barCategoryGap="15%">
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-              <XAxis dataKey="year" {...CHART_STYLE.xAxis} tick={{ fill: '#64748b', fontSize: 9 }} />
+              <XAxis dataKey="year" {...CHART_STYLE.xAxis} tick={{ fill: 'var(--text-muted)', fontSize: 9 }} />
               <YAxis {...CHART_STYLE.yAxis} unit="%" />
               <Tooltip {...CHART_STYLE.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`${n.toFixed(1)}%`]; }} />
-              <Legend wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: 'var(--text)' }} />
               <ReferenceLine y={0} stroke="#475569" />
               <Bar dataKey="put" name="PUT Index" fill="#10b98180" radius={[2, 2, 0, 0]} />
               <Bar dataKey="spx" name="S&P 500" fill="#6366f180" radius={[2, 2, 0, 0]} />
@@ -175,22 +175,22 @@ export function PutWrite() {
       {/* Risk Metrics Table */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Risk-Adjusted Performance Metrics (1986–2018)" color="#f59e0b" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20 }}>
           <div className="tbl-wrap">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ background: '#0f1117' }}>
+                <tr style={{ background: 'var(--bg)' }}>
                   {['Metric', 'PUT Index', 'S&P 500', 'Winner'].map(h => (
-                    <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: '#64748b', fontWeight: 600, borderBottom: '1px solid #2a2d3e' }}>{h}</th>
+                    <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: 'var(--text-muted)', fontWeight: 600, borderBottom: '1px solid var(--border)' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {riskMetrics.map(({ metric, put, spx, winner }) => (
-                  <tr key={metric} style={{ borderBottom: '1px solid #1e2130' }}>
-                    <td style={{ padding: '10px 14px', color: '#e2e8f0' }}>{metric}</td>
-                    <td style={{ padding: '10px 14px', color: winner === 'PUT' ? '#10b981' : '#94a3b8', fontFamily: 'monospace', fontWeight: winner === 'PUT' ? 600 : 400 }}>{put}</td>
-                    <td style={{ padding: '10px 14px', color: winner === 'S&P' ? '#10b981' : '#94a3b8', fontFamily: 'monospace', fontWeight: winner === 'S&P' ? 600 : 400 }}>{spx}</td>
+                  <tr key={metric} style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '10px 14px', color: 'var(--text-h)' }}>{metric}</td>
+                    <td style={{ padding: '10px 14px', color: winner === 'PUT' ? '#10b981' : 'var(--text)', fontFamily: 'monospace', fontWeight: winner === 'PUT' ? 600 : 400 }}>{put}</td>
+                    <td style={{ padding: '10px 14px', color: winner === 'S&P' ? '#10b981' : 'var(--text)', fontFamily: 'monospace', fontWeight: winner === 'S&P' ? 600 : 400 }}>{spx}</td>
                     <td style={{ padding: '10px 14px', color: winner === 'PUT' ? '#10b981' : '#6366f1', fontFamily: 'monospace', fontWeight: 600, fontSize: 11 }}>{winner}</td>
                   </tr>
                 ))}
@@ -253,11 +253,11 @@ export function PutWrite() {
               ],
             },
           ].map(({ title, color, items }) => (
-            <div key={title} style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '16px 20px' }}>
+            <div key={title} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 20px' }}>
               <div style={{ fontSize: 14, fontWeight: 600, color, marginBottom: 12 }}>{title}</div>
               <ul style={{ margin: 0, paddingLeft: 16 }}>
                 {items.map(item => (
-                  <li key={item} style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.7, marginBottom: 4 }}>{item}</li>
+                  <li key={item} style={{ fontSize: 12, color: 'var(--text)', lineHeight: 1.7, marginBottom: 4 }}>{item}</li>
                 ))}
               </ul>
             </div>
@@ -268,7 +268,7 @@ export function PutWrite() {
       {/* Why it works */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Why Does Put-Write Outperform on a Risk-Adjusted Basis?" color="#8b5cf6" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20 }}>
           <div className="g-3" style={{ gap: 12 }}>
             {[
               {
@@ -287,9 +287,9 @@ export function PutWrite() {
                 desc: 'The strategy has 40% less standard deviation than pure equity exposure. Even with similar or slightly higher returns, this dramatically improves Sharpe and Calmar ratios.',
               },
             ].map(({ reason, color, desc }) => (
-              <div key={reason} style={{ padding: '14px 16px', background: '#0f1117', borderRadius: 8, borderTop: `2px solid ${color}` }}>
+              <div key={reason} style={{ padding: '14px 16px', background: 'var(--bg)', borderRadius: 8, borderTop: `2px solid ${color}` }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color, marginBottom: 8 }}>{reason}</div>
-                <p style={{ margin: 0, fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>{desc}</p>
+                <p style={{ margin: 0, fontSize: 12, color: 'var(--text)', lineHeight: 1.6 }}>{desc}</p>
               </div>
             ))}
           </div>
@@ -299,7 +299,7 @@ export function PutWrite() {
       {/* Risks */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Known Failure Modes" color="#ef4444" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20 }}>
           <div className="g-2" style={{ gap: 12 }}>
             {[
               {
@@ -319,9 +319,9 @@ export function PutWrite() {
                 desc: '2022 saw a slow grind lower where monthly puts kept expiring in-the-money. Unlike a crash-and-recover, a sustained bear eats put write returns month after month.',
               },
             ].map(({ title, desc }) => (
-              <div key={title} style={{ padding: '12px 14px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #ef4444' }}>
+              <div key={title} style={{ padding: '12px 14px', background: 'var(--bg)', borderRadius: 8, borderLeft: '3px solid #ef4444' }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: '#ef4444', marginBottom: 6 }}>{title}</div>
-                <p style={{ margin: 0, fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>{desc}</p>
+                <p style={{ margin: 0, fontSize: 12, color: 'var(--text)', lineHeight: 1.6 }}>{desc}</p>
               </div>
             ))}
           </div>

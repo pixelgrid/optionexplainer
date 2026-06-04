@@ -206,14 +206,14 @@ function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: st
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20, ...style }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20, ...style }}>
       {children}
     </div>
   );
@@ -231,7 +231,7 @@ function FlagBadge({ flag }: { flag: Flag }) {
       <div style={{ width: 8, height: 8, borderRadius: '50%', background: c.dot, marginTop: 5, flexShrink: 0 }} />
       <div>
         <div style={{ color: c.text, fontWeight: 600, fontSize: 13 }}>{flag.label}</div>
-        <div style={{ color: '#94a3b8', fontSize: 12, marginTop: 2 }}>{flag.detail}</div>
+        <div style={{ color: 'var(--text)', fontSize: 12, marginTop: 2 }}>{flag.detail}</div>
       </div>
     </div>
   );
@@ -240,29 +240,29 @@ function FlagBadge({ flag }: { flag: Flag }) {
 function LearnRow({ name, formula, short, long, gotcha }: { name: string; formula?: string; short: string; long: string; gotcha: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div style={{ borderBottom: '1px solid #2a2d3e' }}>
+    <div style={{ borderBottom: '1px solid var(--border)' }}>
       <button onClick={() => setOpen(v => !v)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: '12px 0', textAlign: 'left' }}>
         <div>
-          <span style={{ color: '#e2e8f0', fontWeight: 600, fontSize: 14 }}>{name}</span>
+          <span style={{ color: 'var(--text-h)', fontWeight: 600, fontSize: 14 }}>{name}</span>
           {formula && <span style={{ color: '#6366f1', fontSize: 12, marginLeft: 10, fontFamily: 'monospace' }}>{formula}</span>}
         </div>
-        <span style={{ color: '#64748b', fontSize: 11, transition: 'transform 0.15s', transform: open ? 'rotate(180deg)' : 'none' }}>▼</span>
+        <span style={{ color: 'var(--text-muted)', fontSize: 11, transition: 'transform 0.15s', transform: open ? 'rotate(180deg)' : 'none' }}>▼</span>
       </button>
       {open && (
         <div style={{ paddingBottom: 14, display: 'grid', gap: 8 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             <div style={{ background: '#10b98110', border: '1px solid #10b98130', borderRadius: 8, padding: 12 }}>
               <div style={{ color: '#10b981', fontSize: 11, fontWeight: 700, marginBottom: 4 }}>SHORT-TERM IMPACT</div>
-              <div style={{ color: '#94a3b8', fontSize: 13 }}>{short}</div>
+              <div style={{ color: 'var(--text)', fontSize: 13 }}>{short}</div>
             </div>
             <div style={{ background: '#6366f110', border: '1px solid #6366f130', borderRadius: 8, padding: 12 }}>
               <div style={{ color: '#818cf8', fontSize: 11, fontWeight: 700, marginBottom: 4 }}>LONG-TERM / VALUATION</div>
-              <div style={{ color: '#94a3b8', fontSize: 13 }}>{long}</div>
+              <div style={{ color: 'var(--text)', fontSize: 13 }}>{long}</div>
             </div>
           </div>
           <div style={{ background: '#f59e0b10', border: '1px solid #f59e0b30', borderRadius: 8, padding: 12 }}>
             <div style={{ color: '#f59e0b', fontSize: 11, fontWeight: 700, marginBottom: 4 }}>⚠ GOTCHA</div>
-            <div style={{ color: '#94a3b8', fontSize: 13 }}>{gotcha}</div>
+            <div style={{ color: 'var(--text)', fontSize: 13 }}>{gotcha}</div>
           </div>
         </div>
       )}
@@ -287,7 +287,7 @@ function LiveTable({ stmts, rows, period }: { stmts: AVReport[]; rows: RowDef[];
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
         <thead>
           <tr>
-            <th style={{ textAlign: 'left', padding: '8px 0', color: '#64748b', fontWeight: 500, borderBottom: '1px solid #2a2d3e', minWidth: 200 }}>
+            <th style={{ textAlign: 'left', padding: '8px 0', color: 'var(--text-muted)', fontWeight: 500, borderBottom: '1px solid var(--border)', minWidth: 200 }}>
               Line Item
               {yoyBase && (
                 <span style={{ fontSize: 10, fontWeight: 400, color: '#3b82f6', marginLeft: 8 }}>
@@ -296,7 +296,7 @@ function LiveTable({ stmts, rows, period }: { stmts: AVReport[]; rows: RowDef[];
               )}
             </th>
             {periods.map((s, i) => (
-              <th key={i} style={{ textAlign: 'right', padding: '8px 8px', color: '#64748b', fontWeight: 500, borderBottom: '1px solid #2a2d3e', minWidth: 110 }}>
+              <th key={i} style={{ textAlign: 'right', padding: '8px 8px', color: 'var(--text-muted)', fontWeight: 500, borderBottom: '1px solid var(--border)', minWidth: 110 }}>
                 {s.fiscalDateEnding?.slice(0, 7) ?? '—'}
               </th>
             ))}
@@ -308,18 +308,18 @@ function LiveTable({ stmts, rows, period }: { stmts: AVReport[]; rows: RowDef[];
             const curr = vals[0];
             const yoyPrev = yoyBase ? n(yoyBase, key) : undefined;
             const chg = pctChange(curr, yoyPrev);
-            const chgColor = chg == null ? '' : chg < -0.05 ? '#ef4444' : chg > 0.05 ? '#10b981' : '#64748b';
+            const chgColor = chg == null ? '' : chg < -0.05 ? '#ef4444' : chg > 0.05 ? '#10b981' : 'var(--text-muted)';
             const display = (v: number | undefined) => {
               if (v == null) return '—';
               if (divisor) return (v / divisor).toFixed(0) + (suffix ?? '');
               return fmt(v);
             };
             return (
-              <tr key={key} style={{ borderBottom: '1px solid #1e2130' }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#1f2335')}
+              <tr key={key} style={{ borderBottom: '1px solid var(--border)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-card-hover)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
               >
-                <td style={{ padding: '9px 0', color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <td style={{ padding: '9px 0', color: 'var(--text-h)', display: 'flex', alignItems: 'center', gap: 8 }}>
                   {label}
                   {chg != null && (
                     <span style={{ fontSize: 11, color: chgColor, fontWeight: 600 }}>
@@ -328,7 +328,7 @@ function LiveTable({ stmts, rows, period }: { stmts: AVReport[]; rows: RowDef[];
                   )}
                 </td>
                 {vals.map((v, i) => (
-                  <td key={i} style={{ textAlign: 'right', padding: '9px 8px', color: '#94a3b8', fontFamily: 'monospace', fontSize: 12 }}>
+                  <td key={i} style={{ textAlign: 'right', padding: '9px 8px', color: 'var(--text)', fontFamily: 'monospace', fontSize: 12 }}>
                     {display(v)}
                   </td>
                 ))}
@@ -449,28 +449,28 @@ function RatioCard({ ratio }: { ratio: RatioDef }) {
   const catColors: Record<string, string> = { Profitability: '#10b981', Liquidity: '#3b82f6', Leverage: '#ef4444', Efficiency: '#f59e0b', Valuation: '#8b5cf6' };
   const color = catColors[ratio.category] ?? '#6366f1';
   return (
-    <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, overflow: 'hidden' }}>
+    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
       <button onClick={() => setOpen(v => !v)} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: 16, textAlign: 'left', gap: 12 }}>
         <div style={{ flex: 1 }}>
           <span style={{ background: color + '20', color, fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, letterSpacing: '0.05em', display: 'inline-block', marginBottom: 6 }}>{ratio.category.toUpperCase()}</span>
-          <div style={{ color: '#e2e8f0', fontWeight: 600, fontSize: 15 }}>{ratio.name}</div>
+          <div style={{ color: 'var(--text-h)', fontWeight: 600, fontSize: 15 }}>{ratio.name}</div>
           <div style={{ color: '#6366f1', fontSize: 12, fontFamily: 'monospace', marginTop: 2 }}>{ratio.formula}</div>
         </div>
-        <span style={{ color: '#64748b', fontSize: 11, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s', marginTop: 4, flexShrink: 0 }}>▼</span>
+        <span style={{ color: 'var(--text-muted)', fontSize: 11, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s', marginTop: 4, flexShrink: 0 }}>▼</span>
       </button>
       {open && (
         <div style={{ padding: '0 16px 16px', display: 'grid', gap: 8 }}>
           <div style={{ background: '#10b98110', border: '1px solid #10b98130', borderRadius: 8, padding: 12 }}>
             <div style={{ color: '#10b981', fontSize: 11, fontWeight: 700, marginBottom: 4 }}>HOW PROS USE IT</div>
-            <div style={{ color: '#94a3b8', fontSize: 13 }}>{ratio.pro}</div>
+            <div style={{ color: 'var(--text)', fontSize: 13 }}>{ratio.pro}</div>
           </div>
           <div style={{ background: '#ef444410', border: '1px solid #ef444430', borderRadius: 8, padding: 12 }}>
             <div style={{ color: '#ef4444', fontSize: 11, fontWeight: 700, marginBottom: 4 }}>RED FLAGS</div>
-            <div style={{ color: '#94a3b8', fontSize: 13 }}>{ratio.red}</div>
+            <div style={{ color: 'var(--text)', fontSize: 13 }}>{ratio.red}</div>
           </div>
           <div style={{ background: '#6366f110', border: '1px solid #6366f130', borderRadius: 8, padding: 12 }}>
             <div style={{ color: '#818cf8', fontSize: 11, fontWeight: 700, marginBottom: 4 }}>INDUSTRY BENCHMARKS</div>
-            <div style={{ color: '#94a3b8', fontSize: 13 }}>{ratio.benchmark}</div>
+            <div style={{ color: 'var(--text)', fontSize: 13 }}>{ratio.benchmark}</div>
           </div>
         </div>
       )}
@@ -672,12 +672,12 @@ export function FinancialStatements() {
   const activeColor = TABS.find(t => t.id === tab)?.color ?? '#6366f1';
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', background: '#0f1117', border: '1px solid #2a2d3e', borderRadius: 8,
-    padding: '10px 14px', color: '#e2e8f0', fontSize: 14, outline: 'none', boxSizing: 'border-box',
+    width: '100%', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8,
+    padding: '10px 14px', color: 'var(--text-h)', fontSize: 14, outline: 'none', boxSizing: 'border-box',
   };
   const btnStyle = (primary = true): React.CSSProperties => ({
-    background: primary ? '#6366f1' : 'none', color: primary ? '#fff' : '#64748b',
-    border: primary ? 'none' : '1px solid #2a2d3e', borderRadius: 8, padding: '10px 20px',
+    background: primary ? '#6366f1' : 'none', color: primary ? '#fff' : 'var(--text-muted)',
+    border: primary ? 'none' : '1px solid var(--border)', borderRadius: 8, padding: '10px 20px',
     fontSize: 14, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' as const,
   });
 
@@ -685,10 +685,10 @@ export function FinancialStatements() {
     <div className="page-wrap" style={{ maxWidth: 960 }}>
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ margin: '0 0 8px', color: '#e2e8f0', fontSize: 'clamp(22px,5vw,30px)', fontWeight: 700 }}>
+        <h1 style={{ margin: '0 0 8px', color: 'var(--text-h)', fontSize: 'clamp(22px,5vw,30px)', fontWeight: 700 }}>
           Financial Statement Analysis
         </h1>
-        <p style={{ margin: 0, color: '#64748b', fontSize: 14 }}>
+        <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: 14 }}>
           Learn what every line means, how professionals use ratios, and analyze a real company's latest filings via Alpha Vantage.
         </p>
       </div>
@@ -697,8 +697,8 @@ export function FinancialStatements() {
       {showKeyInput ? (
         <Card style={{ marginBottom: 24, border: '1px solid #6366f140' }}>
           <div style={{ color: '#818cf8', fontWeight: 600, marginBottom: 8 }}>Alpha Vantage API Key Required</div>
-          <p style={{ color: '#94a3b8', fontSize: 13, margin: '0 0 12px' }}>
-            Get a free key at <strong style={{ color: '#e2e8f0' }}>alphavantage.co/support/#api-key</strong> (no credit card, 25 calls/day free). Your key is saved locally in your browser.
+          <p style={{ color: 'var(--text)', fontSize: 13, margin: '0 0 12px' }}>
+            Get a free key at <strong style={{ color: 'var(--text-h)' }}>alphavantage.co/support/#api-key</strong> (no credit card, 25 calls/day free). Your key is saved locally in your browser.
           </p>
           <div style={{ display: 'flex', gap: 10 }}>
             <input
@@ -730,7 +730,7 @@ export function FinancialStatements() {
             {data && (
               <div style={{ display: 'flex', gap: 6 }}>
                 {(['annual', 'quarterly'] as Period[]).map(p => (
-                  <button key={p} onClick={() => setPeriod(p)} style={{ background: period === p ? '#6366f120' : 'none', border: `1px solid ${period === p ? '#6366f1' : '#2a2d3e'}`, borderRadius: 6, padding: '8px 14px', color: period === p ? '#818cf8' : '#64748b', fontSize: 13, cursor: 'pointer', fontWeight: period === p ? 600 : 400, textTransform: 'capitalize' }}>
+                  <button key={p} onClick={() => setPeriod(p)} style={{ background: period === p ? '#6366f120' : 'none', border: `1px solid ${period === p ? '#6366f1' : 'var(--border)'}`, borderRadius: 6, padding: '8px 14px', color: period === p ? '#818cf8' : 'var(--text-muted)', fontSize: 13, cursor: 'pointer', fontWeight: period === p ? 600 : 400, textTransform: 'capitalize' }}>
                     {p}
                   </button>
                 ))}
@@ -739,14 +739,14 @@ export function FinancialStatements() {
             <button onClick={() => setShowKeyInput(true)} style={{ ...btnStyle(false), fontSize: 12, padding: '8px 12px' }}>⚙ API Key</button>
           </div>
           {error && <div style={{ marginTop: 12, color: '#fca5a5', fontSize: 13, background: '#ef444415', border: '1px solid #ef444430', borderRadius: 8, padding: '10px 14px' }}>⚠ {error}</div>}
-          {ticker && !error && <div style={{ marginTop: 10, color: '#64748b', fontSize: 13 }}>Showing <span style={{ color: '#818cf8', fontWeight: 700 }}>{ticker}</span> · {period} · most recent 4 periods</div>}
+          {ticker && !error && <div style={{ marginTop: 10, color: 'var(--text-muted)', fontSize: 13 }}>Showing <span style={{ color: '#818cf8', fontWeight: 700 }}>{ticker}</span> · {period} · most recent 4 periods</div>}
         </Card>
       )}
 
       {/* Tab bar */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid #2a2d3e', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 4, marginBottom: 24, borderBottom: '1px solid var(--border)', flexWrap: 'wrap' }}>
         {TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '10px 16px', fontSize: 14, fontWeight: tab === t.id ? 600 : 400, color: tab === t.id ? t.color : '#64748b', borderBottom: `2px solid ${tab === t.id ? t.color : 'transparent'}`, marginBottom: -1, transition: 'all 0.15s' }}>
+          <button key={t.id} onClick={() => setTab(t.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '10px 16px', fontSize: 14, fontWeight: tab === t.id ? 600 : 400, color: tab === t.id ? t.color : 'var(--text-muted)', borderBottom: `2px solid ${tab === t.id ? t.color : 'transparent'}`, marginBottom: -1, transition: 'all 0.15s' }}>
             {t.label}
           </button>
         ))}
@@ -757,7 +757,7 @@ export function FinancialStatements() {
         <div style={{ display: 'grid', gap: 24 }}>
           <div>
             <SectionHeader title="Income Statement (P&L)" color={activeColor} />
-            <p style={{ color: '#64748b', fontSize: 14, margin: '0 0 16px' }}>Shows revenue, costs, and profit over a period. The most-watched report on earnings day. Click any line item to understand its valuation implications.</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: '0 0 16px' }}>Shows revenue, costs, and profit over a period. The most-watched report on earnings day. Click any line item to understand its valuation implications.</p>
             <Card>{INCOME_LEARN.map(r => <LearnRow key={r.name} {...r} />)}</Card>
           </div>
           {data && (
@@ -765,7 +765,7 @@ export function FinancialStatements() {
               <SectionHeader title={`${ticker} — Income Statement (${period})`} color={activeColor} />
               {iFlags.length > 0 && (
                 <div style={{ display: 'grid', gap: 8, marginBottom: 16 }}>
-                  <div style={{ color: '#64748b', fontSize: 12, fontWeight: 700, letterSpacing: '0.05em' }}>AUTO-DETECTED FINDINGS</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, letterSpacing: '0.05em' }}>AUTO-DETECTED FINDINGS</div>
                   {iFlags.map((f, i) => <FlagBadge key={i} flag={f} />)}
                 </div>
               )}
@@ -780,7 +780,7 @@ export function FinancialStatements() {
         <div style={{ display: 'grid', gap: 24 }}>
           <div>
             <SectionHeader title="Balance Sheet" color={activeColor} />
-            <p style={{ color: '#64748b', fontSize: 14, margin: '0 0 16px' }}>A snapshot of what a company owns (assets), owes (liabilities), and the residual claim for shareholders (equity) at a point in time.</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: '0 0 16px' }}>A snapshot of what a company owns (assets), owes (liabilities), and the residual claim for shareholders (equity) at a point in time.</p>
             <Card>{BALANCE_LEARN.map(r => <LearnRow key={r.name} {...r} />)}</Card>
           </div>
           {data && (
@@ -788,7 +788,7 @@ export function FinancialStatements() {
               <SectionHeader title={`${ticker} — Balance Sheet (${period})`} color={activeColor} />
               {bFlags.length > 0 && (
                 <div style={{ display: 'grid', gap: 8, marginBottom: 16 }}>
-                  <div style={{ color: '#64748b', fontSize: 12, fontWeight: 700, letterSpacing: '0.05em' }}>AUTO-DETECTED FINDINGS</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, letterSpacing: '0.05em' }}>AUTO-DETECTED FINDINGS</div>
                   {bFlags.map((f, i) => <FlagBadge key={i} flag={f} />)}
                 </div>
               )}
@@ -803,7 +803,7 @@ export function FinancialStatements() {
         <div style={{ display: 'grid', gap: 24 }}>
           <div>
             <SectionHeader title="Cash Flow Statement" color={activeColor} />
-            <p style={{ color: '#64748b', fontSize: 14, margin: '0 0 16px' }}>Shows actual cash in and out. Divided into operating, investing, and financing. The hardest statement to manipulate — the closest proxy for economic reality.</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: '0 0 16px' }}>Shows actual cash in and out. Divided into operating, investing, and financing. The hardest statement to manipulate — the closest proxy for economic reality.</p>
             <Card>{CASHFLOW_LEARN.map(r => <LearnRow key={r.name} {...r} />)}</Card>
           </div>
           {data && (
@@ -811,7 +811,7 @@ export function FinancialStatements() {
               <SectionHeader title={`${ticker} — Cash Flow Statement (${period})`} color={activeColor} />
               {cFlags.length > 0 && (
                 <div style={{ display: 'grid', gap: 8, marginBottom: 16 }}>
-                  <div style={{ color: '#64748b', fontSize: 12, fontWeight: 700, letterSpacing: '0.05em' }}>AUTO-DETECTED FINDINGS</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, letterSpacing: '0.05em' }}>AUTO-DETECTED FINDINGS</div>
                   {cFlags.map((f, i) => <FlagBadge key={i} flag={f} />)}
                 </div>
               )}
@@ -827,15 +827,15 @@ export function FinancialStatements() {
           {/* Intro */}
           <Card style={{ background: '#ec489910', border: '1px solid #ec489940' }}>
             <div style={{ color: '#f9a8d4', fontWeight: 600, fontSize: 14, marginBottom: 8 }}>About These Scores</div>
-            <div style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.7 }}>
-              <strong style={{ color: '#e2e8f0' }}>Piotroski F-Score</strong> uses 9 binary signals across profitability, leverage, and efficiency. Score ≥7 = fundamentally strong. Score ≤2 = deteriorating. Developed by Prof. Joseph Piotroski (2000).<br />
-              <strong style={{ color: '#e2e8f0' }}>Altman Z-Score</strong> predicts bankruptcy risk using 5 balance-sheet ratios. Scores use the <em>private-company model</em> (book equity in X4 rather than market cap). Z′ &gt;2.9 = Safe, 1.23–2.9 = Grey Zone, &lt;1.23 = Distress. Both scores are computed from the financial statements already loaded — no extra API calls.
+            <div style={{ color: 'var(--text)', fontSize: 13, lineHeight: 1.7 }}>
+              <strong style={{ color: 'var(--text-h)' }}>Piotroski F-Score</strong> uses 9 binary signals across profitability, leverage, and efficiency. Score ≥7 = fundamentally strong. Score ≤2 = deteriorating. Developed by Prof. Joseph Piotroski (2000).<br />
+              <strong style={{ color: 'var(--text-h)' }}>Altman Z-Score</strong> predicts bankruptcy risk using 5 balance-sheet ratios. Scores use the <em>private-company model</em> (book equity in X4 rather than market cap). Z′ &gt;2.9 = Safe, 1.23–2.9 = Grey Zone, &lt;1.23 = Distress. Both scores are computed from the financial statements already loaded — no extra API calls.
             </div>
           </Card>
 
           {!data && (
             <Card>
-              <div style={{ color: '#64748b', fontSize: 14 }}>Enter a ticker and click Analyze to compute quality scores.</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>Enter a ticker and click Analyze to compute quality scores.</div>
             </Card>
           )}
 
@@ -859,7 +859,7 @@ export function FinancialStatements() {
                   <div style={{ color: piotroski.score >= 7 ? '#10b981' : piotroski.score >= 5 ? '#f59e0b' : '#ef4444', fontSize: 20, fontWeight: 700 }}>
                     {piotroski.score >= 7 ? 'Strong' : piotroski.score >= 5 ? 'Moderate' : 'Weak'}
                   </div>
-                  <div style={{ color: '#64748b', fontSize: 13, marginTop: 4 }}>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4 }}>
                     {piotroski.score >= 7 && 'Improving fundamentals across profitability, leverage, and efficiency — favorable for selling puts and running the Wheel.'}
                     {piotroski.score >= 5 && piotroski.score < 7 && 'Mixed signals — some positive trends but not consistently improving across all dimensions.'}
                     {piotroski.score < 5 && 'Deteriorating fundamentals — high risk for premium sellers. Avoid or use for directional bearish strategies.'}
@@ -876,13 +876,13 @@ export function FinancialStatements() {
                     <div style={{ color: bucketColors[bucket], fontSize: 12, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 8 }}>{bucket.toUpperCase()}</div>
                     <div style={{ display: 'grid', gap: 8 }}>
                       {bucketChecks.map((c, i) => (
-                        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, background: c.pass === true ? '#10b98108' : c.pass === false ? '#ef444408' : '#ffffff05', border: `1px solid ${c.pass === true ? '#10b98130' : c.pass === false ? '#ef444430' : '#2a2d3e'}`, borderRadius: 8, padding: '10px 14px' }}>
-                          <div style={{ width: 22, height: 22, borderRadius: '50%', background: c.pass === true ? '#10b981' : c.pass === false ? '#ef4444' : '#2a2d3e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 12, fontWeight: 700, color: '#fff' }}>
+                        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, background: c.pass === true ? '#10b98108' : c.pass === false ? '#ef444408' : '#ffffff05', border: `1px solid ${c.pass === true ? '#10b98130' : c.pass === false ? '#ef444430' : 'var(--border)'}`, borderRadius: 8, padding: '10px 14px' }}>
+                          <div style={{ width: 22, height: 22, borderRadius: '50%', background: c.pass === true ? '#10b981' : c.pass === false ? '#ef4444' : 'var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 12, fontWeight: 700, color: '#fff' }}>
                             {c.pass === true ? '✓' : c.pass === false ? '✗' : '?'}
                           </div>
                           <div style={{ flex: 1 }}>
-                            <div style={{ color: '#e2e8f0', fontWeight: 600, fontSize: 13 }}>{c.label}</div>
-                            <div style={{ color: '#64748b', fontSize: 12, marginTop: 2 }}>{c.detail}</div>
+                            <div style={{ color: 'var(--text-h)', fontWeight: 600, fontSize: 13 }}>{c.label}</div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 2 }}>{c.detail}</div>
                           </div>
                           <div style={{ color: c.pass === true ? '#10b981' : c.pass === false ? '#ef4444' : '#475569', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
                             {c.pass === true ? '+1' : c.pass === false ? '0' : '—'}
@@ -900,7 +900,7 @@ export function FinancialStatements() {
             <div>
               <SectionHeader title={`${ticker} — Altman Z′-Score`} color="#ec4899" />
               {altman.z == null ? (
-                <Card><div style={{ color: '#64748b', fontSize: 13 }}>Insufficient balance sheet data to compute Z-Score (need: working capital, retained earnings, EBIT, equity, total liabilities, revenue).</div></Card>
+                <Card><div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Insufficient balance sheet data to compute Z-Score (need: working capital, retained earnings, EBIT, equity, total liabilities, revenue).</div></Card>
               ) : (
                 <>
                   {/* Score gauge */}
@@ -911,13 +911,13 @@ export function FinancialStatements() {
                       border: `2px solid ${altman.z > 2.9 ? '#10b981' : altman.z > 1.23 ? '#f59e0b' : '#ef4444'}`,
                     }}>
                       <div style={{ color: altman.z > 2.9 ? '#10b981' : altman.z > 1.23 ? '#f59e0b' : '#ef4444', fontSize: 36, fontWeight: 800 }}>{altman.z.toFixed(2)}</div>
-                      <div style={{ color: '#64748b', fontSize: 11, marginTop: 2 }}>Z′-Score</div>
+                      <div style={{ color: 'var(--text-muted)', fontSize: 11, marginTop: 2 }}>Z′-Score</div>
                     </div>
                     <div>
                       <div style={{ color: altman.z > 2.9 ? '#10b981' : altman.z > 1.23 ? '#f59e0b' : '#ef4444', fontSize: 20, fontWeight: 700 }}>
                         {altman.z > 2.9 ? 'Safe Zone' : altman.z > 1.23 ? 'Grey Zone' : 'Distress Zone'}
                       </div>
-                      <div style={{ color: '#64748b', fontSize: 13, marginTop: 4, maxWidth: 400 }}>
+                      <div style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 4, maxWidth: 400 }}>
                         {altman.z > 2.9 && 'Low bankruptcy risk. Balance sheet fundamentals are sound. Suitable for premium-selling strategies.'}
                         {altman.z > 1.23 && altman.z <= 2.9 && 'Moderate risk. Scores in this zone warrant monitoring. Check debt trends and upcoming refinancings.'}
                         {altman.z <= 1.23 && 'Elevated bankruptcy risk. Avoid selling uncovered puts or holding stock through major downturns.'}
@@ -926,7 +926,7 @@ export function FinancialStatements() {
                         {[['> 2.9', 'Safe', '#10b981'], ['1.23–2.9', 'Grey Zone', '#f59e0b'], ['< 1.23', 'Distress', '#ef4444']].map(([range, label, color]) => (
                           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: color }} />
-                            <span style={{ color: '#64748b', fontSize: 11 }}>{label}: {range}</span>
+                            <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>{label}: {range}</span>
                           </div>
                         ))}
                       </div>
@@ -935,23 +935,23 @@ export function FinancialStatements() {
 
                   {/* Components */}
                   <Card>
-                    <div style={{ color: '#64748b', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 12 }}>SCORE COMPONENTS (Z′ = 0.717X1 + 0.847X2 + 3.107X3 + 0.420X4 + 0.998X5)</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 12 }}>SCORE COMPONENTS (Z′ = 0.717X1 + 0.847X2 + 3.107X3 + 0.420X4 + 0.998X5)</div>
                     <div style={{ display: 'grid', gap: 8 }}>
                       {altman.components.map((c, i) => (
                         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                          <div style={{ color: '#64748b', fontSize: 12, minWidth: 300 }}>{c.label}</div>
-                          <div style={{ color: '#e2e8f0', fontSize: 13, fontFamily: 'monospace', minWidth: 70 }}>{c.value.toFixed(3)}</div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: 12, minWidth: 300 }}>{c.label}</div>
+                          <div style={{ color: 'var(--text-h)', fontSize: 13, fontFamily: 'monospace', minWidth: 70 }}>{c.value.toFixed(3)}</div>
                           <div style={{ color: c.contribution > 0 ? '#10b981' : '#ef4444', fontSize: 13, fontFamily: 'monospace', minWidth: 70 }}>
                             {c.contribution > 0 ? '+' : ''}{(c.contribution).toFixed(3)}
                           </div>
-                          <div style={{ flex: 1, height: 6, background: '#2a2d3e', borderRadius: 3, overflow: 'hidden' }}>
+                          <div style={{ flex: 1, height: 6, background: 'var(--border)', borderRadius: 3, overflow: 'hidden' }}>
                             <div style={{ width: `${Math.min(100, Math.abs(c.contribution) / Math.abs(altman.z ?? 1) * 100)}%`, height: '100%', background: c.contribution > 0 ? '#10b981' : '#ef4444', borderRadius: 3 }} />
                           </div>
                         </div>
                       ))}
                     </div>
-                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #2a2d3e', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ color: '#64748b', fontSize: 12 }}>Total Z′-Score</span>
+                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Total Z′-Score</span>
                       <span style={{ color: altman.z > 2.9 ? '#10b981' : altman.z > 1.23 ? '#f59e0b' : '#ef4444', fontSize: 18, fontWeight: 700, fontFamily: 'monospace' }}>{altman.z.toFixed(3)}</span>
                     </div>
                     <div style={{ marginTop: 10, color: '#475569', fontSize: 11 }}>Uses the Altman Z′ private-company model with book value of equity in X4. The public-company model (market cap / total liabilities) typically yields higher scores for well-valued stocks.</div>
@@ -971,9 +971,9 @@ export function FinancialStatements() {
               <SectionHeader title={`${ticker} — Computed Ratios (latest ${period})`} color={activeColor} />
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10 }}>
                 {ratioRows.map(r => (
-                  <div key={r.label} style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '14px 16px' }}>
-                    <div style={{ color: '#64748b', fontSize: 11, fontWeight: 600, letterSpacing: '0.04em', marginBottom: 4 }}>{r.label.toUpperCase()}</div>
-                    <div style={{ color: '#e2e8f0', fontSize: 20, fontWeight: 700 }}>{r.value}</div>
+                  <div key={r.label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
+                    <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 600, letterSpacing: '0.04em', marginBottom: 4 }}>{r.label.toUpperCase()}</div>
+                    <div style={{ color: 'var(--text-h)', fontSize: 20, fontWeight: 700 }}>{r.value}</div>
                   </div>
                 ))}
               </div>
@@ -981,10 +981,10 @@ export function FinancialStatements() {
           )}
           <div>
             <SectionHeader title="Key Ratios — Professional Guide" color={activeColor} />
-            <p style={{ color: '#64748b', fontSize: 14, margin: '0 0 16px' }}>How institutional analysts and fund managers use financial ratios. Click any ratio for the full breakdown.</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 14, margin: '0 0 16px' }}>How institutional analysts and fund managers use financial ratios. Click any ratio for the full breakdown.</p>
             {['Profitability', 'Liquidity', 'Leverage', 'Efficiency', 'Valuation'].map(cat => (
               <div key={cat} style={{ marginBottom: 20 }}>
-                <div style={{ color: '#e2e8f0', fontSize: 13, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 10, textTransform: 'uppercase' }}>{cat}</div>
+                <div style={{ color: 'var(--text-h)', fontSize: 13, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 10, textTransform: 'uppercase' }}>{cat}</div>
                 <div style={{ display: 'grid', gap: 8 }}>
                   {RATIOS.filter(r => r.category === cat).map(r => <RatioCard key={r.name} ratio={r} />)}
                 </div>

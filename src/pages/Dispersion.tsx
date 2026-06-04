@@ -4,25 +4,25 @@ import {
 } from 'recharts';
 
 const CHART_STYLE = {
-  cartesianGrid: { strokeDasharray: '3 3', stroke: '#1e2130' },
-  xAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  yAxis: { stroke: '#2a2d3e', tick: { fill: '#64748b', fontSize: 11 } },
-  tooltip: { contentStyle: { background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 8, fontSize: 13 } },
+  cartesianGrid: { strokeDasharray: '3 3', stroke: 'var(--border)' },
+  xAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  yAxis: { stroke: 'var(--border)', tick: { fill: 'var(--text-muted)', fontSize: 11 } },
+  tooltip: { contentStyle: { background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 13 } },
 };
 
 function SectionHeader({ title, color = '#6366f1' }: { title: string; color?: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <div style={{ width: 4, height: 22, borderRadius: 2, background: color }} />
-      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: '#e2e8f0' }}>{title}</h2>
+      <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-h)' }}>{title}</h2>
     </div>
   );
 }
 
 function Citation({ authors, year, title, source }: { authors: string; year: string; title: string; source: string }) {
   return (
-    <div style={{ padding: '10px 14px', background: '#0f1117', border: '1px solid #2a2d3e', borderRadius: 8, marginBottom: 8 }}>
-      <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>
+    <div style={{ padding: '10px 14px', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8, marginBottom: 8 }}>
+      <div style={{ fontSize: 12, color: 'var(--text)', lineHeight: 1.6 }}>
         <span style={{ color: '#6366f1', fontWeight: 600 }}>{authors} ({year})</span>
         {' — '}
         <span style={{ fontStyle: 'italic' }}>{title}</span>
@@ -81,11 +81,11 @@ export function Dispersion() {
           VOLATILITY ARBITRAGE
         </div>
       </div>
-      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: '#e2e8f0', letterSpacing: '-0.02em' }}>
+      <h1 style={{ margin: '0 0 8px', fontSize: 32, fontWeight: 700, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
         Dispersion Trading
       </h1>
-      <p style={{ margin: '0 0 32px', color: '#64748b', fontSize: 15, lineHeight: 1.7 }}>
-        Dispersion trading harvests the <strong style={{ color: '#94a3b8' }}>correlation risk premium</strong> — the systematic overpricing of index implied volatility relative to the weighted average IV of its constituent stocks. When correlations between stocks are lower than the market prices in, selling index vol and buying single-stock vol generates a profit. Driessen, Maenhout & Vilkov (2009) documented an average premium of 5–9% per month in the pre-2007 era; subsequent research has confirmed a persistent (if smaller) premium post-2008.
+      <p style={{ margin: '0 0 32px', color: 'var(--text-muted)', fontSize: 15, lineHeight: 1.7 }}>
+        Dispersion trading harvests the <strong style={{ color: 'var(--text)' }}>correlation risk premium</strong> — the systematic overpricing of index implied volatility relative to the weighted average IV of its constituent stocks. When correlations between stocks are lower than the market prices in, selling index vol and buying single-stock vol generates a profit. Driessen, Maenhout & Vilkov (2009) documented an average premium of 5–9% per month in the pre-2007 era; subsequent research has confirmed a persistent (if smaller) premium post-2008.
       </p>
 
       {/* Key Stats */}
@@ -96,9 +96,9 @@ export function Dispersion() {
           { label: 'Avg IV Spread', value: '+7pp', sub: 'index vs stock avg', color: '#6366f1' },
           { label: 'Strategy Capacity', value: 'High', sub: 'scales to $100M+', color: '#f59e0b' },
         ].map(({ label, value, sub, color }) => (
-          <div key={label} style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: '16px 20px' }}>
+          <div key={label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 20px' }}>
             <div style={{ fontSize: 24, fontWeight: 700, color, fontFamily: 'monospace', marginBottom: 4 }}>{value}</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: '#e2e8f0', marginBottom: 2 }}>{label}</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-h)', marginBottom: 2 }}>{label}</div>
             <div style={{ fontSize: 11, color: '#475569' }}>{sub}</div>
           </div>
         ))}
@@ -107,12 +107,12 @@ export function Dispersion() {
       {/* The Core Idea */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="The Core Idea: Index Vol vs Stock Vol" color="#06b6d4" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20, marginBottom: 16 }}>
-          <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20, marginBottom: 16 }}>
+          <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
             An index like the S&P 500 is a portfolio of correlated stocks. Its realized volatility depends on two things: individual stock volatilities and the correlations between them. The key mathematical identity is:
           </p>
-          <div style={{ background: '#0f1117', borderRadius: 8, padding: '16px 20px', marginBottom: 16, textAlign: 'center' }}>
-            <div style={{ fontFamily: 'monospace', fontSize: 16, color: '#e2e8f0', lineHeight: 2 }}>
+          <div style={{ background: 'var(--bg)', borderRadius: 8, padding: '16px 20px', marginBottom: 16, textAlign: 'center' }}>
+            <div style={{ fontFamily: 'monospace', fontSize: 16, color: 'var(--text-h)', lineHeight: 2 }}>
               σ<sub>index</sub>² ≈ Σᵢ wᵢ² σᵢ² + 2 Σᵢ&lt;ⱼ wᵢ wⱼ ρᵢⱼ σᵢ σⱼ
             </div>
             <p style={{ margin: '8px 0 0', fontSize: 12, color: '#475569' }}>
@@ -120,15 +120,15 @@ export function Dispersion() {
             </p>
           </div>
           <div className="g-2" style={{ gap: 16 }}>
-            <div style={{ padding: '14px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #10b981' }}>
+            <div style={{ padding: '14px 16px', background: 'var(--bg)', borderRadius: 8, borderLeft: '3px solid #10b981' }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#10b981', marginBottom: 8 }}>Sell Side</div>
-              <p style={{ margin: 0, fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>
+              <p style={{ margin: 0, fontSize: 12, color: 'var(--text)', lineHeight: 1.6 }}>
                 Short straddle or strangle on the index (SPX, QQQ). You collect premium on the overpriced index vol. This is the core "alpha" — index vol is chronically too expensive because investors pay for portfolio protection.
               </p>
             </div>
-            <div style={{ padding: '14px 16px', background: '#0f1117', borderRadius: 8, borderLeft: '3px solid #ef4444' }}>
+            <div style={{ padding: '14px 16px', background: 'var(--bg)', borderRadius: 8, borderLeft: '3px solid #ef4444' }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#ef4444', marginBottom: 8 }}>Buy Side</div>
-              <p style={{ margin: 0, fontSize: 12, color: '#94a3b8', lineHeight: 1.6 }}>
+              <p style={{ margin: 0, fontSize: 12, color: 'var(--text)', lineHeight: 1.6 }}>
                 Long straddle or strangle on top N constituent stocks (AAPL, MSFT, AMZN, etc.), vega-weighted to offset index short. You hedge systemic moves while staying long idiosyncratic vol.
               </p>
             </div>
@@ -139,14 +139,14 @@ export function Dispersion() {
       {/* IV Spread Chart */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Index IV vs Weighted Single-Stock IV" color="#6366f1" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20 }}>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={ivSpreadData}>
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
               <XAxis dataKey="month" {...CHART_STYLE.xAxis} />
               <YAxis {...CHART_STYLE.yAxis} unit="%" />
               <Tooltip {...CHART_STYLE.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`${n.toFixed(1)}%`]; }} />
-              <Legend wrapperStyle={{ fontSize: 12, color: '#94a3b8' }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: 'var(--text)' }} />
               <Line type="monotone" dataKey="indexIV" name="Index IV (SPX)" stroke="#6366f1" dot={false} strokeWidth={2} />
               <Line type="monotone" dataKey="stockIV" name="Weighted Stock IV" stroke="#f59e0b" dot={false} strokeWidth={2} />
               <Line type="monotone" dataKey="spread" name="IV Spread (Opportunity)" stroke="#10b981" dot={false} strokeWidth={2} strokeDasharray="5 3" />
@@ -161,22 +161,22 @@ export function Dispersion() {
       {/* Historical Correlation Data */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Implied vs Realized Correlation: Historical Premium" color="#10b981" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20 }}>
           <div className="tbl-wrap">
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ background: '#0f1117' }}>
+                <tr style={{ background: 'var(--bg)' }}>
                   {['Period', 'Implied Correlation', 'Realized Correlation', 'Premium'].map(h => (
-                    <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: '#64748b', fontWeight: 600, borderBottom: '1px solid #2a2d3e' }}>{h}</th>
+                    <th key={h} style={{ padding: '10px 14px', textAlign: 'left', color: 'var(--text-muted)', fontWeight: 600, borderBottom: '1px solid var(--border)' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {correlationData.map(({ label, implied, realized, premium }) => (
-                  <tr key={label} style={{ borderBottom: '1px solid #1e2130' }}>
-                    <td style={{ padding: '10px 14px', color: '#e2e8f0' }}>{label}</td>
-                    <td style={{ padding: '10px 14px', color: '#94a3b8', fontFamily: 'monospace' }}>{implied}%</td>
-                    <td style={{ padding: '10px 14px', color: '#94a3b8', fontFamily: 'monospace' }}>{realized}%</td>
+                  <tr key={label} style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '10px 14px', color: 'var(--text-h)' }}>{label}</td>
+                    <td style={{ padding: '10px 14px', color: 'var(--text)', fontFamily: 'monospace' }}>{implied}%</td>
+                    <td style={{ padding: '10px 14px', color: 'var(--text)', fontFamily: 'monospace' }}>{realized}%</td>
                     <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontWeight: 600, color: premium > 0 ? '#10b981' : '#ef4444' }}>
                       {premium > 0 ? '+' : ''}{premium}pp
                     </td>
@@ -194,11 +194,11 @@ export function Dispersion() {
       {/* Monthly P&L */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Illustrative Monthly P&L: Dispersion Trade" color="#f59e0b" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20 }}>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={monthlyPnl} barCategoryGap="20%">
               <CartesianGrid {...CHART_STYLE.cartesianGrid} />
-              <XAxis dataKey="month" {...CHART_STYLE.xAxis} label={{ value: 'Month', position: 'insideBottom', offset: -4, fill: '#64748b', fontSize: 11 }} height={40} />
+              <XAxis dataKey="month" {...CHART_STYLE.xAxis} label={{ value: 'Month', position: 'insideBottom', offset: -4, fill: 'var(--text-muted)', fontSize: 11 }} height={40} />
               <YAxis {...CHART_STYLE.yAxis} unit="%" />
               <Tooltip {...CHART_STYLE.tooltip} formatter={(v) => { const n = typeof v === 'number' ? v : 0; return [`${n.toFixed(1)}%`, 'P&L']; }} />
               <ReferenceLine y={0} stroke="#475569" />
@@ -218,8 +218,8 @@ export function Dispersion() {
       {/* Implementation */}
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Trade Construction (Retail-Accessible Version)" color="#8b5cf6" />
-        <div style={{ background: '#1a1d27', border: '1px solid #2a2d3e', borderRadius: 10, padding: 20 }}>
-          <p style={{ margin: '0 0 16px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: 20 }}>
+          <p style={{ margin: '0 0 16px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
             Institutional dispersion involves 50+ single-stock positions and sophisticated correlation swaps. A simplified version accessible to retail traders:
           </p>
           <div className="g-2" style={{ gap: 16 }}>
@@ -261,11 +261,11 @@ export function Dispersion() {
                 ],
               },
             ].map(({ step, color, items }) => (
-              <div key={step} style={{ padding: '14px 16px', background: '#0f1117', borderRadius: 8, borderLeft: `3px solid ${color}` }}>
+              <div key={step} style={{ padding: '14px 16px', background: 'var(--bg)', borderRadius: 8, borderLeft: `3px solid ${color}` }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color, marginBottom: 10 }}>{step}</div>
                 <ul style={{ margin: 0, paddingLeft: 16 }}>
                   {items.map(item => (
-                    <li key={item} style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.7, marginBottom: 3 }}>{item}</li>
+                    <li key={item} style={{ fontSize: 12, color: 'var(--text)', lineHeight: 1.7, marginBottom: 3 }}>{item}</li>
                   ))}
                 </ul>
               </div>
@@ -278,7 +278,7 @@ export function Dispersion() {
       <section style={{ marginBottom: 40 }}>
         <SectionHeader title="Correlation Spike Risk" color="#ef4444" />
         <div style={{ padding: '16px 20px', background: '#ef444410', border: '1px solid #ef444430', borderRadius: 10 }}>
-          <p style={{ margin: '0 0 12px', fontSize: 14, color: '#94a3b8', lineHeight: 1.7 }}>
+          <p style={{ margin: '0 0 12px', fontSize: 14, color: 'var(--text)', lineHeight: 1.7 }}>
             <strong style={{ color: '#ef4444' }}>The fatal scenario</strong>: a systemic crash where all stocks crash together (March 2020, October 2008). Realized correlation surges to 0.85+ — your short index vol position loses while your long stock vol positions don't profit enough to offset. This is the strategy's "jump risk."
           </p>
           <ul style={{ margin: 0, paddingLeft: 16 }}>
@@ -288,7 +288,7 @@ export function Dispersion() {
               'Diversify across multiple index families (SPX, NDX, RUT) to reduce single-regime exposure',
               'Size conservatively: risk no more than 3–5% of NAV on a full dispersion book',
             ].map(item => (
-              <li key={item} style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.7, marginBottom: 4 }}>{item}</li>
+              <li key={item} style={{ fontSize: 12, color: 'var(--text)', lineHeight: 1.7, marginBottom: 4 }}>{item}</li>
             ))}
           </ul>
         </div>

@@ -38,17 +38,17 @@ export function PnlChart({ strategy }: Props) {
   return (
     <ResponsiveContainer width="100%" height={220}>
       <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -10 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1e2130" />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
         <XAxis
           dataKey="price"
-          tick={{ fill: '#64748b', fontSize: 11 }}
+          tick={{ fill: 'var(--text-muted)', fontSize: 11 }}
           tickLine={false}
-          axisLine={{ stroke: '#2a2d3e' }}
+          axisLine={{ stroke: 'var(--border)' }}
           tickFormatter={(v) => `$${v}`}
           interval={15}
         />
         <YAxis
-          tick={{ fill: '#64748b', fontSize: 11 }}
+          tick={{ fill: 'var(--text-muted)', fontSize: 11 }}
           tickLine={false}
           axisLine={false}
           domain={[yMin - yPad, yMax + yPad]}
@@ -56,11 +56,11 @@ export function PnlChart({ strategy }: Props) {
         />
         <Tooltip
           contentStyle={{
-            background: '#1a1d27',
-            border: '1px solid #2a2d3e',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
             borderRadius: 8,
             fontSize: 12,
-            color: '#e2e8f0',
+            color: 'var(--text-h)',
           }}
           formatter={(value) => {
             const v = typeof value === 'number' ? value : 0;

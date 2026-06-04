@@ -29,8 +29,8 @@ export function StrategyCard({ strategy }: Props) {
   return (
     <div
       style={{
-        background: '#1a1d27',
-        border: '1px solid #2a2d3e',
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
         borderRadius: 12,
         overflow: 'hidden',
         display: 'flex',
@@ -38,9 +38,9 @@ export function StrategyCard({ strategy }: Props) {
       }}
     >
       {/* Header */}
-      <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid #2a2d3e' }}>
+      <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-          <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: '#e2e8f0' }}>
+          <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600, color: 'var(--text-h)' }}>
             {strategy.name}
           </h3>
           <span
@@ -59,7 +59,7 @@ export function StrategyCard({ strategy }: Props) {
             {categoryLabels[strategy.category]}
           </span>
         </div>
-        <p style={{ margin: 0, fontSize: 13, color: '#64748b', lineHeight: 1.5 }}>
+        <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
           {strategy.description}
         </p>
       </div>
@@ -78,19 +78,19 @@ export function StrategyCard({ strategy }: Props) {
           display: 'grid',
           gridTemplateColumns: '1fr 1fr 1fr',
           gap: 1,
-          background: '#2a2d3e',
-          borderTop: '1px solid #2a2d3e',
+          background: 'var(--border)',
+          borderTop: '1px solid var(--border)',
           margin: '8px 0 0',
         }}
       >
         {[
           { label: 'Max Profit', value: strategy.maxProfit, color: '#10b981' },
           { label: 'Max Loss', value: strategy.maxLoss, color: '#ef4444' },
-          { label: 'Breakeven', value: strategy.breakeven, color: '#94a3b8' },
+          { label: 'Breakeven', value: strategy.breakeven, color: 'var(--text)' },
         ].map(({ label, value, color: c }) => (
           <div
             key={label}
-            style={{ background: '#1a1d27', padding: '10px 12px', textAlign: 'center' }}
+            style={{ background: 'var(--bg-card)', padding: '10px 12px', textAlign: 'center' }}
           >
             <div style={{ fontSize: 10, color: '#475569', marginBottom: 3, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               {label}
@@ -106,7 +106,7 @@ export function StrategyCard({ strategy }: Props) {
         style={{
           background: 'none',
           border: 'none',
-          borderTop: '1px solid #2a2d3e',
+          borderTop: '1px solid var(--border)',
           padding: '10px 20px',
           cursor: 'pointer',
           color: '#6366f1',
@@ -127,9 +127,9 @@ export function StrategyCard({ strategy }: Props) {
           style={{
             padding: '4px 20px 16px',
             fontSize: 13,
-            color: '#94a3b8',
+            color: 'var(--text)',
             lineHeight: 1.65,
-            borderTop: '1px solid #1e2130',
+            borderTop: '1px solid var(--border)',
           }}
         >
           {strategy.whenToUse}
