@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AutoAnalysis } from '../components/AutoAnalysis';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -847,6 +848,18 @@ export function ResearchFramework() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* ── Auto-Analysis ── */}
+      <AutoAnalysis />
+
+      {/* Divider */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 32 }}>
+        <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+          Research Roadmap — Phase by Phase
+        </span>
+        <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
       </div>
 
       {/* Phase roadmap */}
