@@ -57,6 +57,7 @@ const NAV_SECTIONS: NavSection[] = [
       {
         heading: 'Fundamental Analysis',
         links: [
+          { to: '/research-framework', label: '📋 Research Framework' },
           { to: '/financials', label: 'Financial Statements' },
           { to: '/earnings-history', label: 'Earnings Surprises' },
           { to: '/valuation', label: 'Valuation Snapshot' },

@@ -27,6 +27,7 @@ import { Landing } from './pages/Landing';
 import { NewsSentiment } from './pages/NewsSentiment';
 import { ZeroCostCollar } from './pages/ZeroCostCollar';
 import { StocksGlossary } from './pages/StocksGlossary';
+import { ResearchFramework } from './pages/ResearchFramework';
 
 export default function App() {
   return (
@@ -60,6 +61,7 @@ export default function App() {
         <Route path="/news-sentiment" element={<NewsSentiment />} />
         <Route path="/zero-cost-collar" element={<ZeroCostCollar />} />
         <Route path="/stocks-glossary" element={<StocksGlossary />} />
+        <Route path="/research-framework" element={<ResearchFramework />} />
       </Routes>
     </BrowserRouter>
   );
