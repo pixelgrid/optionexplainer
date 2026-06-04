@@ -7,7 +7,10 @@ import { nn } from './avClient';
 
 export type Grade = 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F';
 export type FlagType = 'good' | 'bad' | 'neutral';
-export type GrowthRegime = 'high_growth' | 'moderate_growth' | 'mature' | 'recovery' | 'inflection';
+// Primary regime drives scoring curves. Modifier is independent and does NOT override primary.
+export type PrimaryRegime = 'high_growth' | 'moderate_growth' | 'mature' | 'inflection';
+export type RegimeModifier = 'recovery' | null;
+export type GrowthRegime = PrimaryRegime | 'recovery'; // union kept for PhaseScore.regime compat
 
 export interface ScoreDetail {
   label: string;
@@ -41,11 +44,13 @@ export interface PhaseScore {
 }
 
 export interface GrowthRegimeInfo {
-  regime: GrowthRegime;
+  primary: PrimaryRegime;          // drives scoring curves in phases 4, 5
+  modifier: RegimeModifier;        // 'recovery' triggers EPS discount in phase 3; does NOT change primary
+  regime: PrimaryRegime;           // alias for primary — used by PhaseScore.regime
   impliedEpsCAGR: number | null;   // from P/E ÷ PEG
   recentEpsGrowth: number | null;  // QuarterlyEarningsGrowthYOY
   revCagr: number | null;          // 3yr historical revenue CAGR
-  isTrough: boolean;               // LTM EPS < 3yr prior
+  isTrough: boolean;               // LTM EPS < 3yr prior (same as modifier === 'recovery')
   label: string;                   // human-readable
 }
 
@@ -153,37 +158,38 @@ export function detectGrowthRegime(
   const eps3yrAgo = nn(annualEarnings[3]?.reportedEPS);
   const isTrough = ltmEPS != null && eps3yrAgo != null && ltmEPS < eps3yrAgo;
 
-  // Derive regime
-  // Primary signal: implied EPS CAGR from PEG; fallback: recent quarterly
+  // ── Step 1: Determine PRIMARY regime from forward growth — trough does NOT override ──
   const fwdGrowth = impliedEpsCAGR ?? (recentEpsGrowth != null ? recentEpsGrowth * 100 : null);
-
-  // Historical FCF CAGR for inflection detection (needed for Fix 7)
   const fwdRevGrowth = nn(ov.QuarterlyRevenueGrowthYOY);
 
-  let regime: GrowthRegime;
-  if (isTrough) {
-    regime = 'recovery';
-  } else if (
+  let primary: PrimaryRegime;
+  if (
     (revCagr != null && revCagr < 0.20) &&
     (fwdRevGrowth != null && fwdRevGrowth > 0.30)
   ) {
-    regime = 'inflection';
+    primary = 'inflection';
   } else if (fwdGrowth != null && fwdGrowth > 25) {
-    regime = 'high_growth';
+    primary = 'high_growth';
   } else if (fwdGrowth != null && fwdGrowth >= 10) {
-    regime = 'moderate_growth';
+    primary = 'moderate_growth';
   } else {
-    regime = 'mature';
+    primary = 'mature';
   }
 
-  const label =
-    regime === 'high_growth'   ? `High-growth regime (implied EPS CAGR: ~${fwdGrowth != null ? fwdGrowth.toFixed(0) : '?'}%)` :
-    regime === 'moderate_growth' ? `Moderate-growth regime (~${fwdGrowth != null ? fwdGrowth.toFixed(0) : '?'}% EPS CAGR)` :
-    regime === 'mature'         ? 'Mature / value regime' :
-    regime === 'recovery'       ? 'Recovery / trough regime — LTM EPS below 3yr prior' :
-                                   'Growth inflection — historical FCF lag vs. forward revenue growth';
+  // ── Step 2: Apply recovery modifier independently — does NOT change primary ──
+  const modifier: RegimeModifier = isTrough ? 'recovery' : null;
 
-  return { regime, impliedEpsCAGR, recentEpsGrowth, revCagr, isTrough, label };
+  // ── Label: show primary + modifier when both active ──
+  const primaryLabel =
+    primary === 'high_growth'    ? `High-growth scoring (implied EPS CAGR ~${fwdGrowth != null ? fwdGrowth.toFixed(0) : '?'}%)` :
+    primary === 'moderate_growth' ? `Moderate-growth scoring (~${fwdGrowth != null ? fwdGrowth.toFixed(0) : '?'}% EPS CAGR)` :
+    primary === 'inflection'     ? 'Growth inflection scoring — historical FCF lag vs. forward revenue growth' :
+                                    'Value / mature scoring';
+  const label = modifier === 'recovery'
+    ? `${primaryLabel} · Recovery modifier applied (LTM EPS below 3yr prior)`
+    : primaryLabel;
+
+  return { primary, modifier, regime: primary, impliedEpsCAGR, recentEpsGrowth, revCagr, isTrough, label };
 }
 
 // ── Phase 2 — Financial Health ────────────────────────────────────────────────
@@ -492,14 +498,12 @@ export function scoreValuation(
   const flags: { text: string; type: FlagType }[] = [];
   let total = 0;
 
-  const isHighGrowth = regime.regime === 'high_growth' || regime.regime === 'inflection';
-  const isModGrowth = regime.regime === 'moderate_growth';
+  // Fix 2: use PRIMARY regime for scoring curves — recovery modifier never overrides this
+  const isHighGrowth = regime.primary === 'high_growth' || regime.primary === 'inflection';
+  const isModGrowth  = regime.primary === 'moderate_growth';
 
-  const regimeLabel = isHighGrowth
-    ? `Growth-adjusted scoring (${regime.label})`
-    : isModGrowth
-    ? `Moderate-growth scoring (${regime.label})`
-    : `Value/income scoring (${regime.label})`;
+  // regimeLabel shows full context including modifier (e.g. "High-growth scoring · Recovery modifier applied")
+  const regimeLabel = regime.label;
 
   // ── Forward P/E — 20pts (Fix 5: growth-adjusted for high-growth companies) ──
   const fpe = nn(ov.ForwardPE);
@@ -638,15 +642,22 @@ export function scoreValuation(
 
   return {
     phase: 4, title: 'Valuation Assessment', score, grade: gradeFromScore(score), headline,
-    summary: `${isPEfwd ? 'Fwd' : 'Trl'} P/E ${activePE != null ? fmt2(activePE) + 'x' : '—'} · PEG ${peg != null ? fmt2(peg) + 'x' : '—'} · EV/EBITDA ${evEbitda != null ? fmt2(evEbitda) + 'x' : '—'} · ${regimeLabel}`,
+    summary: `${isPEfwd ? 'Fwd' : 'Trl'} P/E ${activePE != null ? fmt2(activePE) + 'x' : '—'} · PEG ${peg != null ? fmt2(peg) + 'x' : '—'} · EV/EBITDA ${evEbitda != null ? fmt2(evEbitda) + 'x' : '—'} · ${regime.primary}`,
     details, flags,
-    regime: regime.regime,
+    regime: regime.primary,   // Fix 2: always primary, never 'recovery'
     regimeLabel,
   };
 }
 
 // ── Phase 5 — Intrinsic Value (Auto-DCF with scenarios) ──────────────────────
 // Fix 7: three-scenario table; base case uses forward estimates (implied from PEG); MoS vs base
+// Fix 1 (v2): MoS formula is (IV − price) / price — price is always the denominator.
+//             This is the standard margin-of-safety definition. Centralized here.
+
+/** Canonical MoS formula: positive = discount to IV, negative = premium above IV */
+function calcMoS(intrinsicValue: number, marketPrice: number): number {
+  return (intrinsicValue - marketPrice) / marketPrice;
+}
 
 function runDCF(startFCF: number, growthRate: number, sharesOut: number, wacc: number, termG: number): number {
   let pv = 0; let projFCF = startFCF;
@@ -694,12 +705,13 @@ export function scoreDCF(
       label: 'Bear',
       growthRate: bearGrowth,
       intrinsicValue: bearValue,
-      marginOfSafety: price != null && bearValue > 0 ? (bearValue - price) / bearValue : null,
+      marginOfSafety: price != null && price > 0 ? calcMoS(bearValue, price) : null,
       method: `Historical FCF CAGR (${pctLabel(bearGrowth)}) — conservative extrapolation`,
     });
 
     // ── Base: forward estimate from implied EPS CAGR (via PEG) ──
     // This is the primary / most realistic scenario
+    // Fix 2: use regime.primary, not regime.regime, so recovery doesn't suppress high-growth DCF
     let baseMethod: string;
     const impliedCAGR = regime.impliedEpsCAGR; // e.g. 55.3 (as percentage)
 
@@ -719,7 +731,7 @@ export function scoreDCF(
         label: 'Base',
         growthRate: g1to3,
         intrinsicValue: baseValue,
-        marginOfSafety: price != null && baseValue > 0 ? (baseValue - price) / baseValue : null,
+        marginOfSafety: price != null && price > 0 ? calcMoS(baseValue, price) : null,
         method: baseMethod,
       });
     } else {
@@ -731,7 +743,7 @@ export function scoreDCF(
         label: 'Base',
         growthRate: recentG,
         intrinsicValue: baseValue,
-        marginOfSafety: price != null && baseValue > 0 ? (baseValue - price) / baseValue : null,
+        marginOfSafety: price != null && price > 0 ? calcMoS(baseValue, price) : null,
         method: baseMethod,
       });
       flags.push({ text: 'No forward FCF estimates available via API — base case uses recent quarterly EPS growth as FCF proxy; may understate growth for inflection companies. Use the manual DCF Calculator with analyst estimates for more reliable output.', type: 'neutral' });
@@ -745,7 +757,7 @@ export function scoreDCF(
       label: 'Bull',
       growthRate: bullGrowth,
       intrinsicValue: bullValue,
-      marginOfSafety: price != null && bullValue > 0 ? (bullValue - price) / bullValue : null,
+      marginOfSafety: price != null && price > 0 ? calcMoS(bullValue, price) : null,
       method: `Bull case — base growth +25% (${pctLabel(bullGrowth)})`,
     });
   }
@@ -812,7 +824,7 @@ export function scoreDCF(
     phase: 5, title: 'Intrinsic Value (Auto-DCF)', score, grade: gradeFromScore(score), headline,
     summary: `Base: ${baseValue != null ? '$' + baseValue.toFixed(2) : '—'} (MoS ${baseMoS != null ? pctLabel(baseMoS) : '—'}) · Bear: ${scenarios.find(s => s.label === 'Bear')?.intrinsicValue != null ? '$' + scenarios.find(s => s.label === 'Bear')!.intrinsicValue!.toFixed(2) : '—'} · Bull: ${scenarios.find(s => s.label === 'Bull')?.intrinsicValue != null ? '$' + scenarios.find(s => s.label === 'Bull')!.intrinsicValue!.toFixed(2) : '—'}`,
     details, flags, dcfScenarios: scenarios,
-    regime: regime.regime,
+    regime: regime.primary,   // Fix 2: always primary
   };
 }
 
@@ -835,7 +847,8 @@ export function scoreDividends(
   // ── Shared: compute SBC, buybacks, net leverage ──
   const sbc = cf0 ? Math.abs(r(cf0, 'stockBasedCompensation') ?? 0) : 0;
   const buybacksRaw = cf0 ? Math.abs(r(cf0, 'commonStockRepurchased') ?? r(cf0, 'paymentsForRepurchaseOfCommonStock') ?? 0) : 0;
-  const netBuybacks = Math.max(0, buybacksRaw - sbc);
+  // Fix 4: do NOT floor at 0 — negative values (SBC > buybacks) are meaningful and scored differently
+  const netBuybacks = buybacksRaw - sbc;
   const netBuybackYield = mktCap != null && mktCap > 0 ? netBuybacks / mktCap : null;
 
   // Net leverage for debt-adjusted cap
@@ -864,20 +877,40 @@ export function scoreDividends(
     details.push({ label: 'FCF Yield', value: fcfYield != null ? (fcfYield * 100).toFixed(1) + '%' : '—', points: fcfYieldPts, maxPoints: 30,
       note: fcfYield != null && fcfYield > 0.04 ? 'Strong FCF yield — capital is being generated for reinvestment or return' : fcfYield != null && fcfYield > 0.02 ? 'Moderate FCF yield' : 'Low FCF yield — either reinvesting aggressively for growth, or marginal cash generation' });
 
-    // 2. Net Buyback Yield = (gross buybacks − SBC) / market cap (Fix 8)
+    // 2. Net Buyback Yield = (gross buybacks − SBC) / market cap
+    // Fix 4: calibrated scale — 0.0% yields 8/20 (below neutral), not 10/20
+    // Scale: >3%→20, 2-3%→17, 1-2%→14, 0.5-1%→11, 0-0.5%→8, -0.5-0%→5, <-0.5%→2
     let netBBPts: number;
     let netBBNote: string;
     if (netBuybackYield == null) {
       netBBPts = 10; netBBNote = 'Buyback data unavailable';
-    } else if (netBuybackYield < 0) {
-      netBBPts = 0; netBBNote = 'SBC issuance exceeds buybacks — net dilutive to shareholders';
-      flags.push({ text: 'Net dilution: SBC issued exceeds shares repurchased — buybacks are not offsetting equity dilution', type: 'bad' });
-    } else if (netBuybackYield === 0) {
-      netBBPts = 10; netBBNote = 'No net capital return via buybacks after SBC offset';
+    } else if (netBuybackYield > 0.03) {
+      netBBPts = 20;
+      netBBNote = `Strong net buyback yield of ${(netBuybackYield * 100).toFixed(1)}% after SBC — meaningful reduction in share count; shareholder-friendly`;
+      flags.push({ text: `Net buyback yield of ${(netBuybackYield * 100).toFixed(1)}% (after SBC offset) — genuine capital return compounding per-share value`, type: 'good' });
+    } else if (netBuybackYield > 0.02) {
+      netBBPts = 17;
+      netBBNote = `Net buyback yield of ${(netBuybackYield * 100).toFixed(1)}% after SBC — solid shareholder return`;
+    } else if (netBuybackYield > 0.01) {
+      netBBPts = 14;
+      netBBNote = `Moderate net buyback yield of ${(netBuybackYield * 100).toFixed(1)}% after SBC`;
+    } else if (netBuybackYield > 0.005) {
+      netBBPts = 11;
+      netBBNote = `Modest net buyback yield of ${(netBuybackYield * 100).toFixed(1)}% after SBC — buybacks partially offsetting dilution`;
+    } else if (netBuybackYield >= 0) {
+      // 0–0.5% band including exactly 0.0%
+      netBBPts = 8;
+      netBBNote = netBuybackYield === 0
+        ? 'Gross buybacks fully offset by SBC — no net reduction in share count; effective capital return is zero'
+        : `Net buyback yield of ${(netBuybackYield * 100).toFixed(2)}% is near-zero — buybacks barely exceed SBC dilution`;
+    } else if (netBuybackYield > -0.005) {
+      netBBPts = 5;
+      netBBNote = `Slight net dilution (${(netBuybackYield * 100).toFixed(2)}%) — SBC marginally exceeds buybacks; share count growing slowly`;
+      flags.push({ text: `Slight net dilution: SBC marginally exceeds buybacks — share count is not decreasing despite buyback program`, type: 'bad' });
     } else {
-      netBBPts = netBuybackYield > 0.04 ? 20 : netBuybackYield > 0.02 ? 16 : netBuybackYield > 0.005 ? 11 : 7;
-      netBBNote = `Net buyback yield of ${(netBuybackYield * 100).toFixed(1)}% after deducting SBC — shareholder-friendly capital allocation`;
-      if (netBuybackYield > 0.03) flags.push({ text: `Net buyback yield of ${(netBuybackYield * 100).toFixed(1)}% (after SBC) — meaningful cash return to shareholders`, type: 'good' });
+      netBBPts = 2;
+      netBBNote = `Meaningful net dilution (${(netBuybackYield * 100).toFixed(1)}%) — SBC significantly exceeds buybacks; buyback program does not offset equity compensation dilution`;
+      flags.push({ text: 'Net dilution: SBC significantly exceeds buybacks — shareholders are being diluted despite the stated buyback program', type: 'bad' });
     }
     total += netBBPts;
     details.push({ label: 'Net Buyback Yield (after SBC)', value: netBuybackYield != null ? (netBuybackYield * 100).toFixed(1) + '%' : '—', points: netBBPts, maxPoints: 20,
@@ -1069,8 +1102,12 @@ export function scoreSentiment(
     warning: sentWarning,
   });
 
-  // ── Rolling trend (Fix 9) ──
-  let trendPts = 15; let trendNote = 'Insufficient history for trend'; let trendLabel = '—';
+  // ── Rolling trend (Fix 9 + Fix 3 v2) ──
+  // When trend data unavailable: score at exactly 12.5/25 (mathematical midpoint = no opinion).
+  // This is transparent and consistent: missing data → neutral score, not arbitrary 12 or 15.
+  let trendPts = 13; // round(12.5) — explicit midpoint convention
+  let trendNote = 'Scored at midpoint — insufficient trend history (need articles spanning 90+ days). No opinion injected.';
+  let trendLabel = '—';
   if (sent7 != null && sent90 != null) {
     const trend = sent7 - sent90;
     trendLabel = trend > 0.05 ? 'Improving ↑' : trend < -0.05 ? 'Deteriorating ↓' : 'Stable →';
@@ -1082,10 +1119,19 @@ export function scoreSentiment(
     if (trend > 0.08) flags.push({ text: `Sentiment trend: improving over last 30 days (+${(trend * 100).toFixed(1)} pts) — narrative turning more positive`, type: 'good' });
     if (trend < -0.08) flags.push({ text: `Sentiment trend: deteriorating (${(trend * 100).toFixed(1)} pts) — narrative turning more negative recently`, type: 'bad' });
   } else if (sentAll != null) {
-    trendPts = 12; trendNote = `Overall avg sentiment ${sentAll.toFixed(3)} — trend unavailable (need 90+ days of data)`;
+    // Some articles exist but not enough date spread for a trend — keep midpoint convention
+    trendNote = `Scored at midpoint — articles available but date range insufficient for trend (need 90+ days). Overall avg: ${sentAll.toFixed(3)}.`;
+    // trendPts stays at 13 (midpoint already set above)
   }
   total += trendPts;
-  details.push({ label: 'Sentiment Trend (90d)', value: trendLabel, points: trendPts, maxPoints: 25, note: trendNote });
+  details.push({
+    label: 'Sentiment Trend (90d)',
+    value: trendLabel,
+    points: trendPts,
+    maxPoints: 25,
+    note: trendNote,
+    warning: trendLabel === '—' ? 'Midpoint convention (12.5/25) — no trend data available' : undefined,
+  });
 
   // ── Bullish article rate — 25pts (Fix 9: trend arrow) ──
   const labelsRecent = allRecent.map(getLabel);
