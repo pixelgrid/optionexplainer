@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react';
 import { avFetch, LS_AV_KEY, sleep } from '../lib/avClient';
-import { fetchAllFMP, LS_FMP_KEY } from '../lib/fmpClient';
 import {
   detectGrowthRegime,
   scoreFinancialHealth, scoreEarningsQuality, scoreValuation, scoreDCF,
@@ -9,8 +8,6 @@ import {
   type AVOverview, type AVReport, type AVEarningsQuarter, type AVEarningsAnnual,
   type AVDividendEntry, type AVNewsItem,
 } from '../lib/autoAnalysis';
-
-type Provider = 'av' | 'fmp';
 
 // ── Colour helpers ────────────────────────────────────────────────────────────
 
@@ -339,30 +336,11 @@ function CompositeCard({ phases }: { phases: PhaseScore[] }) {
   );
 }
 
-// ── Provider badge ────────────────────────────────────────────────────────────
-
-function ProviderBadge({ p }: { p: Provider | null }) {
-  if (!p) return null;
-  const isAV = p === 'av';
-  return (
-    <span style={{
-      fontSize: 10, fontWeight: 700, letterSpacing: '0.5px',
-      padding: '2px 8px', borderRadius: 4,
-      background: isAV ? 'rgba(99,102,241,0.12)' : 'rgba(16,185,129,0.12)',
-      color: isAV ? '#6366f1' : '#10b981',
-      border: `1px solid ${isAV ? '#6366f130' : '#10b98130'}`,
-    }}>
-      {isAV ? 'Alpha Vantage' : 'FMP'}
-    </span>
-  );
-}
-
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function AutoAnalysis() {
   const [ticker, setTicker] = useState('');
-  const [avKey,  setAvKey]  = useState(() => localStorage.getItem(LS_AV_KEY)  ?? '');
-  const [fmpKey, setFmpKey] = useState(() => localStorage.getItem(LS_FMP_KEY) ?? '');
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem(LS_AV_KEY) ?? '');
   const [steps, setSteps] = useState<FetchStep[]>(STEPS.map(s => ({ ...s })));
   const [phases, setPhases] = useState<PhaseScore[]>([]);
   const [regime, setRegime] = useState<GrowthRegimeInfo | null>(null);
@@ -371,146 +349,95 @@ export function AutoAnalysis() {
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
-  const [activeProvider, setActiveProvider] = useState<Provider | null>(null);
-  const [fallbackNotice, setFallbackNotice] = useState<string | null>(null);
   const abortRef = useRef(false);
 
-  const setStep = (id: string, status: FetchStep['status']) =>
-    setSteps(prev => prev.map(s => s.id === id ? { ...s, status } : s));
-
-  // ── AV sequential fetch ────────────────────────────────────────────────────
-  const fetchWithAV = async (sym: string): Promise<{
-    ov: AVOverview; price: number | null;
-    income: AVReport[]; balance: AVReport[]; cashflow: AVReport[];
-    quarterly: AVEarningsQuarter[]; annual: AVEarningsAnnual[];
-    divEntries: AVDividendEntry[]; newsItems: AVNewsItem[];
-  }> => {
-    setStep('overview', 'loading');
-    const ovRaw = await avFetch('OVERVIEW', sym, avKey);
-    const ov = ovRaw as unknown as AVOverview;
-    if (!ov.Name) throw new Error('Ticker not found or Alpha Vantage key is invalid');
-    setCompanyName(ov.Name); setSector(ov.Sector);
-    setStep('overview', 'done');
-    await sleep(1200);
-
-    const quoteRaw = await avFetch('GLOBAL_QUOTE', sym, avKey);
-    const price = parseFloat((quoteRaw['Global Quote'] as Record<string, string>)?.['05. price'] ?? '') || null;
-    await sleep(1200);
-
-    setStep('income', 'loading');
-    const incRaw = await avFetch('INCOME_STATEMENT', sym, avKey) as Record<string, AVReport[]>;
-    const income: AVReport[] = incRaw.annualReports ?? [];
-    setStep('income', 'done');
-    await sleep(1200);
-
-    setStep('balance', 'loading');
-    const balRaw = await avFetch('BALANCE_SHEET', sym, avKey) as Record<string, AVReport[]>;
-    const balance: AVReport[] = balRaw.annualReports ?? [];
-    setStep('balance', 'done');
-    await sleep(1200);
-
-    setStep('cashflow', 'loading');
-    const cfRaw = await avFetch('CASH_FLOW', sym, avKey) as Record<string, AVReport[]>;
-    const cashflow: AVReport[] = cfRaw.annualReports ?? [];
-    setStep('cashflow', 'done');
-    await sleep(1200);
-
-    setStep('earnings', 'loading');
-    const earRaw = await avFetch('EARNINGS', sym, avKey) as Record<string, unknown>;
-    const quarterly: AVEarningsQuarter[] = (earRaw.quarterlyEarnings as AVEarningsQuarter[]) ?? [];
-    const annual: AVEarningsAnnual[]     = (earRaw.annualEarnings    as AVEarningsAnnual[])  ?? [];
-    setStep('earnings', 'done');
-    await sleep(1200);
-
-    setStep('dividends', 'loading');
-    let divEntries: AVDividendEntry[] = [];
-    try {
-      const divRaw = await avFetch('DIVIDENDS', sym, avKey) as Record<string, AVDividendEntry[]>;
-      divEntries = divRaw.data ?? [];
-    } catch { /* not fatal */ }
-    setStep('dividends', 'done');
-    await sleep(1200);
-
-    setStep('news', 'loading');
-    let newsItems: AVNewsItem[] = [];
-    try {
-      const newsRaw = await avFetch('NEWS_SENTIMENT', sym, avKey) as Record<string, unknown>;
-      newsItems = (newsRaw.feed as AVNewsItem[]) ?? [];
-    } catch { /* not fatal */ }
-    setStep('news', 'done');
-
-    return { ov, price, income, balance, cashflow, quarterly, annual, divEntries, newsItems };
-  };
-
-  // ── FMP parallel fetch ─────────────────────────────────────────────────────
-  const fetchWithFMP = async (sym: string): Promise<{
-    ov: AVOverview; price: number | null;
-    income: AVReport[]; balance: AVReport[]; cashflow: AVReport[];
-    quarterly: AVEarningsQuarter[]; annual: AVEarningsAnnual[];
-    divEntries: AVDividendEntry[]; newsItems: AVNewsItem[];
-  }> => {
-    // FMP fetches all endpoints in parallel (no strict rate throttle on free tier)
-    setSteps(prev => prev.map(s => ({ ...s, status: 'loading' })));
-    const data = await fetchAllFMP(sym, fmpKey);
-    if (!data.overview.Name) throw new Error('Ticker not found or FMP key is invalid');
-    setCompanyName(data.overview.Name); setSector(data.overview.Sector);
-    setSteps(prev => prev.map(s => ({ ...s, status: 'done' })));
-    return {
-      ov: data.overview, price: data.price,
-      income: data.income, balance: data.balance, cashflow: data.cashflow,
-      quarterly: data.quarterly, annual: data.annual,
-      divEntries: data.dividends, newsItems: data.news,
-    };
-  };
+  const setStep = (id: string, status: FetchStep['status'], err?: string) =>
+    setSteps(prev => prev.map(s => s.id === id ? { ...s, status, error: err } : s));
 
   const runAnalysis = async () => {
-    const hasAV  = avKey.trim().length > 0;
-    const hasFMP = fmpKey.trim().length > 0;
-    if (!ticker.trim() || (!hasAV && !hasFMP)) return;
-
-    if (hasAV)  localStorage.setItem(LS_AV_KEY,  avKey);
-    if (hasFMP) localStorage.setItem(LS_FMP_KEY, fmpKey);
-
+    if (!ticker.trim() || !apiKey.trim()) return;
+    localStorage.setItem(LS_AV_KEY, apiKey);
     abortRef.current = false;
-    setRunning(true); setDone(false); setError(null);
-    setPhases([]); setRegime(null); setFallbackNotice(null);
+    setRunning(true); setDone(false); setError(null); setPhases([]); setRegime(null);
     setSteps(STEPS.map(s => ({ ...s, status: 'idle' })));
 
     const sym = ticker.trim().toUpperCase();
 
     try {
-      let data: Awaited<ReturnType<typeof fetchWithAV>>;
+      // OVERVIEW
+      setStep('overview', 'loading');
+      const ovRaw = await avFetch('OVERVIEW', sym, apiKey);
+      if (abortRef.current) return;
+      const ov = ovRaw as unknown as AVOverview;
+      if (!ov.Name) throw new Error('Ticker not found or API key is invalid');
+      setCompanyName(ov.Name); setSector(ov.Sector);
+      setStep('overview', 'done');
+      await sleep(1200);
 
-      // Try primary provider, fall back automatically on rate limit
-      if (hasAV) {
-        setActiveProvider('av');
-        try {
-          data = await fetchWithAV(sym);
-        } catch (e: unknown) {
-          const msg = (e instanceof Error ? e.message : '').toLowerCase();
-          const isRateLimit = msg.includes('rate limit') || msg.includes('25 calls') || msg.includes('note');
-          if (isRateLimit && hasFMP) {
-            // Switch to FMP
-            setFallbackNotice('Alpha Vantage rate limit reached — switched to FMP automatically');
-            setActiveProvider('fmp');
-            setSteps(STEPS.map(s => ({ ...s, status: 'idle' })));
-            data = await fetchWithFMP(sym);
-          } else {
-            throw e;
-          }
-        }
-      } else {
-        setActiveProvider('fmp');
-        data = await fetchWithFMP(sym);
-      }
+      // GLOBAL QUOTE
+      const quoteRaw = await avFetch('GLOBAL_QUOTE', sym, apiKey);
+      const price = parseFloat((quoteRaw['Global Quote'] as Record<string, string>)?.['05. price'] ?? '') || null;
+      await sleep(1200);
+
+      // INCOME STATEMENT
+      setStep('income', 'loading');
+      const incRaw = await avFetch('INCOME_STATEMENT', sym, apiKey) as Record<string, AVReport[]>;
+      if (abortRef.current) return;
+      const income: AVReport[] = incRaw.annualReports ?? [];
+      setStep('income', 'done');
+      await sleep(1200);
+
+      // BALANCE SHEET
+      setStep('balance', 'loading');
+      const balRaw = await avFetch('BALANCE_SHEET', sym, apiKey) as Record<string, AVReport[]>;
+      if (abortRef.current) return;
+      const balance: AVReport[] = balRaw.annualReports ?? [];
+      setStep('balance', 'done');
+      await sleep(1200);
+
+      // CASH FLOW
+      setStep('cashflow', 'loading');
+      const cfRaw = await avFetch('CASH_FLOW', sym, apiKey) as Record<string, AVReport[]>;
+      if (abortRef.current) return;
+      const cashflow: AVReport[] = cfRaw.annualReports ?? [];
+      setStep('cashflow', 'done');
+      await sleep(1200);
+
+      // EARNINGS (quarterly + annual)
+      setStep('earnings', 'loading');
+      const earRaw = await avFetch('EARNINGS', sym, apiKey) as Record<string, unknown>;
+      if (abortRef.current) return;
+      const quarterly: AVEarningsQuarter[] = (earRaw.quarterlyEarnings as AVEarningsQuarter[]) ?? [];
+      const annual: AVEarningsAnnual[]     = (earRaw.annualEarnings as AVEarningsAnnual[]) ?? [];
+      setStep('earnings', 'done');
+      await sleep(1200);
+
+      // DIVIDENDS
+      setStep('dividends', 'loading');
+      let divEntries: AVDividendEntry[] = [];
+      try {
+        const divRaw = await avFetch('DIVIDENDS', sym, apiKey) as Record<string, AVDividendEntry[]>;
+        divEntries = divRaw.data ?? [];
+      } catch { /* not fatal */ }
+      setStep('dividends', 'done');
+      await sleep(1200);
+
+      // NEWS SENTIMENT
+      setStep('news', 'loading');
+      let newsItems: AVNewsItem[] = [];
+      try {
+        const newsRaw = await avFetch('NEWS_SENTIMENT', sym, apiKey) as Record<string, unknown>;
+        newsItems = (newsRaw.feed as AVNewsItem[]) ?? [];
+      } catch { /* not fatal */ }
+      setStep('news', 'done');
 
       if (abortRef.current) return;
 
-      const { ov, price, income, balance, cashflow, quarterly, annual, divEntries, newsItems } = data;
-
+      // ── Detect growth regime ONCE (architectural fix) ──
       const detectedRegime = detectGrowthRegime(ov, income, quarterly, annual);
       setRegime(detectedRegime);
 
+      // ── Score all phases ──
       const scored: PhaseScore[] = [
         scoreFinancialHealth(income, balance, cashflow),
         scoreEarningsQuality(quarterly, annual, detectedRegime),
@@ -532,15 +459,14 @@ export function AutoAnalysis() {
   const reset = () => {
     abortRef.current = true;
     setRunning(false); setDone(false); setError(null);
-    setPhases([]); setRegime(null); setFallbackNotice(null);
+    setPhases([]); setRegime(null);
     setSteps(STEPS.map(s => ({ ...s, status: 'idle' })));
-    setCompanyName(''); setSector(''); setActiveProvider(null);
+    setCompanyName(''); setSector('');
   };
 
   const anyRunning = steps.some(s => s.status === 'loading');
   const doneCount  = steps.filter(s => s.status === 'done').length;
   const progressPct = (doneCount / steps.length) * 100;
-  const canRun = ticker.trim() && (avKey.trim() || fmpKey.trim());
 
   return (
     <div style={{ marginBottom: 48 }}>
@@ -556,46 +482,39 @@ export function AutoAnalysis() {
           </span>
         </div>
         <p style={{ margin: '0 0 16px', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
-          Enter a ticker and at least one API key. Provide both for automatic fallback when one is rate-limited.
-          <strong style={{ color: 'var(--text-h)' }}> Alpha Vantage: </strong>25 calls/day, NLP sentiment.
-          <strong style={{ color: 'var(--text-h)' }}> FMP: </strong>250 calls/day, no sentiment scores (Phase 7 degrades).
+          Enter a ticker and your Alpha Vantage API key. Fetches 7 endpoints, detects growth regime, scores each phase 0–100 with growth-adjusted curves, and provides a detailed justification. Free tier: 25 calls/day — this analysis uses 8 calls.
         </p>
 
-        {/* Inputs */}
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
           <input value={ticker} onChange={e => setTicker(e.target.value.toUpperCase())}
             onKeyDown={e => e.key === 'Enter' && !running && runAnalysis()}
             placeholder="Ticker — e.g. AAPL" disabled={running}
-            style={{ width: 130, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '9px 13px', color: 'var(--text-h)', fontSize: 14, fontWeight: 600, outline: 'none', letterSpacing: '0.05em' }} />
-          <input value={avKey} onChange={e => setAvKey(e.target.value)}
-            placeholder="Alpha Vantage key" type="password" disabled={running}
-            style={{ flex: 1, minWidth: 150, background: 'var(--bg)', border: `1px solid ${avKey ? '#6366f150' : 'var(--border)'}`, borderRadius: 8, padding: '9px 13px', color: 'var(--text-h)', fontSize: 13, outline: 'none' }} />
-          <input value={fmpKey} onChange={e => setFmpKey(e.target.value)}
-            placeholder="FMP key (fallback)" type="password" disabled={running}
-            style={{ flex: 1, minWidth: 150, background: 'var(--bg)', border: `1px solid ${fmpKey ? '#10b98150' : 'var(--border)'}`, borderRadius: 8, padding: '9px 13px', color: 'var(--text-h)', fontSize: 13, outline: 'none' }} />
+            style={{ width: 140, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '9px 13px', color: 'var(--text-h)', fontSize: 14, fontWeight: 600, outline: 'none', letterSpacing: '0.05em' }} />
+          <input value={apiKey} onChange={e => setApiKey(e.target.value)}
+            placeholder="Alpha Vantage API key" type="password" disabled={running}
+            style={{ flex: 1, minWidth: 180, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '9px 13px', color: 'var(--text-h)', fontSize: 13, outline: 'none' }} />
           {!running ? (
-            <button onClick={runAnalysis} disabled={!canRun}
-              style={{ background: '#6366f1', border: 'none', borderRadius: 8, padding: '9px 22px', fontSize: 13, fontWeight: 700, color: '#fff', cursor: canRun ? 'pointer' : 'not-allowed', opacity: canRun ? 1 : 0.5, transition: 'opacity 0.15s' }}>
-              Run →
+            <button onClick={runAnalysis} disabled={!ticker.trim() || !apiKey.trim()}
+              style={{ background: '#6366f1', border: 'none', borderRadius: 8, padding: '9px 22px', fontSize: 13, fontWeight: 700, color: '#fff', cursor: ticker.trim() && apiKey.trim() ? 'pointer' : 'not-allowed', opacity: ticker.trim() && apiKey.trim() ? 1 : 0.5, transition: 'opacity 0.15s' }}>
+              Run Analysis →
             </button>
           ) : (
             <button onClick={() => { abortRef.current = true; setRunning(false); }}
-              style={{ background: '#ef4444', border: 'none', borderRadius: 8, padding: '9px 16px', fontSize: 13, fontWeight: 700, color: '#fff', cursor: 'pointer' }}>
+              style={{ background: '#ef4444', border: 'none', borderRadius: 8, padding: '9px 18px', fontSize: 13, fontWeight: 700, color: '#fff', cursor: 'pointer' }}>
               Cancel
             </button>
           )}
           {done && (
-            <button onClick={reset} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '9px 12px', fontSize: 12, color: 'var(--text-muted)', cursor: 'pointer' }}>
+            <button onClick={reset} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '9px 14px', fontSize: 12, color: 'var(--text-muted)', cursor: 'pointer' }}>
               Reset
             </button>
           )}
         </div>
 
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-          <a href="https://www.alphavantage.co/support/#api-key" target="_blank" rel="noreferrer" style={{ color: '#6366f1' }}>Alpha Vantage free key</a>
-          {' '}— 25 calls/day · NLP sentiment ·{' '}
-          <a href="https://site.financialmodelingprep.com/register" target="_blank" rel="noreferrer" style={{ color: '#10b981' }}>FMP free key</a>
-          {' '}— 250 calls/day · no sentiment · provide both for auto-fallback
+        <div style={{ marginTop: 10, fontSize: 11, color: 'var(--text-muted)' }}>
+          Get a free key at{' '}
+          <a href="https://www.alphavantage.co/support/#api-key" target="_blank" rel="noreferrer" style={{ color: '#6366f1' }}>alphavantage.co</a>
+          {' '}· Free tier: 25 calls/day, 5 calls/min
         </div>
       </div>
 
@@ -604,17 +523,14 @@ export function AutoAnalysis() {
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 18px', marginBottom: 20 }}>
           {running && (
             <div style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-h)' }}>
-                    {anyRunning ? 'Fetching data…' : 'Scoring all phases…'}
-                  </span>
-                  <ProviderBadge p={activeProvider} />
-                </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-h)' }}>
+                  {anyRunning ? 'Fetching data…' : 'Scoring all phases…'}
+                </span>
                 <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{doneCount}/{steps.length}</span>
               </div>
               <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: progressPct + '%', background: activeProvider === 'fmp' ? '#10b981' : '#6366f1', borderRadius: 2, transition: 'width 0.4s ease' }} />
+                <div style={{ height: '100%', width: progressPct + '%', background: '#6366f1', borderRadius: 2, transition: 'width 0.4s ease' }} />
               </div>
             </div>
           )}
@@ -637,20 +553,10 @@ export function AutoAnalysis() {
         </div>
       )}
 
-      {/* Fallback notice */}
-      {fallbackNotice && (
-        <div style={{ padding: '10px 14px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.25)', borderRadius: 8, marginBottom: 12, fontSize: 12, color: '#10b981', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span>⇄</span> {fallbackNotice}
-        </div>
-      )}
-
       {/* Error */}
       {error && (
         <div style={{ padding: '14px 16px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, marginBottom: 16, fontSize: 13, color: '#ef4444' }}>
           <strong>Error: </strong>{error}
-          {error.toLowerCase().includes('rate limit') && !avKey && !fmpKey && (
-            <div style={{ marginTop: 6, fontSize: 11 }}>Provide the other provider's key above to enable automatic fallback.</div>
-          )}
         </div>
       )}
 
@@ -660,18 +566,10 @@ export function AutoAnalysis() {
           {/* Company header + regime badge */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '12px 16px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, flexWrap: 'wrap' }}>
             <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-h)' }}>
-                  {companyName} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({ticker.toUpperCase()})</span>
-                </span>
-                <ProviderBadge p={activeProvider} />
+              <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-h)' }}>
+                {companyName} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>({ticker.toUpperCase()})</span>
               </div>
               {sector && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{sector}</div>}
-              {activeProvider === 'fmp' && (
-                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3 }}>
-                  ⚠ FMP mode: analyst target unavailable · Phase 7 sentiment scored at neutral (no NLP data)
-                </div>
-              )}
             </div>
             {regime && (
               <div style={{
@@ -696,7 +594,7 @@ export function AutoAnalysis() {
 
           <div style={{ marginTop: 20, padding: '12px 16px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.65 }}>
             <strong style={{ color: 'var(--text-h)' }}>Important: </strong>
-            Quantitative screening tool — not financial advice. Growth regime uses implied EPS CAGR from P/E ÷ PEG. DCF base case uses forward estimates where available. Phases 1 & 8 require human judgment. When using FMP: analyst target price is unavailable (scored at midpoint), sentiment uses neutral scoring (no NLP), and forward P/E falls back to trailing P/E. Always verify data independently.
+            Quantitative screening tool only — not financial advice. Growth regime detection uses implied EPS CAGR from P/E ÷ PEG. DCF base case uses forward estimates where available; bear case uses historical CAGR. Phase 1 (Business Understanding) and Phase 8 (Decision & Sizing) require human judgment and are not scored. Always do your own due diligence.
           </div>
         </div>
       )}
