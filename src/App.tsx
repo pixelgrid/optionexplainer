@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Nav } from './components/Nav';
 import { Strategies } from './pages/Strategies';
 import { Glossary } from './pages/Glossary';
@@ -31,7 +31,7 @@ import { ResearchFramework } from './pages/ResearchFramework';
 
 export default function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <HashRouter>
       <Nav />
       <Routes>
         <Route path="/" element={<Landing />} />
@@ -63,6 +63,6 @@ export default function App() {
         <Route path="/stocks-glossary" element={<StocksGlossary />} />
         <Route path="/research-framework" element={<ResearchFramework />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
