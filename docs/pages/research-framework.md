@@ -81,17 +81,18 @@ No tool links. Focus: business model, moat, TAM, revenue type (recurring vs tran
 - `/stocks-glossary` — Stock Ratios Reference
 
 **Checklist highlights:**
-- Revenue CAGR 3–5 years
+- Revenue CAGR 3–5 years (auto-analysis uses up to 4yr lookback dynamically)
 - Gross margin stable or expanding?
-- FCF consistently positive? FCF margin vs net margin?
-- Net Debt / EBITDA below 3×?
-- Interest coverage > 5×?
+- FCF: for high-growth companies focus on **FCF margin** (≥10% is solid); for mature companies focus on **FCF conversion ratio** (FCF / net income ≥ 85%)
+- Net Debt / EBITDA below 3×? (not computable when EBITDA is negative — assess absolute debt vs revenue instead)
+- Interest coverage > 5×? (not meaningful when EBIT is negative — evaluate debt load relative to revenue)
 - Working capital trend (rising DSO = revenue quality concern)
+- SBC as % of revenue — if > 10%, GAAP margins understate true cost
 - Piotroski F-Score ≥ 7
 - Altman Z-Score > 2.6
 - SG&A and R&D growing slower than revenue?
 
-**Red flags:** Revenue growing but FCF declining; net income positive but OCF negative; share count increasing rapidly.
+**Red flags:** Revenue growing but FCF declining; net income positive but OCF negative; EBITDA negative with significant debt; share count increasing >3%/yr (check SHARES_OUTSTANDING history).
 
 ---
 
@@ -103,14 +104,16 @@ No tool links. Focus: business model, moat, TAM, revenue type (recurring vs tran
 
 **Checklist highlights:**
 - EPS beat rate over last 8 quarters > 75%?
-- Revenue beat rate > 65%?
-- Average EPS surprise > 3%?
+- **Recent 4Q beat rate** — is execution improving or deteriorating vs the full 8Q record?
+- Average EPS surprise > 3%? (but check: if actual EPS growth is flat or negative, high surprise % may just reflect conservative guidance, not real outperformance)
+- Forward EPS estimates: are analyst revisions trending up or down quarter-over-quarter?
 - Any "kitchen sink" quarters with large write-offs?
 - Guidance trend: raising or cutting?
+- Is EPS growth from genuine operations, or driven by buybacks/lower tax rate?
 
-**Red flags:** Back-to-back revenue misses; EPS beat from buybacks/tax, not growth; guidance cut mid-year; recurring "non-recurring" charges.
+**Red flags:** Back-to-back revenue misses; EPS beat from buybacks/tax only; guidance cut mid-year; recurring "non-recurring" charges; beat rate strong over 8Q but deteriorating in last 4Q.
 
-**Pro tip:** What matters is results vs expectations. A company growing EPS 20% against a 25% expectation will sell off. Always anchor to consensus, not absolute numbers.
+**Pro tip:** What matters is results vs expectations. A company growing EPS 20% against a 25% expectation will sell off. Always anchor to consensus, not absolute numbers. Watch forward estimate revisions — they lead price more reliably than past beats.
 
 ---
 
@@ -122,14 +125,16 @@ No tool links. Focus: business model, moat, TAM, revenue type (recurring vs tran
 - `/stocks-glossary` — Stock Ratios Reference
 
 **Checklist highlights:**
-- P/E vs sector median — premium justified by growth?
-- PEG ratio below 1.5?
-- EV/EBITDA vs sector?
-- P/FCF below 20× (FCF yield > 5%)?
-- Current price vs analyst target and 52-week range?
+- P/E vs sector median — premium justified by growth? For high-growth companies use growth-adjusted P/E (normalized PEG = P/E ÷ EPS CAGR); for mature companies use strict bands
+- **Negative PEG ratio** = forward earnings expected to decline; treat as value/mature stock regardless of other growth signals
+- PEG ratio below 1.5? (below 1.0 = Peter Lynch's golden zone)
+- EV/EBITDA vs sector? (not meaningful when EBITDA is negative — use EV/Sales instead for pre-profit companies)
+- For high-growth companies: **EV/Revenue** (EV/Sales) is a better cross-company comparator than 52-week range position
+- Check whether PEG-implied growth rate aligns with direct analyst EPS estimate forecasts — large divergence (>15pp) signals the DCF input may be unreliable
+- Current price vs analyst target — for high-growth stocks, analyst targets frequently lag price; weigh accordingly
 - Multiple contracted or expanded YTD vs earnings growth?
 
-**Green flags:** P/FCF below 15× with consistent >10% FCF growth; stock at discount to 3-year average multiple; PEG below 1.0; EV/EBITDA below sector median with ROIC above sector.
+**Green flags:** P/FCF below 15× with consistent >10% FCF growth; stock at discount to 3-year average multiple; PEG below 1.0; EV/EBITDA below sector median with ROIC above sector; EV/Sales below 5× for a high-growth company.
 
 ---
 
@@ -140,17 +145,20 @@ No tool links. Focus: business model, moat, TAM, revenue type (recurring vs tran
 - `/dcf` — DCF Calculator
 
 **Checklist highlights:**
-- Base case: consensus revenue growth for years 1–3, conservative beyond
+- Base case: consensus revenue growth for years 1–3 (use direct analyst EPS estimate growth if available; PEG-implied CAGR as secondary source), conservative beyond
+- Cap growth assumptions at **40%/yr** for the projection period — higher rates rarely hold over 5 years
 - Bull case: company executes its best stated targets
-- Bear case: growth halves, margins compress 200bps
+- Bear case: include **negative growth scenarios** (down to -20%/yr for highly cyclical or leveraged companies)
 - WACC 9–11% for most US large-cap
 - Terminal growth 2–3%, never above GDP
-- Margin of safety target: 20–40% below base case intrinsic value
+- **Subtract net debt** (total debt minus cash) from enterprise value to get equity value per share — this is the number to compare against current price
+- Margin of safety target: 20–40% below base case **equity** intrinsic value
+- Verify share count against SHARES_OUTSTANDING registry — OVERVIEW's figure can lag for companies actively buying back
 - Reverse DCF: what growth rate does today's price imply?
 
-**Key metrics:** WACC, terminal growth rate, FCF margin projected, intrinsic value range (bear/base/bull), margin of safety, implied growth rate.
+**Key metrics:** WACC, terminal growth rate, FCF margin projected, intrinsic equity value range (bear/base/bull), margin of safety, implied growth rate, net debt per share.
 
-**Pro tip:** The most useful DCF output is the *reverse* — plug in the current price and solve for the implied growth rate. If the market implies 35% CAGR for 10 years and the business has never grown above 20%, the stock is priced for perfection.
+**Pro tip:** The most useful DCF output is the *reverse* — plug in the current price and solve for the implied growth rate. If the market implies 35% CAGR for 10 years and the business has never grown above 20%, the stock is priced for perfection. Also verify that the PEG-implied growth rate is consistent with direct analyst estimate forecasts — a large divergence means your DCF inputs need scrutiny.
 
 ---
 
@@ -161,24 +169,44 @@ No tool links. Focus: business model, moat, TAM, revenue type (recurring vs tran
 - `/dividends` — Dividend Safety Dashboard
 
 **Checklist highlights:**
+
+**Dividend payers:**
 - FCF payout ratio below 70%?
 - Earnings payout ratio below 60%?
 - Dividend growth consistent over 5+ years?
 - Is the company a Dividend Aristocrat (25+ years increases)?
 - Debt-funded dividend? (debt rising while dividend paid)
-- Total shareholder yield = dividend yield + buyback yield?
 - Yield anomalously high (>6% often signals expected cut)?
 
-**Red flags:** Payout ratio above 100% of FCF; yield trap (stock collapsed, yield artificially high); dividend cut history; high debt + high payout in rising rate environment.
+**Non-dividend payers:**
+- FCF yield (FCF / live market cap using current price) — is cash being generated?
+- **Net buyback yield** = (gross buybacks − SBC) / market cap. A company repurchasing $2B while granting $2B in stock options has a net buyback yield of 0% — no real capital return
+- **Return on equity** (ROIC proxy) — is the reinvested capital generating returns above cost of capital?
+- Is there a clear capital allocation policy, or is cash accumulating with no stated return mechanism?
+- **Share count trajectory**: verify via SHARES_OUTSTANDING history — a buyback program offset entirely by SBC means shares are not actually shrinking
+
+**Red flags (both):** Net buyback yield negative (SBC exceeds gross buybacks); payout ratio above 100% of FCF; yield trap; dividend cut history; high debt + buybacks simultaneously (EBITDA/Net Debt > 2× with active repurchases).
 
 ---
 
-### Phase 7 — Risk & Position Sizing
+### Phase 7 — Sentiment, Insider Activity & Risk
 **Accent:** `#ef4444` (red)
 
 **Tool links:** (none defined in PHASES data)
 
 **Checklist highlights:**
+
+**News sentiment:**
+- Is the 90-day news narrative positive, negative, or neutral?
+- Is sentiment trending in or against the direction of your thesis?
+
+**Insider activity (INSIDER_TRANSACTIONS — last 180 days):**
+- Are insiders net buyers or sellers by dollar value?
+- Net buy ratio > 60%: constructive signal — insiders have skin in the game
+- Net sell ratio > 70%: warrants scrutiny, though selling alone may reflect diversification or liquidity needs
+- Insider buying during an earnings trough is a particularly strong signal of management confidence
+
+**Risk & position sizing:**
 - Maximum position size for conviction level?
 - Defined stop-loss or thesis break level?
 - Macro risks (rate sensitivity, FX, commodities)?
@@ -218,12 +246,33 @@ Each active phase shows:
 
 ## AutoAnalysis Component
 
-The page imports `AutoAnalysis` from `src/components/AutoAnalysis`. This component (details in its own documentation) may use the stored Alpha Vantage key to automatically run a quick analysis when a ticker is entered. It lives at the top or bottom of the framework page as a "quick start" feature.
+The page imports `AutoAnalysis` from `src/components/AutoAnalysis`. This component uses the stored Alpha Vantage key to run a full automated analysis when a ticker is entered — covering Phases 2–7 with growth-regime-adjusted scoring. See `docs/pages/auto-analysis.md` for full details.
+
+**Data sources used (11 API calls):**
+- Company overview, live price, income statement, balance sheet, cash flow — core financials
+- Earnings history (8Q) — beat rate, surprise, trough detection
+- Dividend history — payout coverage
+- News sentiment — AV NLP scores
+- **Earnings estimates** — forward EPS revision signals and DCF fallback growth rate
+- **Insider transactions** — net buy/sell ratio over last 180 days
+- **Shares outstanding history** — annualised dilution rate; fresher share count for DCF
+
+**Phase-by-phase automation summary:**
+
+| Phase | What the auto-analysis adds beyond the manual checklist |
+|-------|--------------------------------------------------------|
+| 2 — Financial Health | Regime-aware FCF scoring (margin vs conversion); negative EBIT/EBITDA guards; dynamic CAGR lookback |
+| 3 — Earnings Quality | Recent 4Q beat rate vs historical; sandbagging cap when EPS growth ≤ 0; forward estimate revision signal |
+| 4 — Valuation | Growth-adjusted P/E; EV/Sales for high-growth; negative EBITDA suppression; analyst estimate cross-check |
+| 5 — Auto-DCF | Net-debt-adjusted equity value; analyst estimate fallback; bear floor to -20%; growth cap at 40% |
+| 6 — Capital Return | Live market cap for yield; ROE sub-criterion; capital allocation clarity; dilution signal from share registry |
+| 7 — Sentiment | Insider net buy/sell ratio with trough-modifier; rolling news trend |
 
 ---
 
 ## Limitations
 
-- **Entirely static content** — the framework does not pull live data into the checklist. It is a process guide, not an automated screener.
-- **Phase 7 has no tool links** — risk and position sizing is addressed conceptually but no dedicated in-app tool exists for it.
+- **Entirely static manual content** — the framework checklist does not pull live data. It is a process guide; the AutoAnalysis component provides the quantitative automation.
+- **Phase 7 has no dedicated tool page** — insider and sentiment signals are surfaced only through the AutoAnalysis component.
 - The framework is opinionated toward fundamental long-term equity analysis. It is less applicable to pure momentum, macro, or short-term trading approaches.
+- **11 API calls per AutoAnalysis run** — on a free AV key (25/day), two full analyses exhaust the daily quota.
