@@ -94,6 +94,25 @@ export interface AVNewsItem {
   ticker_sentiment?: { ticker: string; ticker_sentiment_score: string; ticker_sentiment_label: string }[];
 }
 
+export interface AVEarningsEstimate {
+  fiscalDateEnding: string;
+  estimatedEPS: string;
+  numberOfAnalysts?: string;
+  EPSEstimated?: string;
+}
+
+export interface AVInsiderTransaction {
+  transactionType: string;   // 'P' = purchase, 'S' = sale
+  shares: string;
+  sharePrice: string;
+  transactionDate: string;
+}
+
+export interface AVSharesEntry {
+  date: string;
+  commonStockSharesOutstanding: string;
+}
+
 // ── Utility ───────────────────────────────────────────────────────────────────
 
 function gradeFromScore(s: number): Grade {
@@ -176,6 +195,9 @@ export function detectGrowthRegime(
     primary = 'mature';
   }
 
+  // 4a: negative PEG forces mature classification
+  if (peg != null && peg < 0) primary = 'mature';
+
   // ── Step 2: Apply recovery modifier independently — does NOT change primary ──
   const modifier: RegimeModifier = isTrough ? 'recovery' : null;
 
@@ -196,7 +218,7 @@ export function detectGrowthRegime(
 // Fixes: 1 (FCF contradiction), 2 (SBC flag)
 
 export function scoreFinancialHealth(
-  income: AVReport[], balance: AVReport[], cashflow: AVReport[]
+  income: AVReport[], balance: AVReport[], cashflow: AVReport[], regime: GrowthRegimeInfo
 ): PhaseScore {
   const details: ScoreDetail[] = [];
   const flags: { text: string; type: FlagType }[] = [];
@@ -216,15 +238,17 @@ export function scoreFinancialHealth(
     });
   }
 
-  // ── Revenue CAGR (3yr) — 20pts ──
-  const revs = income.slice(0, 4).map(s => r(s, 'totalRevenue'));
+  // ── Revenue CAGR — 20pts (extended lookback) ──
+  const cagrYears = Math.min(income.length - 1, 4); // use up to 4 years if available
+  const revFirst = income[0] ? r(income[0], 'totalRevenue') : null;
+  const revLast  = income[cagrYears] ? r(income[cagrYears], 'totalRevenue') : null;
   let revCagr: number | null = null;
-  if (revs[0] != null && revs[3] != null && revs[3] > 0)
-    revCagr = Math.pow(revs[0] / revs[3], 1 / 3) - 1;
+  if (revFirst != null && revLast != null && revLast > 0 && cagrYears > 0)
+    revCagr = Math.pow(revFirst / revLast, 1 / cagrYears) - 1;
   const revPts = revCagr == null ? 8 :
     revCagr > 0.20 ? 20 : revCagr > 0.10 ? 15 : revCagr > 0.05 ? 10 : revCagr > 0 ? 6 : 2;
   total += revPts;
-  details.push({ label: 'Revenue CAGR (3yr)', value: pctLabel(revCagr), points: revPts, maxPoints: 20,
+  details.push({ label: `Revenue CAGR (${cagrYears}yr)`, value: pctLabel(revCagr), points: revPts, maxPoints: 20,
     note: revCagr == null ? 'Insufficient history' : revCagr > 0.15 ? 'Strong top-line growth' : revCagr > 0.05 ? 'Moderate growth' : revCagr > 0 ? 'Slow growth' : 'Revenue declining' });
   if (revCagr != null && revCagr < 0) flags.push({ text: 'Revenue declining — top-line is shrinking', type: 'bad' });
   if (revCagr != null && revCagr > 0.20) flags.push({ text: `Strong revenue CAGR of ${(revCagr * 100).toFixed(0)}% — top-line momentum is excellent`, type: 'good' });
@@ -253,10 +277,8 @@ export function scoreFinancialHealth(
   if (omTrend != null && omTrend < -0.03) flags.push({ text: `Operating margin down ${(Math.abs(omTrend) * 100).toFixed(1)}pp — SG&A or R&D growing faster than revenue`, type: 'bad' });
   if (omTrend != null && omTrend > 0.03) flags.push({ text: `Operating leverage evident — GAAP margin expanding ${(omTrend * 100).toFixed(1)}pp`, type: 'good' });
 
-  // ── FCF Conversion Quality — 15pts (Fix 1) ──
-  // Score is driven by FCF/Net Income (conversion ratio), NOT FCF/Revenue (margin).
-  // FCF margin is shown as the displayed value but does NOT drive the score.
-  // The positive "exceptional margin" signal only fires when BOTH conversion ≥ 85% AND margin > 15%.
+  // ── FCF Quality — 15pts (2a: regime-split scoring) ──
+  const isHighGrowthP2 = regime.primary === 'high_growth' || regime.primary === 'inflection';
   let fcfPts = 7;
   let fcfNote = 'Data unavailable';
   let fcfLabel = '—';
@@ -273,41 +295,52 @@ export function scoreFinancialHealth(
     fcfMargin = fcf != null && rev != null && rev > 0 ? fcf / rev : null;
     fcfConversionRatio = fcf != null && ni != null && ni !== 0 ? fcf / Math.abs(ni) : null;
 
-    // Display: show both conversion ratio and margin
-    if (fcfConversionRatio != null) {
-      fcfLabel = `${(fcfConversionRatio * 100).toFixed(0)}% conv${fcfMargin != null ? ` · ${(fcfMargin * 100).toFixed(1)}% margin` : ''}`;
-    } else if (fcfMargin != null) {
-      fcfLabel = `${(fcfMargin * 100).toFixed(1)}% margin`;
-    }
-
-    // Score is conversion ratio
-    if (fcfConversionRatio != null) {
-      fcfPts = fcfConversionRatio > 1.2 ? 15 : fcfConversionRatio > 0.85 ? 12 : fcfConversionRatio > 0.60 ? 8 : fcfConversionRatio > 0.30 ? 4 : 1;
-      fcfNote = fcfConversionRatio > 1.2 ? 'FCF exceeds net income — high earnings quality, no accrual games' :
-        fcfConversionRatio > 0.85 ? 'Strong cash conversion — FCF closely tracks reported earnings' :
-        fcfConversionRatio > 0.60 ? 'Moderate conversion — FCF below earnings; check working capital movements' :
-        'Low cash conversion — reported earnings significantly exceed FCF; potential earnings quality concern';
-
-      if (fcfConversionRatio < 0.50 && ni != null && ni > 0)
-        flags.push({ text: 'Net income significantly exceeds FCF — check receivables buildup or aggressive revenue recognition', type: 'bad' });
-      if (fcfConversionRatio > 1.20)
-        flags.push({ text: 'FCF exceeds net income — earnings quality is high; D&A and working capital are additive to cash', type: 'good' });
-
-      // Guard (Fix 1): positive FCF margin signal fires only when conversion is also ≥ 85%
-      if (fcfMargin != null && fcfMargin > 0.15 && fcfConversionRatio >= 0.85) {
-        flags.push({ text: `FCF margin ${(fcfMargin * 100).toFixed(1)}% and conversion ${(fcfConversionRatio * 100).toFixed(0)}% — both strong; cash generation is high quality`, type: 'good' });
-      } else if (fcfMargin != null && fcfMargin > 0.15 && fcfConversionRatio < 0.85) {
-        // Healthy margin but below-average conversion — surface nuanced signal, not positive checkmark
-        flags.push({ text: `FCF margin ${(fcfMargin * 100).toFixed(1)}% is healthy but cash conversion is only ${(fcfConversionRatio * 100).toFixed(0)}% of net income — gap may reflect heavy working capital build or capitalised costs`, type: 'neutral' });
+    if (isHighGrowthP2) {
+      // High-growth / inflection: score on FCF margin (conversion ratio less meaningful pre-scale)
+      fcfLabel = fcfMargin != null ? `${(fcfMargin * 100).toFixed(1)}% margin` : '—';
+      if (fcfMargin != null) {
+        fcfPts = fcfMargin >= 0.20 ? 15 : fcfMargin >= 0.10 ? 11 : fcfMargin >= 0 ? 7 : 3;
+        fcfNote = fcfMargin >= 0.20 ? 'Strong FCF margin for a high-growth company — cash generation is already scaling' :
+          fcfMargin >= 0.10 ? 'Solid FCF margin — building towards cash generation at scale' :
+          fcfMargin >= 0 ? 'Positive but thin FCF margin — typical for high-growth investment phase' :
+          'Negative FCF margin — company is investing heavily; monitor burn rate';
+        if (fcfMargin >= 0.20) flags.push({ text: `FCF margin ${(fcfMargin * 100).toFixed(1)}% is exceptional for a high-growth company — cash compounding ahead of most peers`, type: 'good' });
+        if (fcfMargin < 0) flags.push({ text: 'Negative FCF — evaluate whether this is an investment-phase build or structural weakness', type: 'bad' });
+      } else if (fcf != null && fcf < 0) {
+        fcfPts = 3; fcfNote = 'Negative free cash flow — company consuming cash';
+        flags.push({ text: 'Negative FCF — evaluate whether this is an investment-phase build or structural weakness', type: 'bad' });
       }
-    } else if (fcf != null && fcf < 0) {
-      fcfPts = 1; fcfNote = 'Negative free cash flow — company consuming cash';
-      flags.push({ text: 'Negative FCF — evaluate whether this is an investment-phase build or structural weakness', type: 'bad' });
+    } else {
+      // Moderate / mature: score on conversion ratio (existing logic)
+      if (fcfConversionRatio != null) {
+        fcfLabel = `${(fcfConversionRatio * 100).toFixed(0)}% conv${fcfMargin != null ? ` · ${(fcfMargin * 100).toFixed(1)}% margin` : ''}`;
+        fcfPts = fcfConversionRatio > 1.2 ? 15 : fcfConversionRatio > 0.85 ? 12 : fcfConversionRatio > 0.60 ? 8 : fcfConversionRatio > 0.30 ? 4 : 1;
+        fcfNote = fcfConversionRatio > 1.2 ? 'FCF exceeds net income — high earnings quality, no accrual games' :
+          fcfConversionRatio > 0.85 ? 'Strong cash conversion — FCF closely tracks reported earnings' :
+          fcfConversionRatio > 0.60 ? 'Moderate conversion — FCF below earnings; check working capital movements' :
+          'Low cash conversion — reported earnings significantly exceed FCF; potential earnings quality concern';
+        if (fcfConversionRatio < 0.50 && ni != null && ni > 0)
+          flags.push({ text: 'Net income significantly exceeds FCF — check receivables buildup or aggressive revenue recognition', type: 'bad' });
+        if (fcfConversionRatio > 1.20)
+          flags.push({ text: 'FCF exceeds net income — earnings quality is high; D&A and working capital are additive to cash', type: 'good' });
+        if (fcfMargin != null && fcfMargin > 0.15 && fcfConversionRatio >= 0.85) {
+          flags.push({ text: `FCF margin ${(fcfMargin * 100).toFixed(1)}% and conversion ${(fcfConversionRatio * 100).toFixed(0)}% — both strong; cash generation is high quality`, type: 'good' });
+        } else if (fcfMargin != null && fcfMargin > 0.15 && fcfConversionRatio < 0.85) {
+          flags.push({ text: `FCF margin ${(fcfMargin * 100).toFixed(1)}% is healthy but cash conversion is only ${(fcfConversionRatio * 100).toFixed(0)}% of net income — gap may reflect heavy working capital build or capitalised costs`, type: 'neutral' });
+        }
+      } else if (fcf != null && fcf < 0) {
+        fcfPts = 1; fcfNote = 'Negative free cash flow — company consuming cash';
+        flags.push({ text: 'Negative FCF — evaluate whether this is an investment-phase build or structural weakness', type: 'bad' });
+      } else if (fcfMargin != null) {
+        fcfLabel = `${(fcfMargin * 100).toFixed(1)}% margin`;
+      }
     }
   }
 
   total += fcfPts;
-  details.push({ label: 'FCF Conversion / Quality', value: fcfLabel, points: fcfPts, maxPoints: 15, note: fcfNote, warning: sbcWarning && fcfConversionRatio != null && fcfConversionRatio < 0.85 ? sbcWarning : undefined });
+  const fcfDetailLabel = isHighGrowthP2 ? 'FCF Margin' : 'FCF Conversion / Quality';
+  details.push({ label: fcfDetailLabel, value: fcfLabel, points: fcfPts, maxPoints: 15, note: fcfNote,
+    warning: sbcWarning && !isHighGrowthP2 && fcfConversionRatio != null && fcfConversionRatio < 0.85 ? sbcWarning : undefined });
 
   // ── Leverage — 20pts ──
   let levPts = 10; let levNote = 'Data unavailable'; let levLabel = '—';
@@ -319,18 +352,25 @@ export function scoreFinancialHealth(
     const da = cf0 ? r(cf0, 'depreciationDepletionAndAmortization') : null;
     const oi = income[0] ? r(income[0], 'operatingIncome') : null;
     const ebitda = income[0] ? (r(income[0], 'ebitda') ?? (oi != null && da != null ? oi + Math.abs(da) : oi)) : null;
-    const ratio = ebitda != null && ebitda > 0 ? netDebt / ebitda : null;
-    levLabel = ratio != null ? xLabel(ratio) : '—';
-    if (ratio != null) {
-      levPts = ratio < 0 ? 20 : ratio < 1 ? 18 : ratio < 2 ? 14 : ratio < 3 ? 9 : ratio < 4 ? 4 : 1;
-      levNote = ratio < 0 ? 'Net cash position — zero leverage risk' :
-        ratio < 1 ? 'Very low leverage — less than 1yr EBITDA to repay all net debt' :
-        ratio < 2 ? 'Conservative leverage — well within investment-grade thresholds' :
-        ratio < 3 ? 'Moderate leverage — monitor in rising rate environment' :
-        ratio < 4 ? 'Elevated leverage — limited financial flexibility' :
-        'High leverage — debt servicing may crowd out investment and dividends';
-      if (ratio > 3.5) flags.push({ text: `Net Debt/EBITDA of ${ratio.toFixed(1)}x is elevated — covenant and refinancing risk`, type: 'bad' });
-      if (ratio < 0.5) flags.push({ text: `Near debt-free (${ratio.toFixed(1)}x) — balance sheet is a competitive advantage`, type: 'good' });
+    if (ebitda != null && ebitda <= 0) {
+      levPts = 5;
+      levLabel = 'N/A — EBITDA negative';
+      levNote = 'EBITDA is negative — leverage ratio not computable';
+      flags.push({ text: 'EBITDA negative — leverage ratio not meaningful; evaluate absolute debt level instead', type: 'bad' });
+    } else {
+      const ratio = ebitda != null && ebitda > 0 ? netDebt / ebitda : null;
+      levLabel = ratio != null ? xLabel(ratio) : '—';
+      if (ratio != null) {
+        levPts = ratio < 0 ? 20 : ratio < 1 ? 18 : ratio < 2 ? 14 : ratio < 3 ? 9 : ratio < 4 ? 4 : 1;
+        levNote = ratio < 0 ? 'Net cash position — zero leverage risk' :
+          ratio < 1 ? 'Very low leverage — less than 1yr EBITDA to repay all net debt' :
+          ratio < 2 ? 'Conservative leverage — well within investment-grade thresholds' :
+          ratio < 3 ? 'Moderate leverage — monitor in rising rate environment' :
+          ratio < 4 ? 'Elevated leverage — limited financial flexibility' :
+          'High leverage — debt servicing may crowd out investment and dividends';
+        if (ratio > 3.5) flags.push({ text: `Net Debt/EBITDA of ${ratio.toFixed(1)}x is elevated — covenant and refinancing risk`, type: 'bad' });
+        if (ratio < 0.5) flags.push({ text: `Near debt-free (${ratio.toFixed(1)}x) — balance sheet is a competitive advantage`, type: 'good' });
+      }
     }
   }
   total += levPts;
@@ -341,7 +381,21 @@ export function scoreFinancialHealth(
   if (income[0]) {
     const ebit = r(income[0], 'operatingIncome') ?? r(income[0], 'ebit');
     const ie = r(income[0], 'interestExpense');
-    if (ebit != null && ie != null && ie !== 0) {
+    const totalDebtIC = balance[0] ? (r(balance[0], 'shortLongTermDebtTotal') ?? r(balance[0], 'longTermDebt') ?? 0) : 0;
+    const revIC = r(income[0], 'totalRevenue') ?? 0;
+
+    if (ebit != null && ebit < 0) {
+      // Negative EBIT — do not compute ratio
+      if (totalDebtIC < revIC) {
+        icPts = 5; icLabel = 'N/A (loss)';
+        icNote = 'Operating loss but debt is low relative to revenue — coverage not meaningful in current period';
+        flags.push({ text: 'Operating loss but low debt burden — interest coverage not meaningful; monitor path to profitability', type: 'neutral' });
+      } else {
+        icPts = 0; icLabel = 'N/A (loss)';
+        icNote = 'Operating loss with significant debt — coverage ratio negative; debt service is a material risk';
+        flags.push({ text: 'Operating loss with significant debt — negative interest coverage; debt servicing risk is elevated', type: 'bad' });
+      }
+    } else if (ebit != null && ie != null && ie !== 0) {
       const cov = ebit / Math.abs(ie);
       icLabel = xLabel(cov);
       icPts = cov > 10 ? 15 : cov > 5 ? 12 : cov > 3 ? 8 : cov > 1.5 ? 3 : 0;
@@ -379,7 +433,8 @@ export function scoreFinancialHealth(
 export function scoreEarningsQuality(
   quarterly: AVEarningsQuarter[],
   annual: AVEarningsAnnual[],
-  regime: GrowthRegimeInfo
+  regime: GrowthRegimeInfo,
+  estimatesData?: AVEarningsEstimate[]
 ): PhaseScore {
   const details: ScoreDetail[] = [];
   const flags: { text: string; type: FlagType }[] = [];
@@ -402,13 +457,38 @@ export function scoreEarningsQuality(
   if (beatRate != null && beatRate >= 0.875) flags.push({ text: `EPS beat rate of ${(beatRate * 100).toFixed(0)}% over last ${q.length}Q — conservative guidance culture; management consistently exceeds estimates`, type: 'good' });
   if (beatRate != null && beatRate < 0.5) flags.push({ text: `Only ${(beatRate * 100).toFixed(0)}% EPS beat rate — execution risk is elevated`, type: 'bad' });
 
+  // 3a: recency-weighted beat rate — flags only, score unchanged
+  const recent4 = q.slice(0, 4);
+  const recentBeats = recent4.filter(e => nn(e.surprisePercentage) != null && nn(e.surprisePercentage)! > 0).length;
+  const recentBeatRate = recent4.length > 0 ? recentBeats / recent4.length : null;
+  if (recentBeatRate != null && beatRate != null) {
+    if (recentBeatRate < 0.5 && beatRate >= 0.75)
+      flags.push({ text: 'Beat rate deteriorating — missed in 2+ of last 4 quarters despite strong historical record', type: 'bad' });
+    if (recentBeatRate >= 0.75 && beatRate < 0.5)
+      flags.push({ text: 'Execution improving — beating in 3+ of last 4 quarters despite weak historical record', type: 'good' });
+  }
+
+  // 3b: compute EPS growth YoY early for sandbagging cap
+  let epsGrowthForCap: number | null = null;
+  if (q.length >= 5) {
+    const cEPS = nn(q[0].reportedEPS);
+    const pEPS = nn(q[4].reportedEPS);
+    if (cEPS != null && pEPS != null && pEPS !== 0 && pEPS > 0)
+      epsGrowthForCap = (cEPS - pEPS) / pEPS;
+  }
+
   // ── Average Surprise % — 25pts ──
   const surprises = q.map(e => nn(e.surprisePercentage)).filter((v): v is number => v != null);
   const avgSurprise = surprises.length > 0 ? surprises.reduce((a, b) => a + b, 0) / surprises.length : null;
   const surprisePts = avgSurprise == null ? 8 :
     avgSurprise > 8 ? 25 : avgSurprise > 5 ? 21 : avgSurprise > 3 ? 16 : avgSurprise > 1 ? 10 : avgSurprise > 0 ? 5 : 2;
-  total += surprisePts;
-  details.push({ label: 'Avg EPS Surprise', value: avgSurprise != null ? (avgSurprise > 0 ? '+' : '') + avgSurprise.toFixed(1) + '%' : '—', points: surprisePts, maxPoints: 25,
+  let finalSurprisePts = surprisePts;
+  if (epsGrowthForCap != null && epsGrowthForCap <= 0 && finalSurprisePts > 15) {
+    finalSurprisePts = 15;
+    flags.push({ text: 'High beat rate may reflect conservative guidance; actual EPS growth is flat or negative — surprise score capped', type: 'neutral' });
+  }
+  total += finalSurprisePts;
+  details.push({ label: 'Avg EPS Surprise', value: avgSurprise != null ? (avgSurprise > 0 ? '+' : '') + avgSurprise.toFixed(1) + '%' : '—', points: finalSurprisePts, maxPoints: 25,
     note: avgSurprise == null ? 'No data' :
       avgSurprise > 5 ? 'Consistently beating by wide margins — high earnings visibility and conservative guidance' :
       avgSurprise > 2 ? 'Regular positive surprises — management sets beatable targets' :
@@ -427,10 +507,11 @@ export function scoreEarningsQuality(
       growthLabel = pctLabel(g);
 
       // Fix 3: Trough detection — is the prior Q the lowest in trailing 4 years?
+      // annualEarnings[0] = most recent fiscal year, annualEarnings[2] = 3 fiscal years ago (index 2 = 3 years back)
       const allAnnualEPS = annual.slice(0, 5).map(a => nn(a.reportedEPS)).filter((v): v is number => v != null);
       const epsMin = allAnnualEPS.length > 1 ? Math.min(...allAnnualEPS.slice(1)) : null;
       const ltmEPS = nn(annual[0]?.reportedEPS);
-      const eps3yrAgo = nn(annual[3]?.reportedEPS);
+      const eps3yrAgo = nn(annual[2]?.reportedEPS);
       const isTroughYear = regime.isTrough;
       // Also detect if the comparison year (prev Q) was part of a trough
       const prevYearAnnual = nn(annual[1]?.reportedEPS);
@@ -449,7 +530,7 @@ export function scoreEarningsQuality(
         rawPts = Math.min(rawPts, 20);
         troughWarning = `Recovery phase — growth measured off a trough year; 3yr CAGR is ${pctLabel(cagr3yr)}`;
         growthNote = `Recovery-phase growth (+${(g * 100).toFixed(0)}% YoY off trough). 3yr EPS CAGR: ${pctLabel(cagr3yr)}. Recovery growth is structurally easier than compounding growth and is discounted in the score.`;
-        flags.push({ text: `YoY EPS growth of ${pctLabel(g)} is measured off a cyclical trough — recovery growth; 3yr EPS CAGR is ${pctLabel(cagr3yr)}`, type: 'neutral' });
+        flags.push({ text: `YoY EPS growth of ${pctLabel(g)} is measured off a cyclical trough — recovery growth; 3yr EPS CAGR is ${pctLabel(cagr3yr)}`, type: 'neutral' }); // "3yr" not "3-year"
       } else {
         growthNote = g > 0.25 ? 'Accelerating EPS growth — earnings power compounding strongly' :
           g > 0.10 ? `Solid EPS growth${cagr3yr != null ? `; 3yr CAGR ${pctLabel(cagr3yr)}` : ''}` :
@@ -472,6 +553,22 @@ export function scoreEarningsQuality(
   details.push({ label: 'Execution Consistency', value: beatRate != null ? `${beats}/${q.length} beats` : '—', points: revBeatPts, maxPoints: 20,
     note: `Measured over last ${q.length} quarters. Consistent execution signals strong management forecasting ability and business visibility.` });
 
+  // Estimates revision signal (flags only — no score change)
+  if (estimatesData && estimatesData.length >= 2) {
+    const futureEsts = estimatesData
+      .filter(e => e.fiscalDateEnding > (quarterly[0]?.fiscalDateEnding ?? ''))
+      .slice(0, 2);
+    if (futureEsts.length >= 2) {
+      const est0 = nn(futureEsts[0].estimatedEPS ?? futureEsts[0].EPSEstimated);
+      const est1 = nn(futureEsts[1].estimatedEPS ?? futureEsts[1].EPSEstimated);
+      if (est0 != null && est1 != null && est1 !== 0) {
+        const estRevision = (est0 - est1) / Math.abs(est1);
+        if (estRevision > 0.10) flags.push({ text: 'Forward EPS estimates trending up — analyst consensus being revised higher', type: 'good' });
+        if (estRevision < -0.10) flags.push({ text: 'Forward EPS estimates being revised down — analyst consensus deteriorating', type: 'bad' });
+      }
+    }
+  }
+
   const score = clamp(Math.round(total), 0, 100);
   const headline =
     score >= 80 ? 'Excellent execution — consistent beats with strong EPS growth; guidance is highly credible' :
@@ -492,7 +589,11 @@ export function scoreEarningsQuality(
 // Fixes: 5 (growth-adjusted P/E), 6A (EV/EBITDA GAAP tag), 6B (analyst upside framing)
 
 export function scoreValuation(
-  ov: AVOverview, price: number | null, regime: GrowthRegimeInfo
+  ov: AVOverview,
+  price: number | null,
+  regime: GrowthRegimeInfo,
+  balance: AVReport[],
+  estimatesData?: AVEarningsEstimate[]
 ): PhaseScore {
   const details: ScoreDetail[] = [];
   const flags: { text: string; type: FlagType }[] = [];
@@ -511,6 +612,22 @@ export function scoreValuation(
   const peg = nn(ov.PEGRatio);
   const activePE = fpe ?? tpe;
   const isPEfwd = fpe != null;
+
+  // 4a: negative PEG guard — regime already forced to 'mature' in detectGrowthRegime
+  if (peg != null && peg < 0) {
+    flags.push({ text: 'Negative PEG ratio — forward earnings expected to decline; valuation scored as mature-profile', type: 'bad' });
+  }
+  // clamp impliedEpsCAGR to [-10, 100] % range at usage point (applied when dividing by 100)
+
+  // 4b: negative EBITDA detection
+  const rawEbitda = nn(ov.EBITDA);
+  const negativeEbitda = rawEbitda != null && rawEbitda <= 0;
+
+  // Compute scaling factors when EBITDA is negative (redistribute 25pts from EV/EBITDA)
+  const pePtsMult   = negativeEbitda ? 35 / 20 : 1;
+  const pegPtsMult  = negativeEbitda ? 30 / 25 : 1;
+  const peMaxPts    = negativeEbitda ? 35 : 20;
+  const pegMaxPts   = negativeEbitda ? 30 : 25;
 
   let pePts: number;
   let peNote: string;
@@ -556,13 +673,15 @@ export function scoreValuation(
     if (activePE != null && activePE > 0 && activePE < 12) flags.push({ text: `P/E of ${fmt2(activePE)}x is well below market average — potential value opportunity`, type: 'good' });
   }
 
-  total += pePts;
-  details.push({ label: isPEfwd ? 'Forward P/E' : 'Trailing P/E', value: activePE != null ? fmt2(activePE) + 'x' : '—', points: pePts, maxPoints: 20, note: peNote });
+  const scaledPePts = Math.min(Math.round(pePts * pePtsMult), peMaxPts);
+  total += scaledPePts;
+  details.push({ label: isPEfwd ? 'Forward P/E' : 'Trailing P/E', value: activePE != null ? fmt2(activePE) + 'x' : '—', points: scaledPePts, maxPoints: peMaxPts, note: peNote });
 
-  // ── PEG Ratio — 25pts ──
+  // ── PEG Ratio — 25pts (or 30pts when EBITDA negative) ──
   const pegPts = peg == null ? 10 : peg <= 0 ? 5 : peg < 0.75 ? 25 : peg < 1.0 ? 22 : peg < 1.5 ? 16 : peg < 2.0 ? 9 : 3;
-  total += pegPts;
-  details.push({ label: 'PEG Ratio', value: peg != null ? fmt2(peg) + 'x' : '—', points: pegPts, maxPoints: 25,
+  const scaledPegPts = Math.min(Math.round(pegPts * pegPtsMult), pegMaxPts);
+  total += scaledPegPts;
+  details.push({ label: 'PEG Ratio', value: peg != null ? fmt2(peg) + 'x' : '—', points: scaledPegPts, maxPoints: pegMaxPts,
     note: peg == null ? 'Data unavailable' : peg <= 0 ? 'Negative — not meaningful' :
       peg < 0.75 ? "Compelling — paying less than 75c per point of growth (classic undervalue signal)" :
       peg < 1.0 ? "Attractive — Peter Lynch's golden zone, growth not fully priced in" :
@@ -571,39 +690,66 @@ export function scoreValuation(
   if (peg != null && peg > 0 && peg < 1.0) flags.push({ text: `PEG of ${fmt2(peg)} below 1.0 — classic signal that growth is not fully priced in`, type: 'good' });
   if (peg != null && peg > 2.5) flags.push({ text: `PEG of ${fmt2(peg)} — paying a heavy premium for growth`, type: 'bad' });
 
-  // ── EV/EBITDA — 25pts (Fix 6A: GAAP disclosure) ──
+  // ── EV/EBITDA — 25pts (Fix 6A: GAAP disclosure; 4b: suppressed when EBITDA negative) ──
   const evEbitda = nn(ov.EVToEBITDA);
-  const evePts = evEbitda == null ? 10 :
-    evEbitda <= 0 ? 5 : evEbitda < 8 ? 25 : evEbitda < 12 ? 21 : evEbitda < 18 ? 14 : evEbitda < 25 ? 8 : 3;
-  total += evePts;
-  // Fix 6A: always surface GAAP disclosure; note non-GAAP would be lower for M&A-heavy companies
-  details.push({ label: 'EV / EBITDA', value: evEbitda != null ? fmt2(evEbitda) + 'x' : '—', points: evePts, maxPoints: 25,
-    note: evEbitda == null ? 'Data unavailable' :
-      evEbitda <= 0 ? 'Negative EBITDA — company not yet operationally profitable' :
-      evEbitda < 8 ? 'Deeply cheap on GAAP operational basis — M&A-level attractiveness' :
-      evEbitda < 12 ? 'Well-priced on GAAP basis — below S&P 500 median' :
-      evEbitda < 18 ? 'Fair GAAP value — in line with market' :
-      evEbitda < 25 ? 'Premium GAAP multiple — requires above-average growth' :
-      'Expensive on GAAP basis — significant acquisition amortization may be inflating this multiple',
-    warning: 'GAAP basis — includes acquisition-related intangible amortization; non-GAAP multiple would be lower for M&A-intensive companies' });
-
-  // ── Price vs 52-week range — 15pts ──
-  let rangePts = 7; let rangeNote = 'Unavailable'; let rangeLabel = '—';
-  const hi = nn(ov['52WeekHigh']); const lo = nn(ov['52WeekLow']);
-  if (price != null && hi != null && lo != null && hi > lo) {
-    const pos = (price - lo) / (hi - lo);
-    rangeLabel = (pos * 100).toFixed(0) + '% of range';
-    rangePts = pos < 0.20 ? 15 : pos < 0.35 ? 13 : pos < 0.55 ? 10 : pos < 0.75 ? 6 : 3;
-    rangeNote = pos < 0.20 ? 'Trading near 52-week low — contrarian opportunity; verify no structural reason' :
-      pos < 0.40 ? 'In lower half of range — recent weakness may represent entry point' :
-      pos < 0.65 ? 'Middle of range — neutral positioning' :
-      pos < 0.85 ? 'In upper range — momentum strong but less margin of safety' :
-      'Near 52-week high — requires strong fundamental conviction';
-    if (pos > 0.90) flags.push({ text: 'Trading within 10% of 52-week high — strong momentum but entry risk elevated', type: 'neutral' });
-    if (pos < 0.15) flags.push({ text: 'Near 52-week low — review whether weakness is opportunity or warning sign', type: 'neutral' });
+  if (negativeEbitda) {
+    // 4b: suppress EV/EBITDA when EBITDA is negative
+    total += 0;
+    details.push({ label: 'EV / EBITDA', value: '—', points: 0, maxPoints: 25,
+      note: 'Not applicable — EBITDA negative; metric omitted and weight redistributed to P/E and PEG' });
+    flags.push({ text: 'EV/EBITDA not meaningful when EBITDA is negative — criterion omitted', type: 'neutral' });
+  } else {
+    const evePts = evEbitda == null ? 10 :
+      evEbitda <= 0 ? 5 : evEbitda < 8 ? 25 : evEbitda < 12 ? 21 : evEbitda < 18 ? 14 : evEbitda < 25 ? 8 : 3;
+    total += evePts;
+    details.push({ label: 'EV / EBITDA', value: evEbitda != null ? fmt2(evEbitda) + 'x' : '—', points: evePts, maxPoints: 25,
+      note: evEbitda == null ? 'Data unavailable' :
+        evEbitda <= 0 ? 'Negative EBITDA — company not yet operationally profitable' :
+        evEbitda < 8 ? 'Deeply cheap on GAAP operational basis — M&A-level attractiveness' :
+        evEbitda < 12 ? 'Well-priced on GAAP basis — below S&P 500 median' :
+        evEbitda < 18 ? 'Fair GAAP value — in line with market' :
+        evEbitda < 25 ? 'Premium GAAP multiple — requires above-average growth' :
+        'Expensive on GAAP basis — significant acquisition amortization may be inflating this multiple',
+      warning: 'GAAP basis — includes acquisition-related intangible amortization; non-GAAP multiple would be lower for M&A-intensive companies' });
   }
-  total += rangePts;
-  details.push({ label: 'Price vs 52-Week Range', value: rangeLabel, points: rangePts, maxPoints: 15, note: rangeNote });
+
+  // ── Price vs 52-week range OR EV/Sales (4c: regime gate) — 15pts ──
+  if (isHighGrowth) {
+    // EV/Sales: use MarketCap + debt - cash from balance sheet
+    const bal0_4 = balance[0];
+    const debtEV = bal0_4 ? (r(bal0_4, 'shortLongTermDebtTotal') ?? r(bal0_4, 'longTermDebt') ?? 0) : 0;
+    const cashEV = bal0_4 ? (r(bal0_4, 'cashAndShortTermInvestments') ?? r(bal0_4, 'cashAndCashEquivalentsAtCarryingValue') ?? 0) : 0;
+    const mktCapEV = nn(ov.MarketCapitalization) ?? 0;
+    const ev = mktCapEV + debtEV - cashEV;
+    const revTTM = nn(ov.RevenueTTM);
+    const evSales = revTTM != null && revTTM > 0 ? ev / revTTM : null;
+    const evSalesPts = evSales == null ? 7 : evSales < 5 ? 15 : evSales < 10 ? 11 : evSales < 20 ? 7 : 3;
+    total += evSalesPts;
+    details.push({ label: 'EV / Revenue', value: evSales != null ? fmt2(evSales) + 'x' : '—', points: evSalesPts, maxPoints: 15,
+      note: evSales == null ? 'Insufficient data' :
+        evSales < 5 ? 'Low EV/Sales for a high-growth company — potential value relative to revenue' :
+        evSales < 10 ? 'Moderate EV/Sales — reasonable for strong growth profile' :
+        evSales < 20 ? 'Elevated EV/Sales — high execution bar' :
+        'Very high EV/Sales — priced for sustained hyper-growth' });
+  } else {
+    // 52-week range (existing logic for moderate_growth and mature)
+    let rangePts = 7; let rangeNote = 'Unavailable'; let rangeLabel = '—';
+    const hi = nn(ov['52WeekHigh']); const lo = nn(ov['52WeekLow']);
+    if (price != null && hi != null && lo != null && hi > lo) {
+      const pos = (price - lo) / (hi - lo);
+      rangeLabel = (pos * 100).toFixed(0) + '% of range';
+      rangePts = pos < 0.20 ? 15 : pos < 0.35 ? 13 : pos < 0.55 ? 10 : pos < 0.75 ? 6 : 3;
+      rangeNote = pos < 0.20 ? 'Trading near 52-week low — contrarian opportunity; verify no structural reason' :
+        pos < 0.40 ? 'In lower half of range — recent weakness may represent entry point' :
+        pos < 0.65 ? 'Middle of range — neutral positioning' :
+        pos < 0.85 ? 'In upper range — momentum strong but less margin of safety' :
+        'Near 52-week high — requires strong fundamental conviction';
+      if (pos > 0.90) flags.push({ text: 'Trading within 10% of 52-week high — strong momentum but entry risk elevated', type: 'neutral' });
+      if (pos < 0.15) flags.push({ text: 'Near 52-week low — review whether weakness is opportunity or warning sign', type: 'neutral' });
+    }
+    total += rangePts;
+    details.push({ label: 'Price vs 52-Week Range', value: rangeLabel, points: rangePts, maxPoints: 15, note: rangeNote });
+  }
 
   // ── Analyst Target — 15pts (Fix 6B: context-aware framing) ──
   let targetPts = 7; let targetNote = 'No data'; let targetLabel = '—';
@@ -632,6 +778,27 @@ export function scoreValuation(
   total += targetPts;
   details.push({ label: 'Analyst Target Upside', value: targetLabel, points: targetPts, maxPoints: 15, note: targetNote });
 
+  // Estimates cross-check: compare PEG-implied growth vs direct analyst estimate growth
+  if (estimatesData && estimatesData.length >= 2) {
+    const sortedEsts = [...estimatesData].sort((a, b) => a.fiscalDateEnding.localeCompare(b.fiscalDateEnding));
+    // Find two annual estimates (current year + next)
+    const annualEsts = sortedEsts.filter((_e, _i) => true).slice(-2);
+    if (annualEsts.length >= 2) {
+      const thisYearEPS = nn(annualEsts[annualEsts.length - 2]?.estimatedEPS ?? annualEsts[annualEsts.length - 2]?.EPSEstimated);
+      const nextYearEPS = nn(annualEsts[annualEsts.length - 1]?.estimatedEPS ?? annualEsts[annualEsts.length - 1]?.EPSEstimated);
+      if (thisYearEPS != null && nextYearEPS != null && thisYearEPS !== 0) {
+        const directForwardGrowth = (nextYearEPS - thisYearEPS) / Math.abs(thisYearEPS);
+        const impliedCAGR = regime.impliedEpsCAGR; // in percent
+        if (impliedCAGR != null) {
+          const divergence = Math.abs(impliedCAGR / 100 - directForwardGrowth);
+          if (divergence > 0.15) {
+            flags.push({ text: `PEG-implied growth (~${impliedCAGR.toFixed(0)}%) diverges from analyst EPS estimate growth (~${(directForwardGrowth * 100).toFixed(0)}%) — treat DCF output with caution`, type: 'neutral' });
+          }
+        }
+      }
+    }
+  }
+
   const score = clamp(Math.round(total), 0, 100);
   const headline =
     score >= 80 ? 'Attractively valued — multiple metrics point to undervaluation relative to fundamentals' :
@@ -642,7 +809,7 @@ export function scoreValuation(
 
   return {
     phase: 4, title: 'Valuation Assessment', score, grade: gradeFromScore(score), headline,
-    summary: `${isPEfwd ? 'Fwd' : 'Trl'} P/E ${activePE != null ? fmt2(activePE) + 'x' : '—'} · PEG ${peg != null ? fmt2(peg) + 'x' : '—'} · EV/EBITDA ${evEbitda != null ? fmt2(evEbitda) + 'x' : '—'} · ${regime.primary}`,
+    summary: `${isPEfwd ? 'Fwd' : 'Trl'} P/E ${activePE != null ? fmt2(activePE) + 'x' : '—'} · PEG ${peg != null ? fmt2(peg) + 'x' : '—'} · EV/EBITDA ${evEbitda != null ? fmt2(evEbitda) + 'x' : negativeEbitda ? 'neg.EBITDA' : '—'} · ${regime.primary}`,
     details, flags,
     regime: regime.primary,   // Fix 2: always primary, never 'recovery'
     regimeLabel,
@@ -672,7 +839,13 @@ function runDCF(startFCF: number, growthRate: number, sharesOut: number, wacc: n
 }
 
 export function scoreDCF(
-  cashflow: AVReport[], ov: AVOverview, price: number | null, regime: GrowthRegimeInfo
+  cashflow: AVReport[],
+  ov: AVOverview,
+  price: number | null,
+  regime: GrowthRegimeInfo,
+  balance?: AVReport[],
+  freshShares?: number | null,
+  estimatesData?: AVEarningsEstimate[]
 ): PhaseScore {
   const details: ScoreDetail[] = [];
   const flags: { text: string; type: FlagType }[] = [];
@@ -695,18 +868,31 @@ export function scoreDCF(
   const sharesOut = nn(ov.SharesOutstanding);
   const startFCF = fcfs[0] ?? null;
 
+  // Use freshShares (from SHARES_OUTSTANDING) if available and more recent
+  const effectiveShares = freshShares ?? sharesOut;
+
+  // 5b: compute net debt for equity value adjustment
+  const bal0DCF = balance?.[0];
+  const dcfDebt = bal0DCF ? (r(bal0DCF, 'shortLongTermDebtTotal') ?? r(bal0DCF, 'longTermDebt') ?? 0) : 0;
+  const dcfCash = bal0DCF ? (r(bal0DCF, 'cashAndShortTermInvestments') ?? r(bal0DCF, 'cashAndCashEquivalentsAtCarryingValue') ?? 0) : 0;
+  const dcfNetDebt = dcfDebt - dcfCash;
+
   const scenarios: DCFScenario[] = [];
 
-  if (startFCF != null && sharesOut != null && sharesOut > 0) {
+  if (startFCF != null && effectiveShares != null && effectiveShares > 0) {
+    // Net debt per share for equity value adjustment
+    const netDebtPerShare = effectiveShares > 0 ? dcfNetDebt / effectiveShares : 0;
+
     // ── Bear: historical FCF CAGR ──
-    const bearGrowth = historicalCAGR != null ? clamp(historicalCAGR, 0, 0.25) : 0.05;
-    const bearValue = runDCF(startFCF, bearGrowth, sharesOut, WACC, TERMINAL_G);
+    const bearGrowth = historicalCAGR != null ? clamp(historicalCAGR, -0.20, 0.25) : 0.05; // 5a: floor -0.20
+    const bearValueRaw = runDCF(startFCF, bearGrowth, effectiveShares, WACC, TERMINAL_G);
+    const adjustedBearValue = Math.max(0, bearValueRaw - netDebtPerShare);
     scenarios.push({
       label: 'Bear',
       growthRate: bearGrowth,
-      intrinsicValue: bearValue,
-      marginOfSafety: price != null && price > 0 ? calcMoS(bearValue, price) : null,
-      method: `Historical FCF CAGR (${pctLabel(bearGrowth)}) — conservative extrapolation`,
+      intrinsicValue: adjustedBearValue,
+      marginOfSafety: price != null && price > 0 ? calcMoS(adjustedBearValue, price) : null,
+      method: `Historical FCF CAGR (${pctLabel(bearGrowth)}) — conservative extrapolation · net debt adjusted`,
     });
 
     // ── Base: forward estimate from implied EPS CAGR (via PEG) ──
@@ -716,8 +902,11 @@ export function scoreDCF(
     const impliedCAGR = regime.impliedEpsCAGR; // e.g. 55.3 (as percentage)
 
     if (impliedCAGR != null && impliedCAGR > 0) {
-      // Cap at 60% for DCF stability; step down after year 3
-      const g1to3 = clamp(impliedCAGR / 100, 0, 0.60);
+      // 5c: Cap at 40% for DCF stability; step down after year 3
+      const g1to3 = clamp(impliedCAGR / 100, 0, 0.40);
+      if (impliedCAGR / 100 > 0.40) {
+        flags.push({ text: `Implied growth rate capped at 40% for DCF stability — AV-derived implied CAGR was ~${impliedCAGR.toFixed(0)}%`, type: 'neutral' });
+      }
       const g4to5 = clamp((impliedCAGR / 100 + (historicalCAGR ?? 0.10)) / 2, 0, 0.40);
       // Two-phase growth DCF
       let pv = 0; let projFCF = startFCF;
@@ -725,40 +914,63 @@ export function scoreDCF(
       for (let yr = 4; yr <= 5; yr++) { projFCF *= (1 + g4to5); pv += projFCF / Math.pow(1 + WACC, yr); }
       const tv = (projFCF * (1 + TERMINAL_G)) / (WACC - TERMINAL_G);
       pv += tv / Math.pow(1 + WACC, 5);
-      const baseValue = pv / sharesOut;
-      baseMethod = `Implied forward EPS CAGR ~${impliedCAGR.toFixed(0)}% (yr 1–3) → ${(g4to5 * 100).toFixed(0)}% (yr 4–5), from P/E ÷ PEG`;
+      const baseValueRaw = pv / effectiveShares;
+      const adjustedBaseValue = Math.max(0, baseValueRaw - netDebtPerShare);
+      baseMethod = `Implied forward EPS CAGR ~${impliedCAGR.toFixed(0)}% (yr 1–3) → ${(g4to5 * 100).toFixed(0)}% (yr 4–5), from P/E ÷ PEG · net debt adjusted`;
       scenarios.push({
         label: 'Base',
         growthRate: g1to3,
-        intrinsicValue: baseValue,
-        marginOfSafety: price != null && price > 0 ? calcMoS(baseValue, price) : null,
+        intrinsicValue: adjustedBaseValue,
+        marginOfSafety: price != null && price > 0 ? calcMoS(adjustedBaseValue, price) : null,
         method: baseMethod,
       });
     } else {
-      // Fallback: use recent quarterly EPS growth as proxy
-      const recentG = regime.recentEpsGrowth != null ? clamp(regime.recentEpsGrowth, 0, 0.40) : clamp((historicalCAGR ?? 0.05) * 1.5, 0, 0.40);
-      baseMethod = `Recent quarterly EPS growth as FCF proxy (${pctLabel(recentG)}) — forward estimates unavailable`;
-      const baseValue = runDCF(startFCF, recentG, sharesOut, WACC, TERMINAL_G);
+      // Fallback: try estimatesData first, then recentEpsGrowth
+      let recentG: number;
+      let baseMethod2: string;
+
+      const estFallback = (() => {
+        if (!estimatesData || estimatesData.length < 2) return null;
+        const sortedE = [...estimatesData].sort((a, b) => a.fiscalDateEnding.localeCompare(b.fiscalDateEnding));
+        const last2 = sortedE.slice(-2);
+        const e0 = nn(last2[0]?.estimatedEPS ?? last2[0]?.EPSEstimated);
+        const e1 = nn(last2[1]?.estimatedEPS ?? last2[1]?.EPSEstimated);
+        if (e0 != null && e1 != null && e0 !== 0) return clamp((e1 - e0) / Math.abs(e0), -0.10, 1.00);
+        return null;
+      })();
+
+      if (estFallback != null) {
+        recentG = clamp(estFallback, 0, 0.40);
+        baseMethod2 = `Direct analyst EPS estimate growth (${pctLabel(recentG)}) — used as FCF proxy (PEG unavailable) · net debt adjusted`;
+      } else {
+        recentG = regime.recentEpsGrowth != null ? clamp(regime.recentEpsGrowth, 0, 0.40) : clamp((historicalCAGR ?? 0.05) * 1.5, 0, 0.40);
+        baseMethod2 = `Recent quarterly EPS growth as FCF proxy (${pctLabel(recentG)}) — forward estimates unavailable · net debt adjusted`;
+        flags.push({ text: 'No forward FCF estimates available via API — base case uses recent quarterly EPS growth as FCF proxy; may understate growth for inflection companies. Use the manual DCF Calculator with analyst estimates for more reliable output.', type: 'neutral' });
+      }
+
+      const baseValueRaw2 = runDCF(startFCF, recentG, effectiveShares, WACC, TERMINAL_G);
+      const adjustedBaseValue2 = Math.max(0, baseValueRaw2 - netDebtPerShare);
+      baseMethod = baseMethod2;
       scenarios.push({
         label: 'Base',
         growthRate: recentG,
-        intrinsicValue: baseValue,
-        marginOfSafety: price != null && price > 0 ? calcMoS(baseValue, price) : null,
+        intrinsicValue: adjustedBaseValue2,
+        marginOfSafety: price != null && price > 0 ? calcMoS(adjustedBaseValue2, price) : null,
         method: baseMethod,
       });
-      flags.push({ text: 'No forward FCF estimates available via API — base case uses recent quarterly EPS growth as FCF proxy; may understate growth for inflection companies. Use the manual DCF Calculator with analyst estimates for more reliable output.', type: 'neutral' });
     }
 
     // ── Bull: base growth rate + 25% relative uplift ──
     const baseMoS = scenarios.find(s => s.label === 'Base');
     const bullGrowth = clamp((baseMoS?.growthRate ?? 0.15) * 1.25, 0, 0.80);
-    const bullValue = runDCF(startFCF, bullGrowth, sharesOut, WACC, TERMINAL_G);
+    const bullValueRaw = runDCF(startFCF, bullGrowth, effectiveShares, WACC, TERMINAL_G);
+    const adjustedBullValue = Math.max(0, bullValueRaw - netDebtPerShare);
     scenarios.push({
       label: 'Bull',
       growthRate: bullGrowth,
-      intrinsicValue: bullValue,
-      marginOfSafety: price != null && price > 0 ? calcMoS(bullValue, price) : null,
-      method: `Bull case — base growth +25% (${pctLabel(bullGrowth)})`,
+      intrinsicValue: adjustedBullValue,
+      marginOfSafety: price != null && price > 0 ? calcMoS(adjustedBullValue, price) : null,
+      method: `Bull case — base growth +25% (${pctLabel(bullGrowth)}) · net debt adjusted`,
     });
   }
 
@@ -832,7 +1044,13 @@ export function scoreDCF(
 // Fix 8: net buyback yield, ROIC-based reinvestment quality, debt-adjusted cap
 
 export function scoreDividends(
-  divEntries: AVDividendEntry[], cashflow: AVReport[], _income: AVReport[], ov: AVOverview
+  divEntries: AVDividendEntry[],
+  cashflow: AVReport[],
+  _income: AVReport[],
+  ov: AVOverview,
+  currentPrice?: number | null,
+  freshShares?: number | null,
+  sharesData?: AVSharesEntry[]
 ): PhaseScore {
   const details: ScoreDetail[] = [];
   const flags: { text: string; type: FlagType }[] = [];
@@ -849,6 +1067,7 @@ export function scoreDividends(
   const buybacksRaw = cf0 ? Math.abs(r(cf0, 'commonStockRepurchased') ?? r(cf0, 'paymentsForRepurchaseOfCommonStock') ?? 0) : 0;
   // Fix 4: do NOT floor at 0 — negative values (SBC > buybacks) are meaningful and scored differently
   const netBuybacks = buybacksRaw - sbc;
+  // For shared netBuybackYield used in dividend path, use mktCap; non-dividend path uses liveMarketCap below
   const netBuybackYield = mktCap != null && mktCap > 0 ? netBuybacks / mktCap : null;
 
   // Net leverage for debt-adjusted cap
@@ -867,70 +1086,103 @@ export function scoreDividends(
   if (!hasDividend) {
     // ── Non-dividend path (Fix 8) ──
 
+    // 6a: compute liveMarketCap using fresh share count + current price
+    const sharesForMktCap = freshShares ?? nn(ov.SharesOutstanding);
+    const liveMarketCap = (currentPrice != null && sharesForMktCap != null && currentPrice > 0 && sharesForMktCap > 0)
+      ? currentPrice * sharesForMktCap
+      : nn(ov.MarketCapitalization);
+
     // 1. FCF Yield (unchanged sub-score)
     const ocf = cf0 ? r(cf0, 'operatingCashflow') : null;
     const capex = cf0 ? r(cf0, 'capitalExpenditures') : null;
     const fcf = ocf != null && capex != null ? ocf - Math.abs(capex) : null;
-    const fcfYield = fcf != null && mktCap != null && mktCap > 0 ? fcf / mktCap : null;
+    const fcfYield = fcf != null && liveMarketCap != null && liveMarketCap > 0 ? fcf / liveMarketCap : null;
     const fcfYieldPts = fcfYield != null ? (fcfYield > 0.05 ? 30 : fcfYield > 0.03 ? 24 : fcfYield > 0.01 ? 16 : 8) : 18;
     total += fcfYieldPts;
     details.push({ label: 'FCF Yield', value: fcfYield != null ? (fcfYield * 100).toFixed(1) + '%' : '—', points: fcfYieldPts, maxPoints: 30,
       note: fcfYield != null && fcfYield > 0.04 ? 'Strong FCF yield — capital is being generated for reinvestment or return' : fcfYield != null && fcfYield > 0.02 ? 'Moderate FCF yield' : 'Low FCF yield — either reinvesting aggressively for growth, or marginal cash generation' });
 
-    // 2. Net Buyback Yield = (gross buybacks − SBC) / market cap
+    // 2. Net Buyback Yield = (gross buybacks − SBC) / liveMarketCap
     // Fix 4: calibrated scale — 0.0% yields 8/20 (below neutral), not 10/20
     // Scale: >3%→20, 2-3%→17, 1-2%→14, 0.5-1%→11, 0-0.5%→8, -0.5-0%→5, <-0.5%→2
+    const netBuybackYieldNonDiv = liveMarketCap != null && liveMarketCap > 0 ? netBuybacks / liveMarketCap : null;
     let netBBPts: number;
     let netBBNote: string;
-    if (netBuybackYield == null) {
+    if (netBuybackYieldNonDiv == null) {
       netBBPts = 10; netBBNote = 'Buyback data unavailable';
-    } else if (netBuybackYield > 0.03) {
+    } else if (netBuybackYieldNonDiv > 0.03) {
       netBBPts = 20;
-      netBBNote = `Strong net buyback yield of ${(netBuybackYield * 100).toFixed(1)}% after SBC — meaningful reduction in share count; shareholder-friendly`;
-      flags.push({ text: `Net buyback yield of ${(netBuybackYield * 100).toFixed(1)}% (after SBC offset) — genuine capital return compounding per-share value`, type: 'good' });
-    } else if (netBuybackYield > 0.02) {
+      netBBNote = `Strong net buyback yield of ${(netBuybackYieldNonDiv * 100).toFixed(1)}% after SBC — meaningful reduction in share count; shareholder-friendly`;
+      flags.push({ text: `Net buyback yield of ${(netBuybackYieldNonDiv * 100).toFixed(1)}% (after SBC offset) — genuine capital return compounding per-share value`, type: 'good' });
+    } else if (netBuybackYieldNonDiv > 0.02) {
       netBBPts = 17;
-      netBBNote = `Net buyback yield of ${(netBuybackYield * 100).toFixed(1)}% after SBC — solid shareholder return`;
-    } else if (netBuybackYield > 0.01) {
+      netBBNote = `Net buyback yield of ${(netBuybackYieldNonDiv * 100).toFixed(1)}% after SBC — solid shareholder return`;
+    } else if (netBuybackYieldNonDiv > 0.01) {
       netBBPts = 14;
-      netBBNote = `Moderate net buyback yield of ${(netBuybackYield * 100).toFixed(1)}% after SBC`;
-    } else if (netBuybackYield > 0.005) {
+      netBBNote = `Moderate net buyback yield of ${(netBuybackYieldNonDiv * 100).toFixed(1)}% after SBC`;
+    } else if (netBuybackYieldNonDiv > 0.005) {
       netBBPts = 11;
-      netBBNote = `Modest net buyback yield of ${(netBuybackYield * 100).toFixed(1)}% after SBC — buybacks partially offsetting dilution`;
-    } else if (netBuybackYield >= 0) {
+      netBBNote = `Modest net buyback yield of ${(netBuybackYieldNonDiv * 100).toFixed(1)}% after SBC — buybacks partially offsetting dilution`;
+    } else if (netBuybackYieldNonDiv >= 0) {
       // 0–0.5% band including exactly 0.0%
       netBBPts = 8;
-      netBBNote = netBuybackYield === 0
+      netBBNote = netBuybackYieldNonDiv === 0
         ? 'Gross buybacks fully offset by SBC — no net reduction in share count; effective capital return is zero'
-        : `Net buyback yield of ${(netBuybackYield * 100).toFixed(2)}% is near-zero — buybacks barely exceed SBC dilution`;
-    } else if (netBuybackYield > -0.005) {
+        : `Net buyback yield of ${(netBuybackYieldNonDiv * 100).toFixed(2)}% is near-zero — buybacks barely exceed SBC dilution`;
+    } else if (netBuybackYieldNonDiv > -0.005) {
       netBBPts = 5;
-      netBBNote = `Slight net dilution (${(netBuybackYield * 100).toFixed(2)}%) — SBC marginally exceeds buybacks; share count growing slowly`;
+      netBBNote = `Slight net dilution (${(netBuybackYieldNonDiv * 100).toFixed(2)}%) — SBC marginally exceeds buybacks; share count growing slowly`;
       flags.push({ text: `Slight net dilution: SBC marginally exceeds buybacks — share count is not decreasing despite buyback program`, type: 'bad' });
     } else {
       netBBPts = 2;
-      netBBNote = `Meaningful net dilution (${(netBuybackYield * 100).toFixed(1)}%) — SBC significantly exceeds buybacks; buyback program does not offset equity compensation dilution`;
+      netBBNote = `Meaningful net dilution (${(netBuybackYieldNonDiv * 100).toFixed(1)}%) — SBC significantly exceeds buybacks; buyback program does not offset equity compensation dilution`;
       flags.push({ text: 'Net dilution: SBC significantly exceeds buybacks — shareholders are being diluted despite the stated buyback program', type: 'bad' });
     }
     total += netBBPts;
-    details.push({ label: 'Net Buyback Yield (after SBC)', value: netBuybackYield != null ? (netBuybackYield * 100).toFixed(1) + '%' : '—', points: netBBPts, maxPoints: 20,
+    details.push({ label: 'Net Buyback Yield (after SBC)', value: netBuybackYieldNonDiv != null ? (netBuybackYieldNonDiv * 100).toFixed(1) + '%' : '—', points: netBBPts, maxPoints: 20,
       note: netBBNote, warning: buybacksRaw > 0 && sbc > 0 ? `Gross buybacks $${(buybacksRaw / 1e9).toFixed(1)}B minus SBC $${(sbc / 1e9).toFixed(1)}B` : undefined });
 
-    // 3. ROIC reinvestment quality (Fix 8)
-    total += roicPts;
-    details.push({ label: 'Reinvestment Quality (ROE proxy)', value: roic != null ? (roic * 100).toFixed(1) + '%' : '—', points: roicPts, maxPoints: 10,
-      note: roic == null ? 'Data unavailable' : roic > 0.25 ? 'High ROE — reinvested FCF is generating strong returns' : roic > 0.15 ? 'Solid ROE — reinvestment creating value above cost of capital' : roic > 0.08 ? 'Moderate reinvestment quality' : 'Low ROE — reinvested capital generating poor returns; question management\'s allocation priorities' });
+    // 6b: Sub-criterion A — Return on Equity (ROIC proxy), 15 pts
+    const roeA = nn(ov.ReturnOnEquityTTM);
+    const roeAPts = roeA == null ? 7 :
+      roeA > 0.15 ? 15 : roeA > 0.10 ? 11 : roeA > 0.05 ? 7 : roeA > 0 ? 3 : 0;
+    const roeAPtsFinal = highLeverage ? Math.min(roeAPts, 5) : roeAPts;
+    total += roeAPtsFinal;
+    details.push({ label: 'Return on Equity (ROIC proxy)', value: roeA != null ? (roeA * 100).toFixed(1) + '%' : '—', points: roeAPtsFinal, maxPoints: 15,
+      note: roeA == null ? 'Data unavailable' :
+        roeA > 0.15 ? 'High ROE — reinvested capital generating strong returns above cost of capital' :
+        roeA > 0.10 ? 'Solid ROE — value creation above typical cost of equity' :
+        roeA > 0.05 ? 'Moderate ROE — marginal value creation' :
+        roeA > 0 ? 'Low ROE — reinvested capital generating poor returns' :
+        'Negative ROE — equity being destroyed' });
 
-    // 4. Debt-adjusted cap (Fix 8)
-    let capReturnPts = 30;
-    let capReturnNote = 'Non-dividend payer — no payout ratio risk; scored on capital return quality';
+    // 6b: Sub-criterion B — Capital Allocation Clarity, 15 pts
+    const cashBal6 = cf0 ? (r(cf0, 'cashAndCashEquivalentsAtCarryingValue') ?? 0) : 0;
+    const mktCapForCash = liveMarketCap ?? nn(ov.MarketCapitalization) ?? 0;
+    let capAllocPts: number;
+    let capAllocNote: string;
+    if (netBuybackYieldNonDiv != null && netBuybackYieldNonDiv > 0.01) {
+      capAllocPts = 15;
+      capAllocNote = `Net buyback yield of ${(netBuybackYieldNonDiv * 100).toFixed(1)}% after SBC — clear capital return mechanism with genuine share reduction`;
+    } else if (buybacksRaw > 0 && (netBuybackYieldNonDiv == null || netBuybackYieldNonDiv <= 0.01)) {
+      capAllocPts = 8;
+      capAllocNote = 'Buyback program exists but SBC offsets most or all of the gross repurchases — net return to shareholders is limited';
+      flags.push({ text: 'SBC offsets buybacks — stated buyback program is largely cancelled out by equity compensation dilution', type: 'neutral' });
+    } else if (buybacksRaw === 0 && mktCapForCash > 0 && cashBal6 > 0.20 * mktCapForCash) {
+      capAllocPts = 5;
+      capAllocNote = 'Large cash balance with no dividend or buyback — capital allocation strategy is unclear; potential for shareholder return or acquisition';
+      flags.push({ text: 'Cash exceeds 20% of market cap with no stated return mechanism — capital allocation strategy undefined', type: 'neutral' });
+    } else {
+      capAllocPts = 8;
+      capAllocNote = 'Capital returned primarily via reinvestment into the business — evaluate ROIC vs cost of capital above';
+    }
+    const capAllocPtsFinal = highLeverage ? Math.min(capAllocPts, 5) : capAllocPts;
+    total += capAllocPtsFinal;
+    details.push({ label: 'Capital Allocation Clarity', value: highLeverage ? 'Leveraged buyback' : (netBuybackYieldNonDiv != null && netBuybackYieldNonDiv > 0.01 ? 'Net buyback' : 'Reinvestment'), points: capAllocPtsFinal, maxPoints: 15, note: capAllocNote });
+
     if (highLeverage) {
-      capReturnPts = Math.min(10, capReturnPts);
-      capReturnNote = `⚠ Net leverage ${netLeverage != null ? fmt2(netLeverage) + 'x' : 'elevated'} while executing buybacks — capital allocation risk: share repurchases while carrying significant debt. Score capped.`;
       flags.push({ text: `High leverage (${netLeverage != null ? fmt2(netLeverage) + 'x' : '?'} Net Debt/EBITDA) while conducting buybacks — prioritising debt reduction would be more conservative`, type: 'bad' });
     }
-    total += capReturnPts;
-    details.push({ label: 'Capital Return Structure', value: highLeverage ? 'Leveraged buyback' : 'No dividend', points: capReturnPts, maxPoints: 30, note: capReturnNote });
 
     flags.push({ text: 'No dividend paid — capital returned via reinvestment or buybacks. Net buyback yield (after SBC) is the relevant return metric.', type: 'neutral' });
 
@@ -1004,6 +1256,21 @@ export function scoreDividends(
     details.push({ label: 'Earnings Payout Ratio', value: earnPayLabel, points: earnPayPts, maxPoints: 25, note: earnPayNote });
   }
 
+  // 3c: Shares outstanding dilution signal from SHARES_OUTSTANDING history
+  if (sharesData && sharesData.length >= 2) {
+    const sharesNow = nn(sharesData[0]?.commonStockSharesOutstanding);
+    const twoYearsAgo = new Date(); twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
+    const entry2yr = sharesData.find(e => new Date(e.date) <= twoYearsAgo);
+    const shares2yr = entry2yr ? nn(entry2yr.commonStockSharesOutstanding) : null;
+    if (sharesNow != null && shares2yr != null && shares2yr > 0) {
+      const annualisedDilution = ((sharesNow - shares2yr) / shares2yr) / 2;
+      if (annualisedDilution > 0.03)
+        flags.push({ text: `Share count growing ~${(annualisedDilution * 100).toFixed(1)}%/yr over 2 years (SHARES_OUTSTANDING data) — meaningful ongoing dilution`, type: 'bad' });
+      else if (annualisedDilution < -0.02)
+        flags.push({ text: `Share count shrinking ~${(Math.abs(annualisedDilution) * 100).toFixed(1)}%/yr over 2 years — active buyback effect confirmed by share registry`, type: 'good' });
+    }
+  }
+
   const score = clamp(Math.round(total), 0, 100);
   const isNoDivScore = !hasDividend;
   const headline = isNoDivScore
@@ -1029,7 +1296,11 @@ export function scoreDividends(
 // Fix 9: 50-article minimum, rolling trend, source breakdown, weighted scoring
 
 export function scoreSentiment(
-  newsItems: AVNewsItem[], ticker: string, ov: AVOverview
+  newsItems: AVNewsItem[],
+  ticker: string,
+  ov: AVOverview,
+  insiderData?: AVInsiderTransaction[],
+  regime?: GrowthRegimeInfo
 ): PhaseScore {
   const details: ScoreDetail[] = [];
   const flags: { text: string; type: FlagType }[] = [];
@@ -1176,6 +1447,36 @@ export function scoreSentiment(
   if (primarySent != null && primarySent > 0.20) flags.push({ text: 'Recent news sentiment is strongly positive — analyst and media tone is constructive', type: 'good' });
   if (primarySent != null && primarySent < -0.10) flags.push({ text: 'Negative news sentiment — recent media coverage is cautious or bearish', type: 'bad' });
 
+  // 3b: Insider transactions signal (flags only)
+  if (insiderData && insiderData.length > 0) {
+    const cutoff180 = daysBefore(now, 180);
+    const recent180 = insiderData.filter(t => {
+      const d = t.transactionDate ? new Date(t.transactionDate) : null;
+      return d != null && d >= cutoff180;
+    });
+    if (recent180.length >= 3) {
+      let totalBuyValue = 0;
+      let totalSellValue = 0;
+      for (const t of recent180) {
+        const shares180 = nn(t.shares) ?? 0;
+        const sp = nn(t.sharePrice) ?? 0;
+        const val = shares180 * sp;
+        if (t.transactionType === 'P') totalBuyValue += val;
+        else if (t.transactionType === 'S') totalSellValue += val;
+      }
+      const totalValue = totalBuyValue + totalSellValue;
+      if (totalValue > 0) {
+        const netBuyRatio = totalBuyValue / totalValue;
+        const troughNote = regime?.isTrough ? ' — particularly notable during earnings trough' : '';
+        if (netBuyRatio > 0.60) {
+          flags.push({ text: `Insiders net buyers in last 6 months (${(netBuyRatio * 100).toFixed(0)}% of transaction value is purchases)${troughNote}`, type: 'good' });
+        } else if (netBuyRatio < 0.30) {
+          flags.push({ text: `Heavy insider selling in last 6 months (${((1 - netBuyRatio) * 100).toFixed(0)}% of transaction value is sales). Note: selling alone may reflect diversification`, type: 'bad' });
+        }
+      }
+    }
+  }
+
   const score = clamp(Math.round(total), 0, 100);
   const headline =
     score >= 80 ? 'Strong positive sentiment — news flow, trend, and coverage are broadly constructive' :
@@ -1194,7 +1495,8 @@ export function scoreSentiment(
 // ── Composite score ───────────────────────────────────────────────────────────
 
 export function computeComposite(phases: PhaseScore[]): { score: number; grade: Grade; headline: string } {
-  const weights: Record<number, number> = { 2: 0.25, 3: 0.20, 4: 0.20, 5: 0.15, 6: 0.10, 7: 0.10 };
+  // Weights: P2=25%, P3=15%, P4=17%, P5=20%, P6=8%, P7=15% — total=100%
+  const weights: Record<number, number> = { 2: 0.25, 3: 0.15, 4: 0.17, 5: 0.20, 6: 0.08, 7: 0.15 };
   let weighted = 0, totalW = 0;
   for (const p of phases) { const w = weights[p.phase] ?? 0; weighted += p.score * w; totalW += w; }
   const score = totalW > 0 ? clamp(Math.round(weighted / totalW), 0, 100) : 50;

@@ -7,6 +7,7 @@ import {
   type PhaseScore, type Grade, type GrowthRegimeInfo,
   type AVOverview, type AVReport, type AVEarningsQuarter, type AVEarningsAnnual,
   type AVDividendEntry, type AVNewsItem,
+  type AVEarningsEstimate, type AVInsiderTransaction, type AVSharesEntry,
 } from '../lib/autoAnalysis';
 
 // ── Colour helpers ────────────────────────────────────────────────────────────
@@ -44,13 +45,16 @@ interface FetchStep {
 }
 
 const STEPS: FetchStep[] = [
-  { id: 'overview', label: 'Company overview & ratios', status: 'idle' },
-  { id: 'income',   label: 'Income statement (4yr)',    status: 'idle' },
-  { id: 'balance',  label: 'Balance sheet',             status: 'idle' },
-  { id: 'cashflow', label: 'Cash flow statement',       status: 'idle' },
-  { id: 'earnings', label: 'Earnings history (8Q)',     status: 'idle' },
-  { id: 'dividends',label: 'Dividend history',          status: 'idle' },
-  { id: 'news',     label: 'News & sentiment',          status: 'idle' },
+  { id: 'overview',  label: 'Company overview & ratios',   status: 'idle' },
+  { id: 'income',    label: 'Income statement (4yr)',       status: 'idle' },
+  { id: 'balance',   label: 'Balance sheet',               status: 'idle' },
+  { id: 'cashflow',  label: 'Cash flow statement',         status: 'idle' },
+  { id: 'earnings',  label: 'Earnings history (8Q)',       status: 'idle' },
+  { id: 'dividends', label: 'Dividend history',            status: 'idle' },
+  { id: 'news',      label: 'News & sentiment',            status: 'idle' },
+  { id: 'estimates', label: 'Earnings estimates',          status: 'idle' },
+  { id: 'insider',   label: 'Insider transactions',        status: 'idle' },
+  { id: 'shares',    label: 'Shares outstanding history',  status: 'idle' },
 ];
 
 // ── DCF Scenario Table ────────────────────────────────────────────────────────
@@ -108,6 +112,9 @@ function DCFTable({ ps }: { ps: PhaseScore }) {
           ★ Margin of Safety and phase score are calculated against the <strong style={{ color: 'var(--text-h)' }}>Base</strong> scenario.
         </div>
       )}
+      <div style={{ marginTop: 4, fontSize: 10, color: 'var(--text-muted)' }}>
+        Intrinsic value shown is equity value (enterprise value less net debt).
+      </div>
     </div>
   );
 }
@@ -330,7 +337,7 @@ function CompositeCard({ phases }: { phases: PhaseScore[] }) {
         </div>
       </div>
       <div style={{ marginTop: 14, fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.6, borderTop: '1px solid var(--border)', paddingTop: 10 }}>
-        Weighted composite: Financial Health 25% · Earnings 20% · Valuation 20% · DCF 15% · Dividends 10% · Sentiment 10%. Scores use growth-regime-adjusted curves. Qualitative factors (Phase 1, 8) not included.
+        Weighted composite: Financial Health 25% · Earnings 15% · Valuation 17% · DCF 20% · Dividends 8% · Sentiment 15%. Scores use growth-regime-adjusted curves. Qualitative factors (Phase 1, 8) not included.
       </div>
     </div>
   );
@@ -430,6 +437,39 @@ export function AutoAnalysis() {
         newsItems = (newsRaw.feed as AVNewsItem[]) ?? [];
       } catch { /* not fatal */ }
       setStep('news', 'done');
+      await sleep(1200);
+
+      // EARNINGS ESTIMATES
+      setStep('estimates', 'loading');
+      let estimatesData: AVEarningsEstimate[] = [];
+      try {
+        const estRaw = await avFetch('EARNINGS_ESTIMATES', sym, apiKey) as Record<string, unknown>;
+        if (abortRef.current) return;
+        estimatesData = (estRaw.data as AVEarningsEstimate[]) ?? [];
+      } catch { /* not fatal */ }
+      setStep('estimates', 'done');
+      await sleep(1200);
+
+      // INSIDER TRANSACTIONS
+      setStep('insider', 'loading');
+      let insiderData: AVInsiderTransaction[] = [];
+      try {
+        const insRaw = await avFetch('INSIDER_TRANSACTIONS', sym, apiKey) as Record<string, unknown>;
+        if (abortRef.current) return;
+        insiderData = (insRaw.data as AVInsiderTransaction[]) ?? [];
+      } catch { /* not fatal */ }
+      setStep('insider', 'done');
+      await sleep(1200);
+
+      // SHARES OUTSTANDING
+      setStep('shares', 'loading');
+      let sharesData: AVSharesEntry[] = [];
+      try {
+        const sharesRaw = await avFetch('SHARES_OUTSTANDING', sym, apiKey) as Record<string, unknown>;
+        if (abortRef.current) return;
+        sharesData = (sharesRaw.data as AVSharesEntry[]) ?? [];
+      } catch { /* not fatal */ }
+      setStep('shares', 'done');
 
       if (abortRef.current) return;
 
@@ -437,14 +477,19 @@ export function AutoAnalysis() {
       const detectedRegime = detectGrowthRegime(ov, income, quarterly, annual);
       setRegime(detectedRegime);
 
+      // Use freshest share count from SHARES_OUTSTANDING if available
+      const freshShares = sharesData.length > 0
+        ? (sharesData[0]?.commonStockSharesOutstanding ? parseFloat(sharesData[0].commonStockSharesOutstanding) || null : null)
+        : null;
+
       // ── Score all phases ──
       const scored: PhaseScore[] = [
-        scoreFinancialHealth(income, balance, cashflow),
-        scoreEarningsQuality(quarterly, annual, detectedRegime),
-        scoreValuation(ov, price, detectedRegime),
-        scoreDCF(cashflow, ov, price, detectedRegime),
-        scoreDividends(divEntries, cashflow, income, ov),
-        scoreSentiment(newsItems, sym, ov),
+        scoreFinancialHealth(income, balance, cashflow, detectedRegime),
+        scoreEarningsQuality(quarterly, annual, detectedRegime, estimatesData),
+        scoreValuation(ov, price, detectedRegime, balance, estimatesData),
+        scoreDCF(cashflow, ov, price, detectedRegime, balance, freshShares, estimatesData),
+        scoreDividends(divEntries, cashflow, income, ov, price, freshShares, sharesData),
+        scoreSentiment(newsItems, sym, ov, insiderData, detectedRegime),
       ];
       setPhases(scored);
       setDone(true);
@@ -482,7 +527,7 @@ export function AutoAnalysis() {
           </span>
         </div>
         <p style={{ margin: '0 0 16px', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
-          Enter a ticker and your Alpha Vantage API key. Fetches 7 endpoints, detects growth regime, scores each phase 0–100 with growth-adjusted curves, and provides a detailed justification. Free tier: 25 calls/day — this analysis uses 8 calls.
+          Fetches 10 endpoints, detects growth regime, scores each phase 0–100 with growth-adjusted curves, and provides a detailed justification. Free tier: 25 calls/day — this analysis uses 11 calls.
         </p>
 
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
