@@ -1079,10 +1079,6 @@ export function scoreDividends(
   const netLeverage = ebitda != null && ebitda > 0 ? netDebt / ebitda : null;
   const highLeverage = netLeverage != null && netLeverage > 2 && buybacksRaw > 0;
 
-  // ── ROIC proxy (Fix 8) ──
-  const roic = nn(ov.ReturnOnEquityTTM); // Proxy; actual ROIC would need more data
-  const roicPts = roic == null ? 5 : roic > 0.25 ? 10 : roic > 0.15 ? 8 : roic > 0.08 ? 5 : 2;
-
   if (!hasDividend) {
     // ── Non-dividend path (Fix 8) ──
 
