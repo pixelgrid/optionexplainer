@@ -28,6 +28,14 @@ import { NewsSentiment } from './pages/NewsSentiment';
 import { ZeroCostCollar } from './pages/ZeroCostCollar';
 import { StocksGlossary } from './pages/StocksGlossary';
 import { ResearchFramework } from './pages/ResearchFramework';
+import { BondBasics } from './pages/BondBasics';
+import { BondPricing } from './pages/BondPricing';
+import { YieldCurve } from './pages/YieldCurve';
+import { CreditAnalysis } from './pages/CreditAnalysis';
+import { BondStrategies } from './pages/BondStrategies';
+import { RelativeValue } from './pages/RelativeValue';
+import { BondMacro } from './pages/BondMacro';
+import { BondGlossary } from './pages/BondGlossary';
 
 export default function App() {
   return (
@@ -62,6 +70,14 @@ export default function App() {
         <Route path="/zero-cost-collar" element={<ZeroCostCollar />} />
         <Route path="/stocks-glossary" element={<StocksGlossary />} />
         <Route path="/research-framework" element={<ResearchFramework />} />
+        <Route path="/bond-basics" element={<BondBasics />} />
+        <Route path="/bond-pricing" element={<BondPricing />} />
+        <Route path="/yield-curve" element={<YieldCurve />} />
+        <Route path="/credit-analysis" element={<CreditAnalysis />} />
+        <Route path="/bond-strategies" element={<BondStrategies />} />
+        <Route path="/bond-relative-value" element={<RelativeValue />} />
+        <Route path="/bond-macro" element={<BondMacro />} />
+        <Route path="/bond-glossary" element={<BondGlossary />} />
       </Routes>
     </HashRouter>
   );

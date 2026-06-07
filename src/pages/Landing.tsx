@@ -56,6 +56,16 @@ const STOCK_TOOLS: Tool[] = [
   { to: '/news-sentiment', name: 'News Sentiment & Summary', desc: 'Local AI analysis of financial news and SEC filings — sentiment scoring, abstractive summary, and key bullish/bearish signals.', tag: 'Local AI', tagColor: '#ec4899' },
 ];
 
+const BOND_TOOLS: Tool[] = [
+  { to: '/bond-basics', name: 'Bond Basics', desc: 'Par value, coupons, yield measures (YTM/YTW/YTC), clean vs dirty price, bond types, and T+1/T+2 settlement.' },
+  { to: '/bond-pricing', name: 'Pricing & Duration', desc: 'Price/yield relationship, Macaulay and modified duration, DV01, convexity, and the full price-change approximation formula.' },
+  { to: '/yield-curve', name: 'Yield Curve', desc: 'Spot/forward/par rates, term structure theories, curve shapes, on/off-the-run, and steepener/flattener/butterfly trades.' },
+  { to: '/credit-analysis', name: 'Credit Analysis', desc: 'Rating scales, G-spread vs Z-spread vs OAS, CDS mechanics, fallen angels, and key credit metrics by sector.' },
+  { to: '/bond-strategies', name: 'Portfolio Strategies', desc: 'Laddering, barbell, bullet, roll-down harvesting, duration immunization, and carry trades — with pro/con analysis.' },
+  { to: '/bond-relative-value', name: 'Relative Value', desc: 'Asset swap spreads, carry & roll-down decomposition, swap spreads, CTD analysis, and cross-currency basis.' },
+  { to: '/bond-macro', name: 'Macro & Rates', desc: 'Real vs nominal yields, TIPS breakevens, duration positioning, term premium, bear flattener vs bull steepener regimes.' },
+];
+
 function ToolCard({ tool, accent }: { tool: Tool; accent: string }) {
   const navigate = useNavigate();
   return (
@@ -105,7 +115,7 @@ export function Landing() {
           Meridian
         </h1>
         <p style={{ margin: '0 auto 28px', color: 'var(--text-muted)', fontSize: 'clamp(14px, 2vw, 17px)', maxWidth: 560, lineHeight: 1.6 }}>
-          A free toolkit for traders and investors — options strategies, volatility analysis, stock fundamentals, and more.
+          A free toolkit for traders and investors — options strategies, volatility analysis, stock fundamentals, fixed income, and more.
         </p>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button onClick={() => navigate('/strategies')}
@@ -115,6 +125,10 @@ export function Landing() {
           <button onClick={() => navigate('/financials')}
             style={{ background: 'none', color: 'var(--text)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
             Stock Research →
+          </button>
+          <button onClick={() => navigate('/bond-basics')}
+            style={{ background: 'none', color: '#f59e0b', border: '1px solid #f59e0b', borderRadius: 10, padding: '12px 28px', fontSize: 15, fontWeight: 600, cursor: 'pointer' }}>
+            Fixed Income →
           </button>
         </div>
       </div>
@@ -172,6 +186,33 @@ export function Landing() {
             Your API key is saved locally in the browser and shared across all stock tools.
             Get a free key at <strong style={{ color: 'var(--text-h)' }}>alphavantage.co/support/#api-key</strong>
           </div>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, var(--border), transparent)', margin: '56px 0' }} />
+
+      {/* ── BONDS SECTION ── */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
+          <div style={{ width: 5, height: 32, borderRadius: 3, background: 'linear-gradient(180deg, #f59e0b, #d97706)' }} />
+          <div>
+            <h2 style={{ margin: 0, color: 'var(--text-h)', fontSize: 26, fontWeight: 700 }}>Fixed Income</h2>
+            <div style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 2 }}>Professional-depth coverage of bond markets — from anatomy to macro positioning</div>
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 10 }}>
+          {BOND_TOOLS.map(tool => (
+            <ToolCard key={tool.to} tool={tool} accent="#f59e0b" />
+          ))}
+        </div>
+
+        <div style={{ marginTop: 16 }}>
+          <button onClick={() => navigate('/bond-basics')}
+            style={{ background: '#f59e0b', color: '#000', border: 'none', borderRadius: 10, padding: '11px 24px', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            Bond Tools →
+          </button>
         </div>
       </div>
 

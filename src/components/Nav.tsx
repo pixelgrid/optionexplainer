@@ -73,6 +73,30 @@ const NAV_SECTIONS: NavSection[] = [
       },
     ],
   },
+  {
+    id: 'bonds',
+    label: 'Bonds',
+    accent: '#f59e0b',
+    groups: [
+      {
+        heading: 'Fundamentals',
+        links: [
+          { to: '/bond-basics', label: 'Bond Basics' },
+          { to: '/bond-pricing', label: 'Pricing & Duration' },
+          { to: '/yield-curve', label: 'Yield Curve' },
+          { to: '/credit-analysis', label: 'Credit Analysis' },
+        ],
+      },
+      {
+        heading: 'Strategy',
+        links: [
+          { to: '/bond-strategies', label: 'Portfolio Strategies' },
+          { to: '/bond-relative-value', label: 'Relative Value' },
+          { to: '/bond-macro', label: 'Macro & Rates' },
+        ],
+      },
+    ],
+  },
 ];
 
 // ── Theme toggle button ────────────────────────────────────────────────────
@@ -220,7 +244,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
       zIndex: 40, overflowY: 'auto', borderTop: '1px solid var(--border)', paddingBottom: 24,
     }}>
       {/* Home + Glossary links */}
-      {[{ to: '/', label: 'Home' }, { to: '/glossary', label: 'Options Glossary' }, { to: '/stocks-glossary', label: 'Stock Ratios' }].map(({ to, label }) => (
+      {[{ to: '/', label: 'Home' }, { to: '/glossary', label: 'Options Glossary' }, { to: '/stocks-glossary', label: 'Stock Ratios' }, { to: '/bond-glossary', label: 'Bond Glossary' }].map(({ to, label }) => (
         <button key={to} onClick={() => go(to)} style={{
           display: 'block', width: '100%', textAlign: 'left',
           padding: '13px 20px', background: 'none', border: 'none',
@@ -313,6 +337,7 @@ export function Nav() {
         <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <NavLink to="/glossary" style={linkStyle}>Options Glossary</NavLink>
           <NavLink to="/stocks-glossary" style={linkStyle}>Stock Ratios</NavLink>
+          <NavLink to="/bond-glossary" style={linkStyle}>Bond Glossary</NavLink>
           {NAV_SECTIONS.map(s => <Dropdown key={s.id} section={s} />)}
           <ThemeToggle />
         </div>
