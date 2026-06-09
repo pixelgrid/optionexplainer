@@ -36,6 +36,7 @@ import { BondStrategies } from './pages/BondStrategies';
 import { RelativeValue } from './pages/RelativeValue';
 import { BondMacro } from './pages/BondMacro';
 import { BondGlossary } from './pages/BondGlossary';
+import { TradrSignals } from './pages/TradrSignals';
 
 export default function App() {
   return (
@@ -78,6 +79,7 @@ export default function App() {
         <Route path="/bond-relative-value" element={<RelativeValue />} />
         <Route path="/bond-macro" element={<BondMacro />} />
         <Route path="/bond-glossary" element={<BondGlossary />} />
+        <Route path="/tradr" element={<TradrSignals />} />
       </Routes>
     </HashRouter>
   );
