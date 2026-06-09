@@ -1,6 +1,9 @@
 import { useState, useCallback } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { avFetch, LS_AV_KEY, nn, fmtMoney, sleep } from '../lib/avClient';
+import { getCached, saveCache, clearCache } from '../lib/jsonbinCache';
+
+const PAGE = 'dividend-safety';
 
 interface DividendEntry {
   ex_dividend_date: string;
@@ -87,6 +90,7 @@ export function DividendSafety() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [ticker, setTicker] = useState('');
+  const [fromCache, setFromCache] = useState(false);
 
   const saveKey = (k: string) => {
     setApiKey(k);
@@ -94,19 +98,28 @@ export function DividendSafety() {
     else localStorage.removeItem(LS_AV_KEY);
   };
 
-  const search = useCallback(async (sym: string, key: string) => {
+  const search = useCallback(async (sym: string, key: string, forceRefresh = false) => {
     if (!sym.trim() || !key.trim()) return;
+    const symUp = sym.trim().toUpperCase();
     setLoading(true); setError('');
     try {
+      if (!forceRefresh) {
+        const cached = await getCached<DividendData>(PAGE, symUp);
+        if (cached) { setData(cached); setTicker(symUp); setFromCache(true); return; }
+      }
       const d = await fetchDividendData(sym.trim(), key.trim());
-      setData(d);
-      setTicker(sym.trim().toUpperCase());
+      await saveCache(PAGE, symUp, d);
+      setData(d); setTicker(symUp); setFromCache(false);
     } catch (e) {
       setError((e as Error).message ?? 'Failed to fetch data');
     } finally {
       setLoading(false);
     }
   }, []);
+
+  const refresh = useCallback(() => {
+    if (ticker) { clearCache(PAGE, ticker); search(ticker, apiKey, true); }
+  }, [ticker, apiKey, search]);
 
   // Derived metrics
   const divs = data?.dividends ?? [];
@@ -228,6 +241,7 @@ export function DividendSafety() {
           ) : (
             <>
               {/* Safety badge */}
+              {fromCache && <div style={{ marginBottom: 12 }}><button onClick={refresh} disabled={loading} style={{ background: '#6366f115', color: '#818cf8', border: '1px solid #6366f130', borderRadius: 6, padding: '3px 10px', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>cached · refresh</button></div>}
               {safety && (
                 <div style={{ marginBottom: 24 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>

@@ -1,6 +1,9 @@
 import { useState, useCallback } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ResponsiveContainer, Cell } from 'recharts';
 import { avFetch, LS_AV_KEY, sleep } from '../lib/avClient';
+import { getCached, saveCache, clearCache } from '../lib/jsonbinCache';
+
+const PAGE = 'earnings-surprises';
 
 interface QuarterlyEarning {
   fiscalDateEnding: string;
@@ -89,6 +92,8 @@ export function EarningsSurprises() {
   const [data, setData] = useState<EarningsData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [ticker, setTicker] = useState('');
+  const [fromCache, setFromCache] = useState(false);
 
   const saveKey = (k: string) => {
     setApiKey(k);
@@ -96,18 +101,28 @@ export function EarningsSurprises() {
     else localStorage.removeItem(LS_AV_KEY);
   };
 
-  const search = useCallback(async (sym: string, key: string) => {
+  const search = useCallback(async (sym: string, key: string, forceRefresh = false) => {
     if (!sym.trim() || !key.trim()) return;
+    const symUp = sym.trim().toUpperCase();
     setLoading(true); setError('');
     try {
+      if (!forceRefresh) {
+        const cached = await getCached<EarningsData>(PAGE, symUp);
+        if (cached) { setData(cached); setTicker(symUp); setFromCache(true); return; }
+      }
       const d = await fetchEarnings(sym.trim(), key.trim());
-      setData(d);
+      await saveCache(PAGE, symUp, d);
+      setData(d); setTicker(symUp); setFromCache(false);
     } catch (e) {
       setError((e as Error).message ?? 'Failed to fetch data');
     } finally {
       setLoading(false);
     }
   }, []);
+
+  const refresh = useCallback(() => {
+    if (ticker) { clearCache(PAGE, ticker); search(ticker, apiKey, true); }
+  }, [ticker, apiKey, search]);
 
   // Compute stats from quarterly data
   const quarters = data?.quarterly?.slice(0, 20) ?? [];
@@ -204,7 +219,10 @@ export function EarningsSurprises() {
         <>
           {/* Summary stats */}
           <div style={{ marginBottom: 24 }}>
-            <SectionHeader title={`${data.symbol} — Earnings Summary`} color="#6366f1" />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 4 }}>
+              <SectionHeader title={`${data.symbol} — Earnings Summary`} color="#6366f1" />
+              {fromCache && <button onClick={refresh} disabled={loading} style={{ background: '#6366f115', color: '#818cf8', border: '1px solid #6366f130', borderRadius: 6, padding: '3px 10px', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>cached · refresh</button>}
+            </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
               <StatBox label="BEAT RATE" value={beatRate != null ? beatRate.toFixed(0) + '%' : '—'}
                 sub={`${beats.length} of ${withEstimates.length} qtrs`}

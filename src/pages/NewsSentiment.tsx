@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { avFetch, LS_AV_KEY, sleep } from '../lib/avClient';
+import { getCached, saveCache, clearCache } from '../lib/jsonbinCache';
+
+const PAGE = 'news-sentiment';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -187,6 +190,7 @@ export function NewsSentiment() {
   const [newsLoading, setNewsLoading] = useState(false);
   const [newsError, setNewsError] = useState('');
   const [articles, setArticles] = useState<AVArticle[]>([]);
+  const [fromCache, setFromCache] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [pastedText, setPastedText] = useState('');
 
@@ -285,21 +289,33 @@ export function NewsSentiment() {
 
   // ── News fetch ────────────────────────────────────────────────────────
 
-  const fetchNews = useCallback(async () => {
+  const fetchNews = useCallback(async (forceRefresh = false) => {
     if (!ticker.trim() || !apiKey.trim()) return;
+    const symUp = ticker.trim().toUpperCase();
     setNewsLoading(true); setNewsError(''); setArticles([]); setSelectedIdx(null); setResult(null);
     try {
-      const data = await avFetch('NEWS_SENTIMENT', ticker.trim().toUpperCase(), apiKey.trim());
+      if (!forceRefresh) {
+        const cached = await getCached<AVArticle[]>(PAGE, symUp);
+        if (cached) { setArticles(cached); setFromCache(true); return; }
+      }
+      const data = await avFetch('NEWS_SENTIMENT', symUp, apiKey.trim());
       await sleep(0);
       const feed = (data.feed as AVArticle[] | undefined) ?? [];
-      if (!feed.length) throw new Error(`No news found for ${ticker.toUpperCase()}`);
-      setArticles(feed.slice(0, 10));
+      if (!feed.length) throw new Error(`No news found for ${symUp}`);
+      const articles = feed.slice(0, 10);
+      await saveCache(PAGE, symUp, articles);
+      setArticles(articles); setFromCache(false);
     } catch (e) {
       setNewsError((e as Error).message);
     } finally {
       setNewsLoading(false);
     }
   }, [ticker, apiKey]);
+
+  const refreshNews = useCallback(() => {
+    clearCache(PAGE, ticker.trim().toUpperCase());
+    fetchNews(true);
+  }, [ticker, fetchNews]);
 
   // ── Analyze ───────────────────────────────────────────────────────────
 
@@ -421,8 +437,11 @@ export function NewsSentiment() {
 
             {articles.length > 0 && (
               <div>
-                <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em', marginBottom: 10 }}>
-                  SELECT AN ARTICLE TO ANALYZE
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, letterSpacing: '0.05em' }}>
+                    SELECT AN ARTICLE TO ANALYZE
+                  </div>
+                  {fromCache && <button onClick={refreshNews} disabled={newsLoading} style={{ background: '#6366f115', color: '#818cf8', border: '1px solid #6366f130', borderRadius: 6, padding: '3px 10px', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>cached · refresh</button>}
                 </div>
                 <div style={{ display: 'grid', gap: 8 }}>
                   {articles.map((a, i) => (

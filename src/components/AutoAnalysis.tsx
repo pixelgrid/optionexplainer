@@ -1,5 +1,8 @@
 import { useState, useRef } from 'react';
 import { avFetch, LS_AV_KEY, sleep } from '../lib/avClient';
+import { getCached, saveCache, clearCache } from '../lib/jsonbinCache';
+
+const PAGE = 'auto-analysis';
 import {
   detectGrowthRegime,
   scoreFinancialHealth, scoreEarningsQuality, scoreValuation, scoreDCF,
@@ -356,12 +359,44 @@ export function AutoAnalysis() {
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [fromCache, setFromCache] = useState(false);
   const abortRef = useRef(false);
 
   const setStep = (id: string, status: FetchStep['status'], err?: string) =>
     setSteps(prev => prev.map(s => s.id === id ? { ...s, status, error: err } : s));
 
-  const runAnalysis = async () => {
+  type AnalysisCache = {
+    ov: AVOverview; price: number | null;
+    income: AVReport[]; balance: AVReport[]; cashflow: AVReport[];
+    quarterly: AVEarningsQuarter[]; annual: AVEarningsAnnual[];
+    divEntries: AVDividendEntry[]; newsItems: AVNewsItem[];
+    estimatesData: AVEarningsEstimate[]; insiderData: AVInsiderTransaction[];
+    sharesData: AVSharesEntry[];
+  };
+
+  const scoreFromRaw = (raw: AnalysisCache) => {
+    const { ov, price, income, balance, cashflow, quarterly, annual,
+            divEntries, newsItems, estimatesData, insiderData, sharesData } = raw;
+    const detectedRegime = detectGrowthRegime(ov, income, quarterly, annual);
+    setRegime(detectedRegime);
+    setCompanyName(ov.Name); setSector(ov.Sector);
+    const freshShares = sharesData.length > 0
+      ? (sharesData[0]?.commonStockSharesOutstanding ? parseFloat(sharesData[0].commonStockSharesOutstanding) || null : null)
+      : null;
+    const scored: PhaseScore[] = [
+      scoreFinancialHealth(income, balance, cashflow, detectedRegime),
+      scoreEarningsQuality(quarterly, annual, detectedRegime, estimatesData),
+      scoreValuation(ov, price, detectedRegime, balance, estimatesData),
+      scoreDCF(cashflow, ov, price, detectedRegime, balance, freshShares, estimatesData),
+      scoreDividends(divEntries, cashflow, income, ov, price, freshShares, sharesData),
+      scoreSentiment(newsItems, ov.Symbol ?? '', ov, insiderData, detectedRegime),
+    ];
+    setPhases(scored);
+    setSteps(STEPS.map(s => ({ ...s, status: 'done' })));
+    setDone(true);
+  };
+
+  const runAnalysis = async (forceRefresh = false) => {
     if (!ticker.trim() || !apiKey.trim()) return;
     localStorage.setItem(LS_AV_KEY, apiKey);
     abortRef.current = false;
@@ -371,6 +406,16 @@ export function AutoAnalysis() {
     const sym = ticker.trim().toUpperCase();
 
     try {
+      // Check cache
+      if (!forceRefresh) {
+        const cached = await getCached<AnalysisCache>(PAGE, sym);
+        if (cached) {
+          scoreFromRaw(cached);
+          setFromCache(true);
+          return;
+        }
+      }
+
       // OVERVIEW
       setStep('overview', 'loading');
       const ovRaw = await avFetch('OVERVIEW', sym, apiKey);
@@ -473,26 +518,13 @@ export function AutoAnalysis() {
 
       if (abortRef.current) return;
 
-      // ── Detect growth regime ONCE (architectural fix) ──
-      const detectedRegime = detectGrowthRegime(ov, income, quarterly, annual);
-      setRegime(detectedRegime);
-
-      // Use freshest share count from SHARES_OUTSTANDING if available
-      const freshShares = sharesData.length > 0
-        ? (sharesData[0]?.commonStockSharesOutstanding ? parseFloat(sharesData[0].commonStockSharesOutstanding) || null : null)
-        : null;
+      // ── Save to JSONBin cache ──
+      const rawData: AnalysisCache = { ov, price, income, balance, cashflow, quarterly, annual, divEntries, newsItems, estimatesData, insiderData, sharesData };
+      saveCache(PAGE, sym, rawData);
 
       // ── Score all phases ──
-      const scored: PhaseScore[] = [
-        scoreFinancialHealth(income, balance, cashflow, detectedRegime),
-        scoreEarningsQuality(quarterly, annual, detectedRegime, estimatesData),
-        scoreValuation(ov, price, detectedRegime, balance, estimatesData),
-        scoreDCF(cashflow, ov, price, detectedRegime, balance, freshShares, estimatesData),
-        scoreDividends(divEntries, cashflow, income, ov, price, freshShares, sharesData),
-        scoreSentiment(newsItems, sym, ov, insiderData, detectedRegime),
-      ];
-      setPhases(scored);
-      setDone(true);
+      scoreFromRaw(rawData);
+      setFromCache(false);
 
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Unknown error');
@@ -506,7 +538,13 @@ export function AutoAnalysis() {
     setRunning(false); setDone(false); setError(null);
     setPhases([]); setRegime(null);
     setSteps(STEPS.map(s => ({ ...s, status: 'idle' })));
-    setCompanyName(''); setSector('');
+    setCompanyName(''); setSector(''); setFromCache(false);
+  };
+
+  const refreshAnalysis = () => {
+    clearCache(PAGE, ticker.trim().toUpperCase());
+    reset();
+    runAnalysis(true);
   };
 
   const anyRunning = steps.some(s => s.status === 'loading');
@@ -616,6 +654,11 @@ export function AutoAnalysis() {
               </div>
               {sector && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{sector}</div>}
             </div>
+            {fromCache && (
+              <button onClick={refreshAnalysis} disabled={running} style={{ background: '#6366f115', color: '#818cf8', border: '1px solid #6366f130', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
+                cached · refresh
+              </button>
+            )}
             {regime && (
               <div style={{
                 padding: '6px 12px', borderRadius: 6,
