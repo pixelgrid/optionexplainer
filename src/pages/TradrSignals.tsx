@@ -700,15 +700,16 @@ function HistoryRow({ sig, isLast }: { sig: HistorySignal; isLast: boolean }) {
     <div style={{
       display: 'flex', alignItems: 'center', gap: 14,
       padding: '14px 16px',
-      borderBottom: isLast ? 'none' : '1px solid #1e2128',
+      borderBottom: isLast ? 'none' : '1px solid var(--border)',
     }}>
       {/* Time box */}
       <div style={{
-        minWidth: 52, background: '#1a1d24', borderRadius: 8,
+        minWidth: 52, background: 'var(--bg)', borderRadius: 8,
         padding: '6px 8px', textAlign: 'center', flexShrink: 0,
+        border: '1px solid var(--border)',
       }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-h)', lineHeight: 1.2 }}>{entry.time}</div>
-        <div style={{ fontSize: 10, color: '#6b7280', marginTop: 1 }}>{entry.ampm}</div>
+        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 1 }}>{entry.ampm}</div>
       </div>
 
       {/* Symbol + price */}
@@ -717,14 +718,9 @@ function HistoryRow({ sig, isLast }: { sig: HistorySignal; isLast: boolean }) {
           <span style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-h)', fontFamily: 'monospace', letterSpacing: '-0.01em' }}>
             {sig.symbol}
           </span>
-          {premarket && (
-            <span style={{
-              background: '#6366f122', color: '#818cf8', border: '1px solid #6366f144',
-              borderRadius: 4, padding: '1px 6px', fontSize: 10, fontWeight: 700,
-            }}>PRE</span>
-          )}
+          {premarket && <Pill label="PRE" color="var(--accent)" />}
         </div>
-        <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>${fmt(sig.signalPrice)}</div>
+        <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>${fmt(sig.signalPrice)}</div>
       </div>
 
       {/* Gain + peak badge */}
@@ -735,9 +731,9 @@ function HistoryRow({ sig, isLast }: { sig: HistorySignal; isLast: boolean }) {
         {showPeak && (
           <div style={{
             marginTop: 5,
-            background: '#1a1d24', border: '1px solid #2a2d35',
+            background: 'var(--bg)', border: '1px solid var(--border)',
             borderRadius: 6, padding: '3px 8px',
-            fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.04em',
+            fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.04em',
           }}>
             {fmtPeakTime(sig.timeToPeakMins)}
           </div>
@@ -780,7 +776,7 @@ function HistoryTab() {
               </div>
               <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14 }}>
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 14, padding: '14px 16px', borderBottom: i < 3 ? '1px solid #1e2128' : 'none' }}>
+                  <div key={i} style={{ display: 'flex', gap: 14, padding: '14px 16px', borderBottom: i < 3 ? '1px solid var(--border)' : 'none' }}>
                     <Skeleton width={52} height={40} />
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
                       <Skeleton width="40%" height={16} />
@@ -804,12 +800,12 @@ function HistoryTab() {
       {!loading && !error && groups.map(group => (
         <div key={group.key}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', letterSpacing: '0.06em' }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.06em' }}>
               {group.label}
             </span>
-            <span style={{ fontSize: 12, color: '#6b7280' }}>{group.items.length} signal{group.items.length !== 1 ? 's' : ''}</span>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{group.items.length} signal{group.items.length !== 1 ? 's' : ''}</span>
           </div>
-          <div style={{ background: '#13151b', border: '1px solid #1e2128', borderRadius: 14, overflow: 'hidden' }}>
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
             {group.items.map((sig, i) => (
               <HistoryRow key={sig.id} sig={sig} isLast={i === group.items.length - 1} />
             ))}
