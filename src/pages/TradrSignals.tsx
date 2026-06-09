@@ -330,7 +330,7 @@ function SignalModal({ item, onClose }: { item: FeedItem; onClose: () => void })
         {/* Signal factors */}
         <div style={{ background: '#1c1f26', border: '1px solid #2a2d35', borderRadius: 14, overflow: 'hidden' }}>
           {FACTOR_ORDER.map((key, i) => {
-            const factor = (item.signalFactors as Record<string, FactorDetail | undefined>)[key];
+            const factor = (item.signalFactors as unknown as Record<string, FactorDetail | undefined>)[key];
             if (!factor) return null;
             const isLast = i === FACTOR_ORDER.length - 1;
             const labelColor = factor.status === 'met' ? 'var(--text-h)' : '#6b7280';
