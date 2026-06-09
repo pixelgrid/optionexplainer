@@ -671,8 +671,8 @@ export function FinancialStatements() {
   const ratioRows = computeRatios(incStmts, balStmts, cfStmts);
 
   // Quality scores always use annual data
-  const piotroski = data ? computePiotroski(data.incomeAnnual, data.balanceAnnual, data.cashflowAnnual) : null;
-  const altman = data ? computeAltmanZ(data.incomeAnnual, data.balanceAnnual) : null;
+  const piotroski = data ? computePiotroski(data.incomeAnnual ?? [], data.balanceAnnual ?? [], data.cashflowAnnual ?? []) : null;
+  const altman = data ? computeAltmanZ(data.incomeAnnual ?? [], data.balanceAnnual ?? []) : null;
 
   const TABS = [
     { id: 'income'   as Tab, label: 'Income Statement', color: '#10b981' },
