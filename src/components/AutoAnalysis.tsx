@@ -577,7 +577,7 @@ export function AutoAnalysis() {
             placeholder="Alpha Vantage API key" type="password" disabled={running}
             style={{ flex: 1, minWidth: 180, background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8, padding: '9px 13px', color: 'var(--text-h)', fontSize: 13, outline: 'none' }} />
           {!running ? (
-            <button onClick={runAnalysis} disabled={!ticker.trim() || !apiKey.trim()}
+            <button onClick={() => runAnalysis()} disabled={!ticker.trim() || !apiKey.trim()}
               style={{ background: '#6366f1', border: 'none', borderRadius: 8, padding: '9px 22px', fontSize: 13, fontWeight: 700, color: '#fff', cursor: ticker.trim() && apiKey.trim() ? 'pointer' : 'not-allowed', opacity: ticker.trim() && apiKey.trim() ? 1 : 0.5, transition: 'opacity 0.15s' }}>
               Run Analysis →
             </button>
