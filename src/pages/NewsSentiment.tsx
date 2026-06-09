@@ -411,7 +411,7 @@ export function NewsSentiment() {
                 <input placeholder="Alpha Vantage API key" style={{ ...inputStyle, flex: 1, minWidth: 180 }}
                   onChange={e => { setApiKey(e.target.value); localStorage.setItem(LS_AV_KEY, e.target.value); }} />
               )}
-              <button onClick={fetchNews} disabled={newsLoading || !ticker.trim() || !apiKey.trim()}
+              <button onClick={() => fetchNews()} disabled={newsLoading || !ticker.trim() || !apiKey.trim()}
                 style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: newsLoading ? 'not-allowed' : 'pointer', opacity: newsLoading ? 0.7 : 1, whiteSpace: 'nowrap' }}>
                 {newsLoading ? 'Loading…' : 'Fetch News'}
               </button>
