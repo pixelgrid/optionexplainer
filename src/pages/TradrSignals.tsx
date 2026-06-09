@@ -16,13 +16,16 @@ interface StrengthFactors {
   wasQuietBefore: boolean;
 }
 
-interface FactorDetail { status: string; label: string }
+interface FactorDetail { status: string; label: string; code?: string }
 
 interface SignalFactors {
   premarketSurge: FactorDetail;
   gap: FactorDetail;
   float: FactorDetail;
-  volume: FactorDetail;
+  volume?: FactorDetail;
+  volatility?: FactorDetail;
+  momentum?: FactorDetail;
+  entryBelowPmHigh?: FactorDetail;
 }
 
 interface FeedItem {
@@ -33,6 +36,7 @@ interface FeedItem {
   peakPrice: number;
   peakGainPct: number;
   tradingDate: string;
+  peakTimestamp?: string;
   isActive: boolean;
   tradingHalted: boolean;
   signalStrength: number;
@@ -167,19 +171,214 @@ function ErrorBox({ message, onRetry }: { message: string; onRetry: () => void }
   );
 }
 
+// ── Signal Modal ───────────────────────────────────────────────────────────
+
+function fmtTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
+const FACTOR_LABELS: Record<string, string> = {
+  premarketSurge: 'Premarket Surge',
+  gap: 'Gap Up',
+  float: 'Float',
+  volatility: 'Volatility',
+  momentum: 'Momentum',
+  entryBelowPmHigh: 'Entry position',
+};
+
+const FACTOR_ORDER = ['premarketSurge', 'gap', 'float', 'volatility', 'momentum', 'entryBelowPmHigh'];
+
+function FactorIcon({ status }: { status: string }) {
+  if (status === 'met') {
+    return (
+      <div style={{
+        width: 32, height: 32, borderRadius: '50%', background: '#10b98122',
+        border: '1px solid #10b98144', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexShrink: 0,
+      }}>
+        <span style={{ color: '#10b981', fontSize: 15, fontWeight: 700 }}>✓</span>
+      </div>
+    );
+  }
+  if (status === 'neutral') {
+    return (
+      <div style={{
+        width: 32, height: 32, borderRadius: '50%', background: '#ffffff0d',
+        border: '1px solid #ffffff1a', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        flexShrink: 0,
+      }}>
+        <span style={{ color: '#9ca3af', fontSize: 18, lineHeight: 1 }}>–</span>
+      </div>
+    );
+  }
+  return (
+    <div style={{
+      width: 32, height: 32, borderRadius: '50%', background: '#ffffff0d',
+      border: '1px solid #ffffff1a', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      flexShrink: 0,
+    }}>
+      <span style={{ color: '#6b7280', fontSize: 14, fontWeight: 700 }}>✕</span>
+    </div>
+  );
+}
+
+function SignalModal({ item, onClose }: { item: FeedItem; onClose: () => void }) {
+  const isUp = item.peakGainPct > 0;
+  const plColor = isUp ? '#10b981' : item.peakGainPct < 0 ? '#ef4444' : '#9ca3af';
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 1000,
+        background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+        display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+        padding: '0',
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: '#111318', borderRadius: '20px 20px 0 0',
+          width: '100%', maxWidth: 480,
+          padding: '24px 20px 40px',
+          display: 'flex', flexDirection: 'column', gap: 20,
+          maxHeight: '92vh', overflowY: 'auto',
+        }}
+      >
+        {/* Drag handle */}
+        <div style={{ width: 36, height: 4, borderRadius: 2, background: '#ffffff22', margin: '0 auto -8px' }} />
+
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-h)', fontFamily: 'monospace', letterSpacing: '-0.01em' }}>
+              {item.symbol}
+            </div>
+            <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>{item.companyName}</div>
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              background: '#ffffff11', border: 'none', color: '#9ca3af',
+              borderRadius: 8, width: 32, height: 32, cursor: 'pointer',
+              fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >✕</button>
+        </div>
+
+        {/* External links */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+          {[
+            { label: 'Yahoo Finance', href: `https://finance.yahoo.com/quote/${item.symbol}`, icon: 'Y!' },
+            { label: 'TradingView', href: `https://www.tradingview.com/chart/?symbol=${item.symbol}`, icon: '▲▼' },
+            { label: 'Google Finance', href: `https://www.google.com/finance/quote/${item.symbol}:NASDAQ`, icon: 'G' },
+          ].map(({ label, href, icon }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                background: '#1c1f26', border: '1px solid #2a2d35',
+                borderRadius: 12, padding: '14px 8px',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                textDecoration: 'none', color: 'var(--text-h)',
+                transition: 'border-color 0.15s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.borderColor = '#6366f1')}
+              onMouseLeave={e => (e.currentTarget.style.borderColor = '#2a2d35')}
+            >
+              <span style={{ fontSize: 18, fontWeight: 800, color: '#d1d5db', fontFamily: 'Georgia, serif' }}>{icon}</span>
+              <span style={{ fontSize: 11, color: '#6b7280', textAlign: 'center' }}>{label}</span>
+            </a>
+          ))}
+        </div>
+
+        {/* Price stats */}
+        <div style={{
+          background: '#1c1f26', border: '1px solid #2a2d35',
+          borderRadius: 14, padding: '16px 20px',
+          display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+        }}>
+          {[
+            {
+              label: 'Signal',
+              value: `$${fmt(item.signalPrice)}`,
+              sub: item.tradingDate ? fmtTime(item.tradingDate) : null,
+            },
+            {
+              label: 'High',
+              value: item.peakPrice ? `$${fmt(item.peakPrice)}` : '—',
+              sub: item.peakTimestamp ? fmtTime(item.peakTimestamp) : null,
+            },
+            {
+              label: 'P&L',
+              value: item.peakGainPct !== 0 ? `${isUp ? '+' : ''}${fmt(item.peakGainPct)}%` : '—',
+              color: plColor,
+              sub: '—',
+            },
+          ].map(({ label, value, sub, color }) => (
+            <div key={label} style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 4 }}>{label}</div>
+              <div style={{ fontSize: 17, fontWeight: 700, color: color ?? 'var(--text-h)' }}>{value}</div>
+              {sub && <div style={{ fontSize: 11, color: '#4b5563', marginTop: 2 }}>{sub}</div>}
+            </div>
+          ))}
+        </div>
+
+        {/* Signal factors */}
+        <div style={{ background: '#1c1f26', border: '1px solid #2a2d35', borderRadius: 14, overflow: 'hidden' }}>
+          {FACTOR_ORDER.map((key, i) => {
+            const factor = (item.signalFactors as Record<string, FactorDetail | undefined>)[key];
+            if (!factor) return null;
+            const isLast = i === FACTOR_ORDER.length - 1;
+            const labelColor = factor.status === 'met' ? 'var(--text-h)' : '#6b7280';
+            return (
+              <div
+                key={key}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 14,
+                  padding: '14px 18px',
+                  borderBottom: isLast ? 'none' : '1px solid #1e2128',
+                }}
+              >
+                <FactorIcon status={factor.status} />
+                <span style={{ flex: 1, fontSize: 15, fontWeight: 500, color: labelColor }}>
+                  {FACTOR_LABELS[key] ?? key}
+                </span>
+                <span style={{ fontSize: 15, fontWeight: 600, color: labelColor }}>
+                  {factor.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Feed Tab ───────────────────────────────────────────────────────────────
 
-function FeedCard({ item }: { item: FeedItem }) {
+function FeedCard({ item, onClick }: { item: FeedItem; onClick: () => void }) {
   const sc = strengthColor(item.signalStrength);
   const isUp = item.peakGainPct > 0;
 
   return (
-    <div style={{
-      background: 'var(--bg-card)', border: '1px solid var(--border)',
-      borderRadius: 12, padding: 18, display: 'flex', flexDirection: 'column', gap: 12,
-      borderLeft: `3px solid ${sc}`,
-      opacity: item.isActive ? 1 : 0.65,
-    }}>
+    <div
+      onClick={onClick}
+      style={{
+        background: 'var(--bg-card)', border: '1px solid var(--border)',
+        borderRadius: 12, padding: 18, display: 'flex', flexDirection: 'column', gap: 12,
+        borderLeft: `3px solid ${sc}`,
+        opacity: item.isActive ? 1 : 0.65,
+        cursor: 'pointer',
+        transition: 'border-color 0.15s',
+      }}
+      onMouseEnter={e => (e.currentTarget.style.borderColor = sc)}
+      onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}
+    >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -208,8 +407,8 @@ function FeedCard({ item }: { item: FeedItem }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
         {[
-          { label: 'Premarket', value: item.strengthFactors.premarketSurge ? `+${fmt(item.strengthFactors.premarketSurge)}%` : '—' },
-          { label: 'Gap', value: item.strengthFactors.gap ? `+${fmt(item.strengthFactors.gap)}%` : '—' },
+          { label: 'Signal Price', value: `$${fmt(item.signalPrice)}` },
+          { label: 'Peak Price', value: item.peakPrice ? `$${fmt(item.peakPrice)}` : '—' },
           { label: 'Float', value: fmtK(item.strengthFactors.floatShares) },
         ].map(({ label, value }) => (
           <div key={label} style={{
@@ -238,6 +437,7 @@ function FeedTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'active'>('active');
+  const [selected, setSelected] = useState<FeedItem | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
@@ -302,11 +502,13 @@ function FeedTab() {
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
-              {visible.map(item => <FeedCard key={item.id} item={item} />)}
+              {visible.map(item => <FeedCard key={item.id} item={item} onClick={() => setSelected(item)} />)}
             </div>
           )}
         </>
       )}
+
+      {selected && <SignalModal item={selected} onClose={() => setSelected(null)} />}
     </div>
   );
 }
