@@ -128,6 +128,15 @@ function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+function fmtPeakElapsed(from: string, to: string): string {
+  const mins = Math.round((new Date(to).getTime() - new Date(from).getTime()) / 60000);
+  if (mins < 1) return 'in <1m';
+  if (mins < 60) return `in ${mins}m`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m > 0 ? `in ${h}h ${m}m` : `in ${h}h`;
+}
+
 function isPremarketISO(iso: string): boolean {
   const d = new Date(iso);
   const etStr = d.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour12: false, hour: '2-digit', minute: '2-digit' });
@@ -376,69 +385,55 @@ function SignalModal({ item, onClose }: { item: FeedItem; onClose: () => void })
 
 function FeedCard({ item, onClick }: { item: FeedItem; onClick: () => void }) {
   const sc = strengthColor(item.signalStrength);
-  const isUp = item.peakGainPct > 0;
+  const peakColor = item.peakGainPct >= 50 ? '#f59e0b' : item.peakGainPct >= 10 ? '#10b981' : '#6b7280';
 
   return (
     <div
       onClick={onClick}
       style={{
         background: 'var(--bg-card)', border: '1px solid var(--border)',
-        borderRadius: 12, padding: 18, display: 'flex', flexDirection: 'column', gap: 12,
+        borderRadius: 12, padding: '14px 18px',
+        display: 'flex', alignItems: 'center', gap: 16,
         borderLeft: `3px solid ${sc}`,
-        cursor: 'pointer',
-        transition: 'border-color 0.15s',
+        cursor: 'pointer', transition: 'border-color 0.15s',
       }}
       onMouseEnter={e => (e.currentTarget.style.borderColor = sc)}
       onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border)')}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-h)', fontFamily: 'monospace' }}>
-              {item.symbol}
-            </span>
-            {item.tradingHalted && <Pill label="HALTED" color="#ef4444" />}
-            {isPremarketISO(item.tradingDate) && <Pill label="PRE" color="#6366f1" />}
-            <Pill label={`S${item.signalStrength}`} color={sc} />
-          </div>
-          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>
-            {item.companyName}
-          </div>
+      {/* Symbol + meta */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-h)', fontFamily: 'monospace' }}>
+            {item.symbol}
+          </span>
+          {item.tradingHalted && <Pill label="HALTED" color="#ef4444" />}
+          {isPremarketISO(item.tradingDate) && <Pill label="PRE" color="#6366f1" />}
+          <Pill label={`S${item.signalStrength}`} color={sc} />
         </div>
-        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-          <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--text-h)' }}>
-            ${fmt(item.signalPrice)}
-          </div>
-          {item.peakGainPct > 0 && (
-            <div style={{ fontSize: 13, color: isUp ? '#10b981' : '#ef4444', fontWeight: 600 }}>
-              peak +{fmt(item.peakGainPct)}%
+        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>{item.companyName}</div>
+        <div style={{ display: 'flex', gap: 16, marginTop: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-h)' }}>${fmt(item.signalPrice)}<span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-muted)', marginLeft: 3 }}>entry</span></span>
+          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-h)' }}>{fmtK(item.strengthFactors.floatShares)}<span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-muted)', marginLeft: 3 }}>float</span></span>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{timeAgo(item.tradingDate)}</span>
+        </div>
+      </div>
+
+      {/* Peak gain + elapsed time */}
+      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+        {item.peakGainPct > 0 ? (
+          <>
+            <div style={{ fontSize: 22, fontWeight: 800, color: peakColor, letterSpacing: '-0.02em', lineHeight: 1 }}>
+              +{fmt(item.peakGainPct, 0)}%
             </div>
-          )}
-        </div>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-        {[
-          { label: 'Signal Price', value: `$${fmt(item.signalPrice)}` },
-          { label: 'Peak Price', value: item.peakPrice ? `$${fmt(item.peakPrice)}` : '—' },
-          { label: 'Float', value: fmtK(item.strengthFactors.floatShares) },
-        ].map(({ label, value }) => (
-          <div key={label} style={{
-            background: 'var(--bg)', borderRadius: 8, padding: '8px 10px',
-            textAlign: 'center',
-          }}>
-            <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 3 }}>{label}</div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-h)' }}>{value}</div>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-          <Pill label={item.strengthFactors.volatility} color={item.strengthFactors.volatility === 'high' ? '#ef4444' : '#f59e0b'} />
-          {item.strengthFactors.wasQuietBefore && <Pill label="quiet before" color="#6366f1" />}
-        </div>
-        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{timeAgo(item.tradingDate)}</span>
+            {item.peakTimestamp && (
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 3 }}>
+                {fmtPeakElapsed(item.tradingDate, item.peakTimestamp)}
+              </div>
+            )}
+          </>
+        ) : (
+          <div style={{ fontSize: 15, fontWeight: 600, color: '#6b7280' }}>—</div>
+        )}
       </div>
     </div>
   );
@@ -475,12 +470,14 @@ function FeedTab() {
       </div>
 
       {loading && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {[...Array(6)].map((_, i) => (
-            <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: 18 }}>
-              <Skeleton height={24} width="60%" />
-              <div style={{ marginTop: 12 }}><Skeleton height={16} /></div>
-              <div style={{ marginTop: 8 }}><Skeleton height={40} /></div>
+            <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <Skeleton height={18} width="30%" />
+                <Skeleton height={13} width="55%" />
+              </div>
+              <Skeleton height={28} width={60} />
             </div>
           ))}
         </div>
@@ -498,7 +495,7 @@ function FeedTab() {
               No signals right now.
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {items.map(item => <FeedCard key={item.id} item={item} onClick={() => setSelected(item)} />)}
             </div>
           )}
