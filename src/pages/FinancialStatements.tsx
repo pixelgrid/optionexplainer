@@ -658,9 +658,9 @@ export function FinancialStatements() {
     if (ticker) { clearCache(PAGE, ticker); search(ticker, apiKey, true); }
   }, [ticker, apiKey, search]);
 
-  const incStmts = data ? (period === 'annual' ? data.incomeAnnual    : data.incomeQuarterly)    : [];
-  const balStmts = data ? (period === 'annual' ? data.balanceAnnual   : data.balanceQuarterly)   : [];
-  const cfStmts  = data ? (period === 'annual' ? data.cashflowAnnual  : data.cashflowQuarterly)  : [];
+  const incStmts = data ? (period === 'annual' ? (data.incomeAnnual    ?? []) : (data.incomeQuarterly    ?? [])) : [];
+  const balStmts = data ? (period === 'annual' ? (data.balanceAnnual   ?? []) : (data.balanceQuarterly   ?? [])) : [];
+  const cfStmts  = data ? (period === 'annual' ? (data.cashflowAnnual  ?? []) : (data.cashflowQuarterly  ?? [])) : [];
 
   // Annual: compare index 0 vs 1 (prior year). Quarterly: compare index 0 vs 4 (same quarter prior year).
   const prevIdx = period === 'quarterly' ? 4 : 1;
