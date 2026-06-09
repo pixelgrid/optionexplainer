@@ -37,7 +37,13 @@ export async function getCached<T>(page: string, ticker: string): Promise<T | nu
     });
     if (!res.ok) return null;
     const json = await res.json();
-    return json.record as T;
+    // JSONBin wraps the stored body in `record`. If the body was accidentally
+    // double-wrapped ({record:{record:{...}}}), unwrap the extra layer.
+    const data = json.record;
+    if (data && typeof data === 'object' && 'record' in data && Object.keys(data).length === 1) {
+      return (data as { record: T }).record;
+    }
+    return data as T;
   } catch {
     return null;
   }
@@ -51,16 +57,17 @@ export async function saveCache<T>(page: string, ticker: string, data: T): Promi
 
   try {
     if (binId) {
+      // JSONBin stores exactly the body you PUT — no wrapper needed
       await fetch(`${JB_BASE}/b/${binId}`, {
         method: 'PUT',
         headers: headers(),
-        body: JSON.stringify({ record: data }),
+        body: JSON.stringify(data),
       });
     } else {
       const res = await fetch(`${JB_BASE}/b`, {
         method: 'POST',
         headers: headers({ 'X-Bin-Name': key }),
-        body: JSON.stringify({ record: data }),
+        body: JSON.stringify(data),
       });
       if (res.ok) {
         const json = await res.json();
