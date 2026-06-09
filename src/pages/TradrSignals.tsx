@@ -63,7 +63,7 @@ interface HistorySignal {
   signalPrice: number;
   peakGainPct: number;
   tradingDate: string;
-  entryTime: string;
+  entryTime?: string | null;
   sector: string;
   industry: string;
   timeToPeakMins: number;
@@ -126,6 +126,19 @@ function timeAgo(iso: string): string {
 
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function isPremarketISO(iso: string): boolean {
+  const d = new Date(iso);
+  const etStr = d.toLocaleTimeString('en-US', { timeZone: 'America/New_York', hour12: false, hour: '2-digit', minute: '2-digit' });
+  const [h, m] = etStr.split(':').map(Number);
+  return h < 9 || (h === 9 && m < 30);
+}
+
+function isPremarketTime(t: string | null | undefined): boolean {
+  if (!t) return false;
+  const [h, m] = t.split(':').map(Number);
+  return h < 9 || (h === 9 && m < 30);
 }
 
 function fmtK(n: number): string {
@@ -372,7 +385,6 @@ function FeedCard({ item, onClick }: { item: FeedItem; onClick: () => void }) {
         background: 'var(--bg-card)', border: '1px solid var(--border)',
         borderRadius: 12, padding: 18, display: 'flex', flexDirection: 'column', gap: 12,
         borderLeft: `3px solid ${sc}`,
-        opacity: item.isActive ? 1 : 0.65,
         cursor: 'pointer',
         transition: 'border-color 0.15s',
       }}
@@ -385,8 +397,8 @@ function FeedCard({ item, onClick }: { item: FeedItem; onClick: () => void }) {
             <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-h)', fontFamily: 'monospace' }}>
               {item.symbol}
             </span>
-            {item.isActive && <Pill label="LIVE" color="#10b981" />}
             {item.tradingHalted && <Pill label="HALTED" color="#ef4444" />}
+            {isPremarketISO(item.tradingDate) && <Pill label="PRE" color="#6366f1" />}
             <Pill label={`S${item.signalStrength}`} color={sc} />
           </div>
           <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>
@@ -436,7 +448,6 @@ function FeedTab() {
   const [items, setItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<'all' | 'active'>('active');
   const [selected, setSelected] = useState<FeedItem | null>(null);
 
   const load = useCallback(async () => {
@@ -453,24 +464,11 @@ function FeedTab() {
 
   useEffect(() => { load(); }, [load]);
 
-  const visible = filter === 'active' ? items.filter(i => i.isActive) : items;
-
   return (
     <div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, alignItems: 'center', flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Show:</span>
-        {(['active', 'all'] as const).map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{
-            background: filter === f ? '#6366f1' : 'var(--bg-card)',
-            border: `1px solid ${filter === f ? '#6366f1' : 'var(--border)'}`,
-            color: filter === f ? '#fff' : 'var(--text-muted)',
-            borderRadius: 8, padding: '5px 14px', fontSize: 13, cursor: 'pointer',
-          }}>
-            {f === 'active' ? 'Live only' : `All (${items.length})`}
-          </button>
-        ))}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
         <button onClick={load} style={{
-          marginLeft: 'auto', background: 'none', border: '1px solid var(--border)',
+          background: 'none', border: '1px solid var(--border)',
           color: 'var(--text-muted)', borderRadius: 8, padding: '5px 12px',
           fontSize: 13, cursor: 'pointer',
         }}>↻ Refresh</button>
@@ -493,16 +491,15 @@ function FeedTab() {
       {!loading && !error && (
         <>
           <div style={{ marginBottom: 12, fontSize: 13, color: 'var(--text-muted)' }}>
-            {visible.length} signal{visible.length !== 1 ? 's' : ''}
-            {filter === 'active' && items.length > 0 && ` of ${items.length} total`}
+            {items.length} signal{items.length !== 1 ? 's' : ''}
           </div>
-          {visible.length === 0 ? (
+          {items.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
-              No {filter === 'active' ? 'live ' : ''}signals right now.
+              No signals right now.
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
-              {visible.map(item => <FeedCard key={item.id} item={item} onClick={() => setSelected(item)} />)}
+              {items.map(item => <FeedCard key={item.id} item={item} onClick={() => setSelected(item)} />)}
             </div>
           )}
         </>
@@ -650,24 +647,105 @@ function NewsTab() {
 
 // ── History Tab ────────────────────────────────────────────────────────────
 
-function HistoryRow({ sig }: { sig: HistorySignal }) {
-  const color = sig.peakGainPct > 50 ? '#10b981' : sig.peakGainPct > 10 ? '#f59e0b' : '#6366f1';
+function gainColor(pct: number): string {
+  if (pct >= 50) return '#f59e0b';
+  if (pct >= 10) return '#10b981';
+  return '#6b7280';
+}
+
+function fmtPeakTime(mins: number): string {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return h > 0 ? `PEAK IN ${h}H ${m}M` : `PEAK IN ${m}M`;
+}
+
+function fmtEntryTime(t: string | null | undefined): { time: string; ampm: string } {
+  if (!t) return { time: '--:--', ampm: '' };
+  // entryTime is "HH:MM:SS"
+  const parts = t.split(':');
+  const h = parseInt(parts[0], 10);
+  const m = parts[1] ?? '00';
+  if (isNaN(h)) return { time: '--:--', ampm: '' };
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const hour = (h % 12 || 12).toString().padStart(2, '0');
+  return { time: `${hour}:${m}`, ampm };
+}
+
+function fmtDayHeader(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-US', {
+    weekday: 'long', month: 'short', day: 'numeric',
+  }).toUpperCase();
+}
+
+function dateKey(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-CA'); // YYYY-MM-DD
+}
+
+function groupByDate(signals: HistorySignal[]): { key: string; label: string; items: HistorySignal[] }[] {
+  const map = new Map<string, HistorySignal[]>();
+  for (const s of signals) {
+    const k = dateKey(s.tradingDate);
+    if (!map.has(k)) map.set(k, []);
+    map.get(k)!.push(s);
+  }
+  return Array.from(map.entries())
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([key, items]) => ({ key, label: fmtDayHeader(items[0].tradingDate), items }));
+}
+
+function HistoryRow({ sig, isLast }: { sig: HistorySignal; isLast: boolean }) {
+  const color = gainColor(sig.peakGainPct);
+  const entry = fmtEntryTime(sig.entryTime ?? sig.tradingDate);
+  const showPeak = sig.timeToPeakMins > 0;
+  const premarket = isPremarketTime(sig.entryTime);
+
   return (
     <div style={{
-      display: 'grid',
-      gridTemplateColumns: '80px 1fr 80px 80px 100px',
-      gap: 12, alignItems: 'center',
-      padding: '10px 16px',
-      borderBottom: '1px solid var(--border)',
-      fontSize: 13,
+      display: 'flex', alignItems: 'center', gap: 14,
+      padding: '14px 16px',
+      borderBottom: isLast ? 'none' : '1px solid #1e2128',
     }}>
-      <span style={{ fontWeight: 700, color: 'var(--text-h)', fontFamily: 'monospace' }}>{sig.symbol}</span>
-      <span style={{ color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {sig.sector || sig.companyName}
-      </span>
-      <span style={{ color, fontWeight: 700 }}>+{fmt(sig.peakGainPct)}%</span>
-      <span style={{ color: 'var(--text-muted)' }}>{sig.timeToPeakMins}m</span>
-      <span style={{ color: 'var(--text-muted)' }}>{fmtDate(sig.tradingDate)}</span>
+      {/* Time box */}
+      <div style={{
+        minWidth: 52, background: '#1a1d24', borderRadius: 8,
+        padding: '6px 8px', textAlign: 'center', flexShrink: 0,
+      }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-h)', lineHeight: 1.2 }}>{entry.time}</div>
+        <div style={{ fontSize: 10, color: '#6b7280', marginTop: 1 }}>{entry.ampm}</div>
+      </div>
+
+      {/* Symbol + price */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-h)', fontFamily: 'monospace', letterSpacing: '-0.01em' }}>
+            {sig.symbol}
+          </span>
+          {premarket && (
+            <span style={{
+              background: '#6366f122', color: '#818cf8', border: '1px solid #6366f144',
+              borderRadius: 4, padding: '1px 6px', fontSize: 10, fontWeight: 700,
+            }}>PRE</span>
+          )}
+        </div>
+        <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>${fmt(sig.signalPrice)}</div>
+      </div>
+
+      {/* Gain + peak badge */}
+      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+        <div style={{ fontSize: 18, fontWeight: 800, color, letterSpacing: '-0.02em' }}>
+          +{fmt(sig.peakGainPct, 0)}%
+        </div>
+        {showPeak && (
+          <div style={{
+            marginTop: 5,
+            background: '#1a1d24', border: '1px solid #2a2d35',
+            borderRadius: 6, padding: '3px 8px',
+            fontSize: 10, fontWeight: 700, color: '#9ca3af', letterSpacing: '0.04em',
+          }}>
+            {fmtPeakTime(sig.timeToPeakMins)}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -676,7 +754,6 @@ function HistoryTab() {
   const [signals, setSignals] = useState<HistorySignal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [sort, setSort] = useState<'date' | 'gain'>('date');
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
@@ -692,40 +769,30 @@ function HistoryTab() {
 
   useEffect(() => { load(); }, [load]);
 
-  const sorted = [...signals].sort((a, b) =>
-    sort === 'gain'
-      ? b.peakGainPct - a.peakGainPct
-      : new Date(b.tradingDate).getTime() - new Date(a.tradingDate).getTime()
-  );
+  const groups = groupByDate(signals);
 
   return (
-    <div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, alignItems: 'center' }}>
-        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Sort:</span>
-        {(['date', 'gain'] as const).map(s => (
-          <button key={s} onClick={() => setSort(s)} style={{
-            background: sort === s ? '#6366f1' : 'var(--bg-card)',
-            border: `1px solid ${sort === s ? '#6366f1' : 'var(--border)'}`,
-            color: sort === s ? '#fff' : 'var(--text-muted)',
-            borderRadius: 8, padding: '5px 14px', fontSize: 13, cursor: 'pointer',
-          }}>
-            {s === 'date' ? 'Latest' : 'Best gain'}
-          </button>
-        ))}
-        <button onClick={load} style={{
-          marginLeft: 'auto', background: 'none', border: '1px solid var(--border)',
-          color: 'var(--text-muted)', borderRadius: 8, padding: '5px 12px',
-          fontSize: 13, cursor: 'pointer',
-        }}>↻ Refresh</button>
-      </div>
-
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
       {loading && (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12 }}>
-          {[...Array(8)].map((_, i) => (
-            <div key={i} style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', gap: 12 }}>
-              <Skeleton width={80} height={16} />
-              <Skeleton height={16} />
-              <Skeleton width={60} height={16} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+          {[...Array(2)].map((_, gi) => (
+            <div key={gi}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                <Skeleton width={160} height={14} />
+                <Skeleton width={60} height={14} />
+              </div>
+              <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 14 }}>
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 14, padding: '14px 16px', borderBottom: i < 3 ? '1px solid #1e2128' : 'none' }}>
+                    <Skeleton width={52} height={40} />
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <Skeleton width="40%" height={16} />
+                      <Skeleton width="20%" height={12} />
+                    </div>
+                    <Skeleton width={60} height={20} />
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
@@ -733,23 +800,25 @@ function HistoryTab() {
 
       {error && <ErrorBox message={error} onRetry={load} />}
 
-      {!loading && !error && (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
-          <div style={{
-            display: 'grid', gridTemplateColumns: '80px 1fr 80px 80px 100px',
-            gap: 12, padding: '8px 16px',
-            background: 'var(--bg)', borderBottom: '1px solid var(--border)',
-            fontSize: 11, fontWeight: 700, color: 'var(--text-muted)',
-            textTransform: 'uppercase', letterSpacing: '0.06em',
-          }}>
-            <span>Symbol</span><span>Sector</span><span>Peak</span><span>Mins</span><span>Date</span>
-          </div>
-          {sorted.map(s => <HistoryRow key={s.id} sig={s} />)}
-          {sorted.length === 0 && (
-            <div style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--text-muted)' }}>No history.</div>
-          )}
-        </div>
+      {!loading && !error && groups.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>No history.</div>
       )}
+
+      {!loading && !error && groups.map(group => (
+        <div key={group.key}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', letterSpacing: '0.06em' }}>
+              {group.label}
+            </span>
+            <span style={{ fontSize: 12, color: '#6b7280' }}>{group.items.length} signal{group.items.length !== 1 ? 's' : ''}</span>
+          </div>
+          <div style={{ background: '#13151b', border: '1px solid #1e2128', borderRadius: 14, overflow: 'hidden' }}>
+            {group.items.map((sig, i) => (
+              <HistoryRow key={sig.id} sig={sig} isLast={i === group.items.length - 1} />
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -888,7 +957,7 @@ function AnalyticsTab() {
 // ── Page ───────────────────────────────────────────────────────────────────
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'feed', label: 'Live Feed' },
+  { id: 'feed', label: 'Signals' },
   { id: 'news', label: 'News' },
   { id: 'history', label: 'History' },
   { id: 'analytics', label: 'Analytics' },
