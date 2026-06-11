@@ -1,9 +1,83 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 // Stored as base64 — not plain-text-searchable in source control
 const _d = (s: string) => atob(s);
 const _B = _d('aHR0cHM6Ly90cmFkci1iYWNrZW5kLmZseS5kZXY=');
 const _K = _d('dHJhZHItcHJvZC1hM2I2YzlkMmU1ZjhnMWg0aTdqMGszbDZtOW4ybzVwOHExcjRzN3QwdTN2Nnc5eDJ5NXo4YTFiNGM3ZDBlM2Y2ZzloMg==');
+
+// ── Polygon client ─────────────────────────────────────────────────────────
+
+export const LS_POLY_KEY = 'polygon_api_key';
+const LS_POLY_PREFIX = 'poly_mcap_v2_';
+const POLY_CACHE_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days
+const POLY_CALLS_PER_MIN = 5;
+const POLY_WINDOW_MS = 60_000;
+
+interface PolyData {
+  marketCap: number | null;
+  cachedAt: number;
+}
+
+function getPolyCache(symbol: string): PolyData | null {
+  try {
+    const raw = localStorage.getItem(LS_POLY_PREFIX + symbol);
+    if (!raw) return null;
+    const data: PolyData = JSON.parse(raw);
+    if (Date.now() - data.cachedAt > POLY_CACHE_TTL) return null;
+    return data;
+  } catch { return null; }
+}
+
+function setPolyCache(symbol: string, data: PolyData) {
+  try { localStorage.setItem(LS_POLY_PREFIX + symbol, JSON.stringify(data)); } catch { /* quota */ }
+}
+
+// Module-level sliding-window rate limiter (survives re-renders)
+const _polyCallTimes: number[] = [];
+
+async function polyFetch(symbol: string, apiKey: string): Promise<PolyData> {
+  // Cached?
+  const cached = getPolyCache(symbol);
+  if (cached) return cached;
+
+  // Wait for a slot in the 5/min window
+  await new Promise<void>(resolve => {
+    function trySlot() {
+      const now = Date.now();
+      // Drop entries older than 1 minute
+      while (_polyCallTimes.length && now - _polyCallTimes[0] >= POLY_WINDOW_MS) _polyCallTimes.shift();
+      if (_polyCallTimes.length < POLY_CALLS_PER_MIN) {
+        _polyCallTimes.push(now);
+        resolve();
+      } else {
+        const wait = POLY_WINDOW_MS - (now - _polyCallTimes[0]) + 50;
+        setTimeout(trySlot, wait);
+      }
+    }
+    trySlot();
+  });
+
+  const res = await fetch(
+    `https://api.polygon.io/v3/reference/tickers/${encodeURIComponent(symbol)}?apiKey=${encodeURIComponent(apiKey)}`
+  );
+  if (!res.ok) throw new Error(`Polygon ${res.status}`);
+  const json = await res.json();
+  const r = json.results ?? {};
+  const data: PolyData = {
+    marketCap: r.market_cap ?? null,
+    cachedAt: Date.now(),
+  };
+  setPolyCache(symbol, data);
+  return data;
+}
+
+function fmtMcap(v: number | null): string {
+  if (v == null) return '—';
+  if (v >= 1e12) return `$${(v / 1e12).toFixed(2)}T`;
+  if (v >= 1e9)  return `$${(v / 1e9).toFixed(1)}B`;
+  if (v >= 1e6)  return `$${(v / 1e6).toFixed(0)}M`;
+  return `$${v.toFixed(0)}`;
+}
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -244,7 +318,7 @@ function FactorIcon({ status }: { status: string }) {
   );
 }
 
-function SignalModal({ item, onClose }: { item: FeedItem; onClose: () => void }) {
+function SignalModal({ item, onClose, polyData }: { item: FeedItem; onClose: () => void; polyData?: PolyData | null }) {
   const isUp = item.peakGainPct > 0;
   const plColor = isUp ? '#10b981' : item.peakGainPct < 0 ? '#ef4444' : '#9ca3af';
 
@@ -349,6 +423,28 @@ function SignalModal({ item, onClose }: { item: FeedItem; onClose: () => void })
           ))}
         </div>
 
+        {/* Market data from Polygon */}
+        {polyData !== undefined && (
+          <div style={{
+            background: '#1c1f26', border: '1px solid #2a2d35',
+            borderRadius: 14, padding: '16px 20px',
+            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0,
+          }}>
+            <div style={{ textAlign: 'center', borderRight: '1px solid #2a2d35', paddingRight: 16 }}>
+              <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 4 }}>Market Cap</div>
+              <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-h)' }}>
+                {polyData ? fmtMcap(polyData.marketCap) : <span style={{ color: '#4b5563', fontSize: 13 }}>Loading…</span>}
+              </div>
+            </div>
+            <div style={{ textAlign: 'center', paddingLeft: 16 }}>
+              <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 4 }}>Float Shares</div>
+              <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--text-h)' }}>
+                {fmtK(item.strengthFactors.floatShares)}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Signal factors */}
         <div style={{ background: '#1c1f26', border: '1px solid #2a2d35', borderRadius: 14, overflow: 'hidden' }}>
           {FACTOR_ORDER.map((key, i) => {
@@ -383,7 +479,7 @@ function SignalModal({ item, onClose }: { item: FeedItem; onClose: () => void })
 
 // ── Feed Tab ───────────────────────────────────────────────────────────────
 
-function FeedCard({ item, onClick }: { item: FeedItem; onClick: () => void }) {
+function FeedCard({ item, onClick, polyData }: { item: FeedItem; onClick: () => void; polyData?: PolyData | null }) {
   const sc = strengthColor(item.signalStrength);
   const peakColor = item.peakGainPct >= 50 ? '#f59e0b' : item.peakGainPct >= 10 ? '#10b981' : '#6b7280';
 
@@ -414,6 +510,12 @@ function FeedCard({ item, onClick }: { item: FeedItem; onClick: () => void }) {
         <div style={{ display: 'flex', gap: 16, marginTop: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-h)' }}>${fmt(item.signalPrice)}<span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-muted)', marginLeft: 3 }}>entry</span></span>
           <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-h)' }}>{fmtK(item.strengthFactors.floatShares)}<span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-muted)', marginLeft: 3 }}>float</span></span>
+          {polyData !== undefined && (
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-h)' }}>
+              {polyData ? fmtMcap(polyData.marketCap) : <span style={{ color: '#4b5563' }}>…</span>}
+              <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--text-muted)', marginLeft: 3 }}>mcap</span>
+            </span>
+          )}
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{timeAgo(item.tradingDate)}</span>
         </div>
       </div>
@@ -439,11 +541,14 @@ function FeedCard({ item, onClick }: { item: FeedItem; onClick: () => void }) {
   );
 }
 
-function FeedTab() {
+function FeedTab({ polygonKey }: { polygonKey: string }) {
   const [items, setItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<FeedItem | null>(null);
+  // Map of symbol → PolyData (null = still loading, undefined = not started/no key)
+  const [polyMap, setPolyMap] = useState<Map<string, PolyData | null>>(new Map());
+  const fetchedSymbols = useRef<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
@@ -458,6 +563,40 @@ function FeedTab() {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  // Fetch Polygon market cap for all new symbols whenever items or key changes
+  useEffect(() => {
+    if (!polygonKey || items.length === 0) return;
+    const newSymbols = items
+      .map(i => i.symbol)
+      .filter((s, idx, arr) => arr.indexOf(s) === idx) // unique
+      .filter(s => !fetchedSymbols.current.has(s));
+
+    if (newSymbols.length === 0) return;
+
+    // Seed with cached data immediately
+    setPolyMap(prev => {
+      const next = new Map(prev);
+      for (const sym of newSymbols) {
+        const cached = getPolyCache(sym);
+        if (cached) { next.set(sym, cached); fetchedSymbols.current.add(sym); }
+        else { next.set(sym, null); } // null = loading
+      }
+      return next;
+    });
+
+    const uncached = newSymbols.filter(s => !getPolyCache(s));
+    for (const sym of uncached) {
+      fetchedSymbols.current.add(sym);
+      polyFetch(sym, polygonKey)
+        .then(data => setPolyMap(prev => new Map(prev).set(sym, data)))
+        .catch(() => {
+          // On error keep null — don't surface per-symbol Polygon errors in the feed
+        });
+    }
+  }, [items, polygonKey]);
+
+  const hasPolyKey = polygonKey.trim().length > 0;
 
   return (
     <div>
@@ -496,13 +635,26 @@ function FeedTab() {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {items.map(item => <FeedCard key={item.id} item={item} onClick={() => setSelected(item)} />)}
+              {items.map(item => (
+                <FeedCard
+                  key={item.id}
+                  item={item}
+                  onClick={() => setSelected(item)}
+                  polyData={hasPolyKey ? polyMap.get(item.symbol) : undefined}
+                />
+              ))}
             </div>
           )}
         </>
       )}
 
-      {selected && <SignalModal item={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <SignalModal
+          item={selected}
+          onClose={() => setSelected(null)}
+          polyData={hasPolyKey ? polyMap.get(selected.symbol) : undefined}
+        />
+      )}
     </div>
   );
 }
@@ -958,6 +1110,16 @@ const TABS: { id: Tab; label: string }[] = [
 
 export function TradrSignals() {
   const [tab, setTab] = useState<Tab>('feed');
+  const [polyKey, setPolyKey] = useState<string>(() => localStorage.getItem(LS_POLY_KEY) ?? '');
+  const [polyKeyInput, setPolyKeyInput] = useState<string>(() => localStorage.getItem(LS_POLY_KEY) ?? '');
+  const [showPolySettings, setShowPolySettings] = useState(false);
+
+  function savePolyKey() {
+    const trimmed = polyKeyInput.trim();
+    localStorage.setItem(LS_POLY_KEY, trimmed);
+    setPolyKey(trimmed);
+    setShowPolySettings(false);
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
@@ -971,19 +1133,85 @@ export function TradrSignals() {
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 20px 60px' }}>
         {/* Header */}
         <div style={{ marginBottom: 28 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-            <div style={{
-              width: 10, height: 10, borderRadius: '50%', background: '#10b981',
-              boxShadow: '0 0 0 3px #10b98133',
-              animation: 'pulse 2s ease-in-out infinite',
-            }} />
-            <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
-              Trading Signals
-            </h1>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{
+                width: 10, height: 10, borderRadius: '50%', background: '#10b981',
+                boxShadow: '0 0 0 3px #10b98133',
+                animation: 'pulse 2s ease-in-out infinite',
+              }} />
+              <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800, color: 'var(--text-h)', letterSpacing: '-0.02em' }}>
+                Trading Signals
+              </h1>
+            </div>
+            {/* Polygon key toggle */}
+            <button
+              onClick={() => setShowPolySettings(s => !s)}
+              title="Polygon.io API key for market cap data"
+              style={{
+                background: polyKey ? '#6366f111' : 'var(--bg-card)',
+                border: `1px solid ${polyKey ? '#6366f144' : 'var(--border)'}`,
+                color: polyKey ? '#6366f1' : 'var(--text-muted)',
+                borderRadius: 8, padding: '6px 12px',
+                fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0,
+              }}
+            >
+              <span style={{ fontSize: 14 }}>⬡</span>
+              {polyKey ? 'Polygon ✓' : 'Add Polygon key'}
+            </button>
           </div>
           <p style={{ margin: 0, fontSize: 14, color: 'var(--text-muted)' }}>
             Live momentum signals, news, and performance analytics.
           </p>
+
+          {/* Polygon key settings panel */}
+          {showPolySettings && (
+            <div style={{
+              marginTop: 16, background: 'var(--bg-card)', border: '1px solid var(--border)',
+              borderRadius: 12, padding: '16px 18px',
+            }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-h)', marginBottom: 4 }}>
+                Polygon.io API Key
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12, lineHeight: 1.5 }}>
+                Used to fetch market cap &amp; float shares. Free tier allows 5 calls/minute — data is cached locally for 30 days.{' '}
+                <a href="https://polygon.io/dashboard/api-keys" target="_blank" rel="noopener noreferrer" style={{ color: '#6366f1' }}>
+                  Get a free key ↗
+                </a>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  type="password"
+                  placeholder="Paste your Polygon API key…"
+                  value={polyKeyInput}
+                  onChange={e => setPolyKeyInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && savePolyKey()}
+                  style={{
+                    flex: 1, padding: '8px 12px',
+                    background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 8,
+                    color: 'var(--text-h)', fontSize: 13, outline: 'none', fontFamily: 'monospace',
+                  }}
+                />
+                <button
+                  onClick={savePolyKey}
+                  style={{
+                    background: '#6366f1', border: 'none', color: '#fff',
+                    borderRadius: 8, padding: '8px 16px', cursor: 'pointer', fontSize: 13, fontWeight: 600,
+                  }}
+                >Save</button>
+                {polyKey && (
+                  <button
+                    onClick={() => { localStorage.removeItem(LS_POLY_KEY); setPolyKey(''); setPolyKeyInput(''); setShowPolySettings(false); }}
+                    style={{
+                      background: 'none', border: '1px solid #ef444444', color: '#ef4444',
+                      borderRadius: 8, padding: '8px 12px', cursor: 'pointer', fontSize: 13,
+                    }}
+                  >Remove</button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Tabs */}
@@ -1009,7 +1237,7 @@ export function TradrSignals() {
         </div>
 
         {/* Tab content */}
-        {tab === 'feed' && <FeedTab />}
+        {tab === 'feed' && <FeedTab polygonKey={polyKey} />}
         {tab === 'news' && <NewsTab />}
         {tab === 'history' && <HistoryTab />}
         {tab === 'analytics' && <AnalyticsTab />}
