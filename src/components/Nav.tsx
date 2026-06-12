@@ -244,7 +244,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
       zIndex: 40, overflowY: 'auto', borderTop: '1px solid var(--border)', paddingBottom: 24,
     }}>
       {/* Home + Glossary links */}
-      {[{ to: '/', label: 'Home' }, { to: '/glossary', label: 'Options Glossary' }, { to: '/stocks-glossary', label: 'Stock Ratios' }, { to: '/bond-glossary', label: 'Bond Glossary' }].map(({ to, label }) => (
+      {[{ to: '/', label: 'Home' }, { to: '/glossary', label: 'Options Glossary' }, { to: '/stocks-glossary', label: 'Stock Ratios' }, { to: '/bond-glossary', label: 'Bond Glossary' }, { to: '/arbitrage-atlas', label: 'Arb Atlas' }].map(({ to, label }) => (
         <button key={to} onClick={() => go(to)} style={{
           display: 'block', width: '100%', textAlign: 'left',
           padding: '13px 20px', background: 'none', border: 'none',
@@ -338,6 +338,7 @@ export function Nav() {
           <NavLink to="/glossary" style={linkStyle}>Options Glossary</NavLink>
           <NavLink to="/stocks-glossary" style={linkStyle}>Stock Ratios</NavLink>
           <NavLink to="/bond-glossary" style={linkStyle}>Bond Glossary</NavLink>
+          <NavLink to="/arbitrage-atlas" style={linkStyle}>Arb Atlas</NavLink>
           {NAV_SECTIONS.map(s => <Dropdown key={s.id} section={s} />)}
           <ThemeToggle />
         </div>
